@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
  
 setup(name='rfcx',
-      version='0.0.2',
+      version='0.0.3',
       url='https://github.com/rfcx/rfcx-sdk-python',
       license='None',
       author='Antony Harfield',
@@ -15,4 +15,6 @@ setup(name='rfcx',
         'Intended Audience :: Science/Research',
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
-      ])
+      ],
+      test_suite='nose.collector',
+      tests_require=['nose'])

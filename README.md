@@ -6,9 +6,15 @@ TODO: Explain how to use this package...
 
 ## Development
 
+Running tests:
+
+`python setup.py test`
+
+
 If you want to use docker to create a separate environment for packaging then try:
 
 `docker run -it --rm -v "$PWD":/app -w /app tensorflow/tensorflow:latest-py3 bash`
+
 
 ### Packaging
 
