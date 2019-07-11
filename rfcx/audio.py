@@ -23,7 +23,7 @@ def csv_download(destination_path, csv_file_name, audio_extension='.opus'):
     if not os.path.isfile(csv_file_name):
         raise Exception('No "{}" file in this directory.'.format(csv_file_name))
     if audio_extension not in ['.opus', '.wav', '.json', '.png']:
-        raise Exception('Audio extension should be .opus, .wav, .json, or .png. Not accept: {}'.format(audio_extension))
+        raise Exception('Audio extension should be opus, wav, json, or png. Not accept: {}'.format(audio_extension))
 
     csv_input = pd.read_csv(csv_file_name).values
     for i in csv_input:
