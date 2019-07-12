@@ -4,12 +4,19 @@
 
 TODO: Explain how to use this package...
 
+Build a docker image
+
+`docker build rfcx-sdk-python .`
+
+and run the example
+
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python python example.py`
+
 ## Development
 
 Running tests:
 
 `python setup.py test`
-
 
 If you want to use docker to create a separate environment for packaging then try:
 
