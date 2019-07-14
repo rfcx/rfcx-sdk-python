@@ -1,4 +1,4 @@
 name = "rfcx"
 
-from .client import login
+from .client import Client
 from .audio import csv_download

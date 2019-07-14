@@ -1,38 +1,43 @@
-import base64
-import hashlib
-import secrets
 import getpass
 import rfcx._pkce as pkce
 import rfcx._api as api
+from rfcx._credentials import Credentials
 
-def login():
+class Client(object):
+    """Authenticate and perform requests against the RFCx platform"""
 
-    # https://auth0.com/docs/integrations/using-auth0-to-secure-a-cli
+    def __init__(self):
+        self.credentials = None
 
-    # Create a Code Verifier & Challenge
-    random = secrets.token_bytes(64)
-    code_verifier = base64.b64encode(random, b'-_').decode().replace('=', '')
-    # code_verifier = pkce.code_verifier()
-    # code_challenge = pkce.code_challenge(code_verifier)
+    def authenticate(self):
+        """Authenticate an RFCx user to obtain a token
 
-    m = hashlib.sha256()
-    m.update(code_verifier.encode())
-    d = m.digest()
-    code_challenge = base64.b64encode(d, b'-_').decode().replace('=', '')
+        Returns:
+            Success if an access_token was obtained
+        """
 
-    url = 'https://auth.rfcx.org/authorize?response_type=code&code_challenge={0}&code_challenge_method=S256&client_id={1}&redirect_uri={2}&audience=https://rfcx.org&scope={3}'
-    client_id = 'LS4dJlP8J2iOBr2snzm6N8I5u7FLSUGd'
-    redirect_uri = 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html'
-    scope = 'openid%20profile'
+        if self.credentials != None:
+            print('Already authenticated')
+            return
 
-    print('Go to this URL in a browser: ' + url.format(code_challenge, client_id, redirect_uri, scope))
-    
-    code = getpass.getpass('Enter your authorization code: ')
-    # gcloud_process.communicate(code.strip())
+        # Create a Code Verifier & Challenge
+        code_verifier = pkce.code_verifier()
+        code_challenge = pkce.code_challenge(code_verifier)
 
-    access_token, refresh_token, token_expiry, id_token = api.authcode_exchange(code, code_verifier, client_id, scope)
+        # See: https://auth0.com/docs/integrations/using-auth0-to-secure-a-cli
+        url = 'https://auth.rfcx.org/authorize?response_type=code&code_challenge={0}&code_challenge_method=S256&client_id={1}&redirect_uri={2}&audience=https://rfcx.org&scope={3}'
+        client_id = 'LS4dJlP8J2iOBr2snzm6N8I5u7FLSUGd'
+        redirect_uri = 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html'
+        scope = 'openid%20profile'
 
-    print('ACCESS TOKEN:')
-    print(access_token)
-    print('ID TOKEN:')
-    print(id_token)
+        # Prompt the user to open their browser. On completion, paste the auth code.
+        print('Go to this URL in a browser: ' + url.format(code_challenge, client_id, redirect_uri, scope))
+        code = getpass.getpass('Enter your authorization code: ')
+
+        # Perform the exchange
+        access_token, refresh_token, token_expiry, id_token = api.authcode_exchange(code.strip(), code_verifier, client_id, scope)
+
+        # Store the result in credentials
+        self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
+        print('ID TOKEN:')
+        print(self.credentials.id_object)

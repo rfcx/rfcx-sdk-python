@@ -20,6 +20,7 @@ See RFC7636.
 
 import base64
 import hashlib
+import secrets
 import os
 
 
@@ -34,15 +35,13 @@ def code_verifier(n_bytes=64):
     Returns:
         Bytestring, representing urlsafe base64-encoded random data.
     """
-    verifier = base64.urlsafe_b64encode(os.urandom(n_bytes)).rstrip(b'=')
-    # https://tools.ietf.org/html/rfc7636#section-4.1
-    # minimum length of 43 characters and a maximum length of 128 characters.
-    if len(verifier) < 43:
+    if n_bytes < 31:
         raise ValueError("Verifier too short. n_bytes must be > 30.")
-    elif len(verifier) > 128:
+    if n_bytes > 96:
         raise ValueError("Verifier too long. n_bytes must be < 97.")
-    else:
-        return verifier
+
+    random = secrets.token_bytes(n_bytes)
+    return base64.urlsafe_b64encode(random).decode().rstrip('=')
 
 
 def code_challenge(verifier):
@@ -57,5 +56,6 @@ def code_challenge(verifier):
         Bytestring, representing a urlsafe base64-encoded sha256 hash digest,
             without '=' padding.
     """
-    digest = hashlib.sha256(verifier).digest()
-    return base64.urlsafe_b64encode(digest).rstrip(b'=')
+    m = hashlib.sha256()
+    m.update(verifier.encode())
+    return base64.urlsafe_b64encode(m.digest()).decode().rstrip('=')

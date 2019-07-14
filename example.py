@@ -1,3 +1,4 @@
 import rfcx
 
-rfcx.client.login()
+client = rfcx.Client()
+client.authenticate()

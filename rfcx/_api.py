@@ -60,14 +60,12 @@ def authcode_exchange(code, code_verifier, client_id, scope):
             delta = datetime.timedelta(seconds=int(d['expires_in']))
             token_expiry = delta + datetime.datetime.utcnow()
 
-        extracted_id_token = None
         id_token_jwt = None
         if 'id_token' in d:
-            extracted_id_token = _extract_id_token(d['id_token'])
             id_token_jwt = d['id_token']
 
         logger.info('Successfully retrieved access token')
-        return access_token, refresh_token, token_expiry, extracted_id_token #id_token_jwt, d
+        return access_token, refresh_token, token_expiry, id_token_jwt
     else:
         logger.info('Failed to retrieve access token: %s', content)
         if 'error' in d:
@@ -92,21 +90,4 @@ def _parse_exchange_token_response(content):
     resp = json.loads(content)
     return resp
 
-def _extract_id_token(id_token):
-    """Extract the JSON payload from a JWT.
-    Does the extraction w/o checking the signature.
-    Args:
-        id_token: string or bytestring, OAuth 2.0 id_token.
-    Returns:
-        object, The deserialized JSON payload.
-    """
-    if type(id_token) == bytes:
-        segments = id_token.split(b'.')
-    else:
-        segments = id_token.split(u'.')
 
-    if len(segments) != 3:
-        raise VerifyJwtTokenError(
-            'Wrong number of segments in token: {0}'.format(id_token))
-
-    return json.loads(helper._urlsafe_b64decode(segments[1]))
