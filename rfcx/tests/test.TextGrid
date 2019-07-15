@@ -1,0 +1,44 @@
+File type = 'ooTextFile'
+Object class = 'TextGrid'
+
+xmin = 0
+xmax = 90
+tiers? <exists>
+size = 1
+item []:
+    item [1]:
+      class = 'IntervalTier'
+      name = 'e56138b0-52e3-4f5b-adaa-1dd47d2909c4'
+      xmin = 0
+      xmax = 90
+      intervals: size = '5'
+      intervals [1]:
+        xmin: 43.018
+        xmax: 43.819
+        ymin: 1260
+        ymax: 6060
+        text: spider_monkey_generic
+      intervals [2]:
+        xmin: 44.086
+        xmax: 44.799
+        ymin: 1740
+        ymax: 4620
+        text: spider_monkey_generic
+      intervals [3]:
+        xmin: 45.155
+        xmax: 45.778
+        ymin: 1069
+        ymax: 8173
+        text: spider_monkey_generic
+      intervals [4]:
+        xmin: 46.134
+        xmax: 46.936
+        ymin: 972
+        ymax: 5388
+        text: spider_monkey_generic
+      intervals [5]:
+        xmin: 47.203
+        xmax: 48.005
+        ymin: 1164
+        ymax: 4236
+        text: spider_monkey_generic
