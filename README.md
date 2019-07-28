@@ -74,3 +74,11 @@ Better test:
 - Result should be:
     ![Example in colab](docs/images/package-test-colab.png?raw=true)
 
+
+### Building documentation
+
+The documentation is generated from docstrings in the source code. To generate
+it, run:
+
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --output-dir dist/docs rfcx"`
+
