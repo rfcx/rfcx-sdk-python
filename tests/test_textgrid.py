@@ -5,7 +5,7 @@ import rfcx
 class TextGridTests(TestCase):
     def test_can_get_intervals(self):
         # Arrange
-        filename = 'rfcx/tests/test.TextGrid'
+        filename = 'tests/test.TextGrid'
         # Act
         tg = rfcx.TextGrid.fromFile(filename)
         # Assert

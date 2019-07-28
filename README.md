@@ -53,6 +53,12 @@ Enter your username and password.
 
 ### Testing
 
+#### Unit tests
+
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python python setup.py test`
+
+#### Package tests
+
 Simple test: `pip install --no-deps rfcx`
 
 Better test:
