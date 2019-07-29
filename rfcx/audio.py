@@ -2,7 +2,10 @@ import pandas as pd
 import urllib.request
 import shutil
 import os    
-import csv 
+import csv
+import rfcx 
+import math
+import librosa
 from pydub import AudioSegment
 
 def csv_download(destination_path, csv_file_name, audio_extension='.opus'):
@@ -30,7 +33,7 @@ def csv_download(destination_path, csv_file_name, audio_extension='.opus'):
     for i in csv_input:
         raw_name = ''.join(i)                         
         audio_id = (os.path.splitext(os.path.basename(raw_name))[0])  
-        __save_audio_file(destination_path, audio_id, audio_extension)
+        save_audio_file(destination_path, audio_id, audio_extension)
 
 def csv_slice_audio(csv_file_name):
     """ Read csv file for cutting audio.
@@ -49,7 +52,31 @@ def csv_slice_audio(csv_file_name):
     with open(csv_file_name, 'r') as f:
         reader = csv.reader(f)
         audio_info_list = list(reader)
-    for info in audio_info_list:
+    __slice_audio(audio_info_list)     
+
+def praat_slice_audio(praat_file_name):
+    """ Read praat file for cutting audio.
+        Args:
+            praat_file_name: Name of the praat file using for cut audio.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+            FileNotFoundError: if missing required audio file.
+    """
+    anno_info = list()
+    tg = rfcx.TextGrid.fromFile(praat_file_name, strict=False)
+    intervals = tg[0]
+    audio_id = intervals.name
+    for interval in intervals:
+        anno_info.append([audio_id, math.floor(interval.minTime), math.ceil(interval.maxTime), interval.mark])
+    __slice_audio(anno_info)
+
+def __slice_audio(audio_list):
+    count = 0
+    for info in audio_list:
         audio_id = info[0]
         start = int(info[1]) * 1000
         stop = int(info[2]) * 1000
@@ -57,11 +84,11 @@ def csv_slice_audio(csv_file_name):
         if not os.path.exists(label):  
             os.mkdir(label)
             print('Success create {} directory'.format(label))
-        newAudio = AudioSegment.from_wav(audio_id + '.wav')
-        newAudio = newAudio[start:stop]
+        audio = AudioSegment.from_wav(audio_id + '.wav')
+        newAudio = audio[start:stop]
         newAudio.export('{}\\{}.{}.wav'.format(label, audio_id, count), format="wav")
         print('File {}.{}.wav saved to {}'.format(audio_id, count, label))
-        count = count + 1        
+        count = count + 1
 
 def __save_file(url, local_path):
     """ Download the file from `url` and save it locally under `local_path` """
@@ -72,7 +99,7 @@ def __local_audio_file_path(path, audio_id, audio_extension):
     """ Create string for the name and the path """    
     return path + '/' + audio_id + "." + audio_extension
 
-def __save_audio_file(destination_path, audio_id, source_audio_extension):
+def save_audio_file(destination_path, audio_id, source_audio_extension):
     """ Prepare `url` and `local_path` and save it using function `__save_file` """
     url = "https://assets.rfcx.org/audio/" + audio_id + "." + source_audio_extension
     local_path = __local_audio_file_path(destination_path, audio_id, source_audio_extension)
