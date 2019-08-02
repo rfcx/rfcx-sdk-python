@@ -48,7 +48,6 @@ def csv_slice_audio(csv_file_name):
             FileNotFoundError: if missing required audio file.
     """
     audio_info_list = list()
-    count = 0
     with open(csv_file_name, 'r') as f:
         reader = csv.reader(f)
         audio_info_list = list(reader)
@@ -99,8 +98,20 @@ def __local_audio_file_path(path, audio_id, audio_extension):
     """ Create string for the name and the path """    
     return path + '/' + audio_id + "." + audio_extension
 
-def save_audio_file(destination_path, audio_id, source_audio_extension):
-    """ Prepare `url` and `local_path` and save it using function `__save_file` """
+def save_audio_file(destination_path, audio_id, source_audio_extension='.opus'):
+    """ Prepare `url` and `local_path` and save it using function `__save_file` 
+        Args:
+            destination_path: Path to the save directory.
+            audio_id: RFCx audio id.
+            source_audio_extension: (optional, default= '.opus') Extension for saving audio files.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+    
+    """
     url = "https://assets.rfcx.org/audio/" + audio_id + "." + source_audio_extension
     local_path = __local_audio_file_path(destination_path, audio_id, source_audio_extension)
     __save_file(url, local_path)
