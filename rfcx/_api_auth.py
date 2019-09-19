@@ -89,5 +89,3 @@ def _parse_exchange_token_response(content):
     """
     resp = json.loads(content)
     return resp
-
-

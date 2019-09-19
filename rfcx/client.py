@@ -1,5 +1,6 @@
 import getpass
 import rfcx._pkce as pkce
+import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
 from rfcx._credentials import Credentials
 
@@ -27,7 +28,7 @@ class Client(object):
         # See: https://auth0.com/docs/integrations/using-auth0-to-secure-a-cli
         url = 'https://auth.rfcx.org/authorize?response_type=code&code_challenge={0}&code_challenge_method=S256&client_id={1}&redirect_uri={2}&audience=https://rfcx.org&scope={3}'
         client_id = 'LS4dJlP8J2iOBr2snzm6N8I5u7FLSUGd'
-        redirect_uri = 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html'
+        redirect_uri = 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html' # TODO move to configuration
         scope = 'openid%20profile'
 
         # Prompt the user to open their browser. On completion, paste the auth code.
@@ -40,3 +41,28 @@ class Client(object):
         # Store the result in credentials
         self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
         print('Successfully authenticated')
+
+
+    def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
+        """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
+        
+        Args:
+            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirned, or inference:rejected
+            labels: List of labels. If None then returns tags of any label.
+            start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 1 month ago.
+            end: Maximum timestamp of the annotations. If None then defaults to now.
+            sites: List of sites by shortname. If None then returns tags from any site.
+            limit: Maximum results to return. Defaults to 1000. (TODO check if there is an upper limit on the API)
+
+        Returns:
+            List of tags
+        """
+        if self.credentials == None:
+            print('Not authenticated')
+            return
+
+        if type not in ['annotation', 'inference', 'inference:confirned', 'inference:rejected']:
+            print('Unrecognized type')
+            return
+
+        return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
