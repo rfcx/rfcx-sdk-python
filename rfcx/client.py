@@ -1,6 +1,6 @@
 import getpass
 import rfcx._pkce as pkce
-import rfcx._api as api
+import rfcx._api_auth as api_auth
 from rfcx._credentials import Credentials
 
 class Client(object):
@@ -35,9 +35,8 @@ class Client(object):
         code = getpass.getpass('Enter your authorization code: ')
 
         # Perform the exchange
-        access_token, refresh_token, token_expiry, id_token = api.authcode_exchange(code.strip(), code_verifier, client_id, scope)
+        access_token, refresh_token, token_expiry, id_token = api_auth.authcode_exchange(code.strip(), code_verifier, client_id, scope)
 
         # Store the result in credentials
         self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
-        print('ID TOKEN:')
-        print(self.credentials.id_object)
+        print('Successfully authenticated')
