@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.3" />
+<title>rfcx.audio API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>rfcx.audio</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">import pandas as pd
+import urllib.request
+import shutil
+import os    
+import csv
+import rfcx 
+import math
+import json
+from operator import itemgetter
+from pydub import AudioSegment
+
+def csv_download(destination_path, csv_file_name, audio_extension=&#39;opus&#39;):
+    &#34;&#34;&#34; Read csv file for downloading audio from RFCx in user format supported: wav, opus, png, etc.
+        Args:
+            destination_path: Path to the save directory.
+            csv_file_name: Name of the csv file using for download audio.
+            audio_extension: (optional, default= &#39;.opus&#39;) Extension for saving audio files.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+    &#34;&#34;&#34;
+
+    if not os.path.exists(destination_path):  
+        raise Exception(&#39;No &#34;{}&#34; directory in current path.&#39;.format(destination_path))
+    if not os.path.isfile(csv_file_name):
+        raise Exception(&#39;No &#34;{}&#34; file in current path.&#39;.format(csv_file_name))
+    if audio_extension not in [&#39;opus&#39;, &#39;wav&#39;, &#39;json&#39;, &#39;png&#39;]:
+        raise Exception(&#39;Audio extension should be opus, wav, json, or png. Not accept: {}&#39;.format(audio_extension))
+
+    csv_input = pd.read_csv(csv_file_name, header=None).values
+    for i in csv_input:
+        raw_name = &#39;&#39;.join(i)                         
+        audio_id = (os.path.splitext(os.path.basename(raw_name))[0])  
+        save_audio_file(destination_path, audio_id, audio_extension)
+
+def csv_slice_audio(save_path, csv_file_name, slice_second=2):
+    &#34;&#34;&#34; Read csv file for cutting audio.
+        Args:
+            csv_file_name: Name of the csv file using for cut audio.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+            FileNotFoundError: if missing required audio file.
+    &#34;&#34;&#34;
+    audio_info_list = list()
+    with open(csv_file_name, &#39;r&#39;) as f:
+        reader = csv.reader(f)
+        audio_info_list = list(reader)
+    for info in audio_info_list:
+        audio_id = info[0]
+        info[1] = int(info[1])
+        info[2] = int(info[2])
+    full_duration = math.floor(librosa.get_duration(filename=audio_id + &#39;.wav&#39;))
+    __slice_audio(save_path, audio_info_list, full_duration, slice_second)     
+
+def praat_slice_audio(save_path, praat_file_name, slice_second=2):
+    &#34;&#34;&#34; Read praat file for cutting audio.
+        Args:
+            praat_file_name: Name of the praat file using for cut audio.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+            FileNotFoundError: if missing required audio file.
+    &#34;&#34;&#34;
+    audio_info_list = list()
+    tg = rfcx.TextGrid.fromFile(praat_file_name, strict=False)
+    intervals = tg[0]
+    audio_id = intervals.name
+    for interval in intervals:
+        audio_info_list.append([audio_id, math.floor(interval.minTime), math.ceil(interval.maxTime), interval.mark])
+   
+    for info in audio_info_list:
+        audio_id = info[0]
+        info[1] = int(info[1])
+        info[2] = int(info[2])
+
+    full_duration = math.floor(librosa.get_duration(filename=audio_id + &#39;.wav&#39;))
+    __slice_audio(save_path, audio_info_list, full_duration, slice_second)
+
+def __slice_audio(save_path, audio_list, full_duration, slice_second):
+    count = 0
+    audio_save_path = save_path
+    full_info = __get_audio_info(audio_list, full_duration)
+
+    if not os.path.exists(audio_save_path):
+        os.mkdir(audio_save_path)
+        print(&#34;Create {} directory&#34;.format(audio_save_path))
+
+    for info in full_info:
+        audio_id, x1, x2, label = info
+        duration = x2-x1
+        audio = AudioSegment.from_wav(audio_id + &#34;.wav&#34;)
+
+        if not os.path.exists(&#39;{}/{}&#39;.format(audio_save_path, label)):
+            os.mkdir(&#39;{}/{}&#39;.format(audio_save_path, label))
+            print(&#34;Create {} directory in {} directory&#34;.format(label, audio_save_path))
+        if(duration &lt; slice_second):
+            start = x1 * 1000
+            stop = x2 * 1000
+            audio = audio[start:stop] * slice_second
+            duration = int(audio.duration_seconds)
+            x1 = 0
+        for i in range(duration-1):
+            count = count + 1
+            start = (x1+i) * 1000
+            stop = (x1+(i+2)) * 1000
+            print(start, stop, audio.duration_seconds, label)
+            audioFragment = audio[start:stop]
+            audioFragment.export(&#39;{}/{}/{}.{}.wav&#39;.format(audio_save_path, label, audio_id, count), format=&#34;wav&#34;)
+            print(&#39;File {}.{}.wav saved to {}&#39;.format(audio_id, count, label))
+    count = 0
+
+
+def __save_file(url, local_path):
+    &#34;&#34;&#34; Download the file from `url` and save it locally under `local_path` &#34;&#34;&#34;
+    with urllib.request.urlopen(url) as response, open(local_path, &#39;wb&#39;) as out_file:
+        shutil.copyfileobj(response, out_file)
+
+def __local_audio_file_path(path, audio_id, audio_extension):
+    &#34;&#34;&#34; Create string for the name and the path &#34;&#34;&#34;    
+    return path + &#39;/&#39; + audio_id + &#34;.&#34; + audio_extension
+
+def save_audio_file(destination_path, audio_id, source_audio_extension=&#39;opus&#39;):
+    &#34;&#34;&#34; Prepare `url` and `local_path` and save it using function `__save_file` 
+        Args:
+            destination_path: Path to the save directory.
+            audio_id: RFCx audio id.
+            source_audio_extension: (optional, default= &#39;.opus&#39;) Extension for saving audio files.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+    
+    &#34;&#34;&#34;
+    url = &#34;https://assets.rfcx.org/audio/&#34; + audio_id + &#34;.&#34; + source_audio_extension
+    print(url)
+    local_path = __local_audio_file_path(destination_path, audio_id, source_audio_extension)
+    __save_file(url, local_path)
+    print(&#39;File {}.{} saved to {}&#39;.format(audio_id, source_audio_extension, destination_path))
+
+def __get_environment_info(audio_annotated_info, audio_full_duration):
+    audio_envirnoment_info = list()
+    audio_id = audio_annotated_info[0][0]
+
+    if len(audio_annotated_info) == 1:
+        audio_envirnoment_info.append([audio_id, 0, audio_full_duration, &#34;environment&#34;])
+        return audio_envirnoment_info
+
+    start_env_time = 0
+    stop_env_time = 0
+
+    for i in range(len(audio_annotated_info)):
+        # Check if the start of annotated is 0 or not
+        if(audio_annotated_info[0][1] == 0):
+            start_env_time = audio_annotated_info[i][2]
+            # Check if it is the last sub info or not
+            if(i &lt; len(audio_annotated_info)-1):
+                stop_env_time = audio_annotated_info[i+1][1]
+                # In case start time and stop time is the same ex. 2,5 5,6
+                if(start_env_time &lt; stop_env_time):
+                    audio_envirnoment_info.append([audio_id, start_env_time, stop_env_time, &#34;environment&#34;])
+            else:
+                # Check if the last sub info is equal to the full duration or not
+                if(audio_annotated_info[-1][2] &lt; audio_full_duration):
+                    start_env_time = audio_annotated_info[i][2]
+                    stop_env_time = audio_full_duration
+                    if(start_env_time &lt; stop_env_time):
+                        audio_envirnoment_info.append([audio_id, start_env_time, stop_env_time, &#34;environment&#34;])
+        
+        else:  
+            stop_env_time = audio_annotated_info[i][1]
+            if(start_env_time &lt; stop_env_time):
+                audio_envirnoment_info.append([audio_id, start_env_time, stop_env_time, &#34;environment&#34;])
+            start_env_time = audio_annotated_info[i][2]
+            if(i == len(audio_annotated_info)-1):
+                if(audio_annotated_info[-1][2] &lt; audio_full_duration):
+                    start_env_time = audio_annotated_info[i][2]
+                    stop_env_time = audio_full_duration
+                    if(start_env_time &lt; stop_env_time):
+                        audio_envirnoment_info.append([audio_id, start_env_time, stop_env_time, &#34;environment&#34;])
+    return audio_envirnoment_info
+
+def __get_audio_info(audio_annotated_list, audio_full_duration):
+    audio_environment_list = __get_environment_info(audio_annotated_list, audio_full_duration)
+    full_information_list = sorted(audio_annotated_list + audio_environment_list, key=itemgetter(1))
+    return full_information_list</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="rfcx.audio.csv_download"><code class="name flex">
+<span>def <span class="ident">csv_download</span></span>(<span>destination_path, csv_file_name, audio_extension='opus')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Read csv file for downloading audio from RFCx in user format supported: wav, opus, png, etc.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>destination_path</code></strong></dt>
+<dd>Path to the save directory.</dd>
+<dt><strong><code>csv_file_name</code></strong></dt>
+<dd>Name of the csv file using for download audio.</dd>
+<dt><strong><code>audio_extension</code></strong></dt>
+<dd>(optional, default= '.opus') Extension for saving audio files.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>if missing required arguements.</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def csv_download(destination_path, csv_file_name, audio_extension=&#39;opus&#39;):
+    &#34;&#34;&#34; Read csv file for downloading audio from RFCx in user format supported: wav, opus, png, etc.
+        Args:
+            destination_path: Path to the save directory.
+            csv_file_name: Name of the csv file using for download audio.
+            audio_extension: (optional, default= &#39;.opus&#39;) Extension for saving audio files.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+    &#34;&#34;&#34;
+
+    if not os.path.exists(destination_path):  
+        raise Exception(&#39;No &#34;{}&#34; directory in current path.&#39;.format(destination_path))
+    if not os.path.isfile(csv_file_name):
+        raise Exception(&#39;No &#34;{}&#34; file in current path.&#39;.format(csv_file_name))
+    if audio_extension not in [&#39;opus&#39;, &#39;wav&#39;, &#39;json&#39;, &#39;png&#39;]:
+        raise Exception(&#39;Audio extension should be opus, wav, json, or png. Not accept: {}&#39;.format(audio_extension))
+
+    csv_input = pd.read_csv(csv_file_name, header=None).values
+    for i in csv_input:
+        raw_name = &#39;&#39;.join(i)                         
+        audio_id = (os.path.splitext(os.path.basename(raw_name))[0])  
+        save_audio_file(destination_path, audio_id, audio_extension)</code></pre>
+</details>
+</dd>
+<dt id="rfcx.audio.csv_slice_audio"><code class="name flex">
+<span>def <span class="ident">csv_slice_audio</span></span>(<span>save_path, csv_file_name, slice_second=2)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Read csv file for cutting audio.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>csv_file_name</code></strong></dt>
+<dd>Name of the csv file using for cut audio.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>if missing required arguements.</dd>
+<dt><strong><code>FileNotFoundError</code></strong></dt>
+<dd>if missing required audio file.</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def csv_slice_audio(save_path, csv_file_name, slice_second=2):
+    &#34;&#34;&#34; Read csv file for cutting audio.
+        Args:
+            csv_file_name: Name of the csv file using for cut audio.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+            FileNotFoundError: if missing required audio file.
+    &#34;&#34;&#34;
+    audio_info_list = list()
+    with open(csv_file_name, &#39;r&#39;) as f:
+        reader = csv.reader(f)
+        audio_info_list = list(reader)
+    for info in audio_info_list:
+        audio_id = info[0]
+        info[1] = int(info[1])
+        info[2] = int(info[2])
+    full_duration = math.floor(librosa.get_duration(filename=audio_id + &#39;.wav&#39;))
+    __slice_audio(save_path, audio_info_list, full_duration, slice_second)     </code></pre>
+</details>
+</dd>
+<dt id="rfcx.audio.praat_slice_audio"><code class="name flex">
+<span>def <span class="ident">praat_slice_audio</span></span>(<span>save_path, praat_file_name, slice_second=2)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Read praat file for cutting audio.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>praat_file_name</code></strong></dt>
+<dd>Name of the praat file using for cut audio.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>if missing required arguements.</dd>
+<dt><strong><code>FileNotFoundError</code></strong></dt>
+<dd>if missing required audio file.</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def praat_slice_audio(save_path, praat_file_name, slice_second=2):
+    &#34;&#34;&#34; Read praat file for cutting audio.
+        Args:
+            praat_file_name: Name of the praat file using for cut audio.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+            FileNotFoundError: if missing required audio file.
+    &#34;&#34;&#34;
+    audio_info_list = list()
+    tg = rfcx.TextGrid.fromFile(praat_file_name, strict=False)
+    intervals = tg[0]
+    audio_id = intervals.name
+    for interval in intervals:
+        audio_info_list.append([audio_id, math.floor(interval.minTime), math.ceil(interval.maxTime), interval.mark])
+   
+    for info in audio_info_list:
+        audio_id = info[0]
+        info[1] = int(info[1])
+        info[2] = int(info[2])
+
+    full_duration = math.floor(librosa.get_duration(filename=audio_id + &#39;.wav&#39;))
+    __slice_audio(save_path, audio_info_list, full_duration, slice_second)</code></pre>
+</details>
+</dd>
+<dt id="rfcx.audio.save_audio_file"><code class="name flex">
+<span>def <span class="ident">save_audio_file</span></span>(<span>destination_path, audio_id, source_audio_extension='opus')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Prepare <code>url</code> and <code>local_path</code> and save it using function <code>__save_file</code> </p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>destination_path</code></strong></dt>
+<dd>Path to the save directory.</dd>
+<dt><strong><code>audio_id</code></strong></dt>
+<dd>RFCx audio id.</dd>
+<dt><strong><code>source_audio_extension</code></strong></dt>
+<dd>(optional, default= '.opus') Extension for saving audio files.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>if missing required arguements.</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def save_audio_file(destination_path, audio_id, source_audio_extension=&#39;opus&#39;):
+    &#34;&#34;&#34; Prepare `url` and `local_path` and save it using function `__save_file` 
+        Args:
+            destination_path: Path to the save directory.
+            audio_id: RFCx audio id.
+            source_audio_extension: (optional, default= &#39;.opus&#39;) Extension for saving audio files.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+    
+    &#34;&#34;&#34;
+    url = &#34;https://assets.rfcx.org/audio/&#34; + audio_id + &#34;.&#34; + source_audio_extension
+    print(url)
+    local_path = __local_audio_file_path(destination_path, audio_id, source_audio_extension)
+    __save_file(url, local_path)
+    print(&#39;File {}.{} saved to {}&#39;.format(audio_id, source_audio_extension, destination_path))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="rfcx" href="index.html">rfcx</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="rfcx.audio.csv_download" href="#rfcx.audio.csv_download">csv_download</a></code></li>
+<li><code><a title="rfcx.audio.csv_slice_audio" href="#rfcx.audio.csv_slice_audio">csv_slice_audio</a></code></li>
+<li><code><a title="rfcx.audio.praat_slice_audio" href="#rfcx.audio.praat_slice_audio">praat_slice_audio</a></code></li>
+<li><code><a title="rfcx.audio.save_audio_file" href="#rfcx.audio.save_audio_file">save_audio_file</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

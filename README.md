@@ -6,7 +6,7 @@ TODO: Explain how to use this package...
 
 Build a docker image
 
-`docker build rfcx-sdk-python .`
+`docker build -t rfcx-sdk-python .`
 
 and run the example
 
@@ -80,5 +80,5 @@ Better test:
 The documentation is generated from docstrings in the source code. To generate
 it, run:
 
-`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --output-dir dist/docs rfcx"`
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --output-dir docs rfcx"`
 
