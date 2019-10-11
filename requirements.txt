@@ -1,2 +1,3 @@
 pandas
 httplib2
+pydub

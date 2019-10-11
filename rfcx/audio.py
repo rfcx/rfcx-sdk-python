@@ -6,7 +6,6 @@ import csv
 import rfcx 
 import math
 import json
-import librosa
 from operator import itemgetter
 from pydub import AudioSegment
 
@@ -37,7 +36,7 @@ def csv_download(destination_path, csv_file_name, audio_extension='opus'):
         audio_id = (os.path.splitext(os.path.basename(raw_name))[0])  
         save_audio_file(destination_path, audio_id, audio_extension)
 
-def csv_slice_audio(save_path, csv_file_name, slice_second=2):
+def csv_slice_audio(csv_file_name, output_path, input_path_prefix=None, slice_second=2):
     """ Read csv file for cutting audio.
         Args:
             csv_file_name: Name of the csv file using for cut audio.
@@ -57,10 +56,9 @@ def csv_slice_audio(save_path, csv_file_name, slice_second=2):
         audio_id = info[0]
         info[1] = int(info[1])
         info[2] = int(info[2])
-    full_duration = math.floor(librosa.get_duration(filename=audio_id + '.wav'))
-    __slice_audio(save_path, audio_info_list, full_duration, slice_second)     
+    __slice_audio(audio_info_list, output_path, input_path_prefix, slice_second)
 
-def praat_slice_audio(save_path, praat_file_name, slice_second=2):
+def praat_slice_audio(praat_file_name, output_path, input_path_prefix=None, slice_second=2):
     """ Read praat file for cutting audio.
         Args:
             praat_file_name: Name of the praat file using for cut audio.
@@ -78,32 +76,26 @@ def praat_slice_audio(save_path, praat_file_name, slice_second=2):
     audio_id = intervals.name
     for interval in intervals:
         audio_info_list.append([audio_id, math.floor(interval.minTime), math.ceil(interval.maxTime), interval.mark])
-   
-    for info in audio_info_list:
-        audio_id = info[0]
-        info[1] = int(info[1])
-        info[2] = int(info[2])
 
-    full_duration = math.floor(librosa.get_duration(filename=audio_id + '.wav'))
-    __slice_audio(save_path, audio_info_list, full_duration, slice_second)
+    __slice_audio(audio_info_list, output_path, input_path_prefix, slice_second)
 
-def __slice_audio(save_path, audio_list, full_duration, slice_second):
+def __slice_audio(audio_list, output_path, input_path_prefix, slice_second):
     count = 0
-    audio_save_path = save_path
-    full_info = __get_audio_info(audio_list, full_duration)
 
-    if not os.path.exists(audio_save_path):
-        os.mkdir(audio_save_path)
-        print("Create {} directory".format(audio_save_path))
+    full_info = __get_audio_info(audio_list, input_path_prefix)
+
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+        print("Created {} directory".format(output_path))
 
     for info in full_info:
         audio_id, x1, x2, label = info
         duration = x2-x1
-        audio = AudioSegment.from_wav(audio_id + ".wav")
+        audio = AudioSegment.from_wav("{}{}.wav".format(input_path_prefix + "/" if input_path_prefix != None else "", audio_id))
 
-        if not os.path.exists('{}/{}'.format(audio_save_path, label)):
-            os.mkdir('{}/{}'.format(audio_save_path, label))
-            print("Create {} directory in {} directory".format(label, audio_save_path))
+        if not os.path.exists('{}/{}'.format(output_path, label)):
+            os.mkdir('{}/{}'.format(output_path, label))
+            print("Created {} directory in {} directory".format(label, output_path))
         if(duration < slice_second):
             start = x1 * 1000
             stop = x2 * 1000
@@ -114,10 +106,11 @@ def __slice_audio(save_path, audio_list, full_duration, slice_second):
             count = count + 1
             start = (x1+i) * 1000
             stop = (x1+(i+2)) * 1000
-            print(start, stop, audio.duration_seconds, label)
+            #print(start, stop, audio.duration_seconds, label)
             audioFragment = audio[start:stop]
-            audioFragment.export('{}/{}/{}.{}.wav'.format(audio_save_path, label, audio_id, count), format="wav")
-            print('File {}.{}.wav saved to {}'.format(audio_id, count, label))
+            file_handle = audioFragment.export('{}/{}/{}.{}.wav'.format(output_path, label, audio_id, count), format="wav")
+            file_handle.close()
+            #print('File {}.{}.wav saved to {}'.format(audio_id, count, label))
     count = 0
 
 
@@ -150,10 +143,14 @@ def save_audio_file(destination_path, audio_id, source_audio_extension='opus'):
     __save_file(url, local_path)
     print('File {}.{} saved to {}'.format(audio_id, source_audio_extension, destination_path))
 
-def __get_environment_info(audio_annotated_info, audio_full_duration):
+def __get_environment_info(audio_annotated_info, input_path_prefix):
     audio_envirnoment_info = list()
     audio_id = audio_annotated_info[0][0]
 
+    # TODO: it shouldn't be necessary to read an audio file here and this code assumes all audio files are the same length
+    audio = AudioSegment.from_wav("{}{}.wav".format(input_path_prefix + "/" if input_path_prefix != None else "", audio_id))
+    audio_full_duration = math.floor(audio.duration_seconds)
+    
     if len(audio_annotated_info) == 1:
         audio_envirnoment_info.append([audio_id, 0, audio_full_duration, "environment"])
         return audio_envirnoment_info
@@ -192,7 +189,7 @@ def __get_environment_info(audio_annotated_info, audio_full_duration):
                         audio_envirnoment_info.append([audio_id, start_env_time, stop_env_time, "environment"])
     return audio_envirnoment_info
 
-def __get_audio_info(audio_annotated_list, audio_full_duration):
-    audio_environment_list = __get_environment_info(audio_annotated_list, audio_full_duration)
+def __get_audio_info(audio_annotated_list, input_path_prefix):
+    audio_environment_list = __get_environment_info(audio_annotated_list, input_path_prefix)
     full_information_list = sorted(audio_annotated_list + audio_environment_list, key=itemgetter(1))
     return full_information_list
