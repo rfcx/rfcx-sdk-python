@@ -9,6 +9,8 @@ class Client(object):
 
     def __init__(self):
         self.credentials = None
+        self.default_site = None
+        self.accessible_sites = None
 
     def authenticate(self):
         """Authenticate an RFCx user to obtain a token
@@ -41,6 +43,12 @@ class Client(object):
         # Store the result in credentials
         self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
         print('Successfully authenticated')
+        app_meta = self.credentials.id_object['https://rfcx.org/app_metadata']
+        if app_meta:
+            self.accessible_sites = app_meta['accessibleSites']
+            self.default_site = app_meta['defaultSite']
+            print('Default site:', self.default_site)
+            print('Accessible sites:', self.accessible_sites)
 
 
     def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
