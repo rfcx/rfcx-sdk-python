@@ -1,4 +1,5 @@
 import getpass
+import datetime
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
@@ -57,7 +58,7 @@ class Client(object):
         Args:
             type: (Required) Type of tag. Must be either: annotation, inference, inference:confirned, or inference:rejected
             labels: List of labels. If None then returns tags of any label.
-            start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 1 month ago.
+            start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the annotations. If None then defaults to now.
             sites: List of sites by shortname. If None then returns tags from any site.
             limit: Maximum results to return. Defaults to 1000. (TODO check if there is an upper limit on the API)
@@ -73,4 +74,9 @@ class Client(object):
             print('Unrecognized type')
             return
 
+        if start == None:
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).replace(microsecond=0).isoformat() + 'Z'
+        if end == None:
+            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+        
         return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
