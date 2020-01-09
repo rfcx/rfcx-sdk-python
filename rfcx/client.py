@@ -56,7 +56,7 @@ class Client(object):
         """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
         
         Args:
-            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirned, or inference:rejected
+            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected
             labels: List of labels. If None then returns tags of any label.
             start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the annotations. If None then defaults to now.
@@ -70,7 +70,7 @@ class Client(object):
             print('Not authenticated')
             return
 
-        if type not in ['annotation', 'inference', 'inference:confirned', 'inference:rejected']:
+        if type not in ['annotation', 'inference', 'inference:confirmed', 'inference:rejected']:
             print('Unrecognized type')
             return
 
