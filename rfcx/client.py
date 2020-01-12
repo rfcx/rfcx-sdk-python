@@ -74,6 +74,19 @@ class Client(object):
             self.accessible_sites = app_meta['accessibleSites']
             self.default_site = app_meta['defaultSite']
 
+    def guardians(self, sites=None):
+        """Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)
+        
+        Args:
+            sites: List of site shortnames (e.g. cerroblanco). Default (None) gets all your accessible sites.
+
+        Returns:
+            List of guardians"""
+
+        if sites == None:
+            sites = self.accessible_sites
+
+        return api_rfcx.guardians(self.credentials.id_token, sites)
 
     def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
         """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API

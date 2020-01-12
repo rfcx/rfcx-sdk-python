@@ -6,24 +6,35 @@ from six.moves import urllib
 
 logger = logging.getLogger(__name__)
 
+host = 'https://api.rfcx.org'  # TODO move to configuration
+
+def guardians(token, sites):
+    data = {'sites[]': sites}
+    path = '/v1/guardians'
+    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    return _request(url, token=token)
+
 def tags(token, type, labels, start, end, sites, limit):
     data = {'type': type, 'values[]': labels, 'starting_after_local': start, 'starting_before_local': end, 'sites[]': sites, 'limit': limit}
-    
-    host = 'https://api.rfcx.org'  # TODO move to configuration
     path = '/v2/tags'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
-
-    logger.debug('url: ' + url)
-    print(url)
+    return _request(url, token=token)
     
-    headers = {'Authorization': 'Bearer ' + token}
+    
+def _request(url, method='GET', token=None):
+    logger.debug('get url: ' + url)
+
+    if token != None:
+        headers = {'Authorization': 'Bearer ' + token}
+    else:
+        headers = {}
 
     http = httplib2.Http()
-    resp, content = http.request(url, method='GET', headers=headers)
+    resp, content = http.request(url, method=method, headers=headers)
 
     if resp.status == http_client.OK:
         return json.loads(content)
     
-    logger.error('HTTP status: ' + resp.status)
+    logger.error(f'HTTP status: {resp.status}')
 
     return None
