@@ -61,3 +61,4 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.rfcx_credentials

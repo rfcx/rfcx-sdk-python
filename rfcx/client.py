@@ -1,5 +1,6 @@
 import getpass
 import datetime
+from os import path
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
@@ -12,8 +13,9 @@ class Client(object):
         self.credentials = None
         self.default_site = None
         self.accessible_sites = None
+        self.persisted_credentials_path = '.rfcx_credentials'
 
-    def authenticate(self):
+    def authenticate(self, persist=True):
         """Authenticate an RFCx user to obtain a token
 
         Returns:
@@ -23,6 +25,19 @@ class Client(object):
         if self.credentials != None:
             print('Already authenticated')
             return
+
+        access_token = None
+
+        # Attempt to load the credentials from disk
+        if path.exists(self.persisted_credentials_path):
+            with open(self.persisted_credentials_path, 'r') as f:
+                lines = f.read().splitlines()
+            print(lines)
+            if len(lines) == 5 and lines[0] == 'version 1':
+                token_expiry = datetime.datetime.strptime(lines[3], "%Y-%m-%dT%H:%M:%S.%fZ")
+                self._setup_credentials(lines[1], lines[2], token_expiry, lines[4])
+                print('Using persisted authenticatation')
+                return
 
         # Create a Code Verifier & Challenge
         code_verifier = pkce.code_verifier()
@@ -40,16 +55,24 @@ class Client(object):
 
         # Perform the exchange
         access_token, refresh_token, token_expiry, id_token = api_auth.authcode_exchange(code.strip(), code_verifier, client_id, scope)
-
-        # Store the result in credentials
-        self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
+        self._setup_credentials(access_token, refresh_token, token_expiry, id_token)
+        
         print('Successfully authenticated')
+        print('Default site:', self.default_site)
+        print('Accessible sites:', self.accessible_sites)
+
+        # Write token to disk
+        if persist:
+            with open(self.persisted_credentials_path, 'w') as f:
+                f.write('version 1\n')
+                f.write(access_token + '\n' + (refresh_token if refresh_token != None else '') + '\n' + token_expiry.isoformat() + 'Z\n' + id_token + '\n')
+
+    def _setup_credentials(self, access_token, token_expiry, refresh_token, id_token):
+        self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
         app_meta = self.credentials.id_object['https://rfcx.org/app_metadata']
         if app_meta:
             self.accessible_sites = app_meta['accessibleSites']
             self.default_site = app_meta['defaultSite']
-            print('Default site:', self.default_site)
-            print('Accessible sites:', self.accessible_sites)
 
 
     def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
