@@ -52,7 +52,7 @@ class Client(object):
             print('Accessible sites:', self.accessible_sites)
 
 
-    def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000, include_windows='true'):
+    def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
         """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
         
         Args:
@@ -79,4 +79,4 @@ class Client(object):
         if end == None:
             end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
         
-        return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit, include_windows)
+        return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
