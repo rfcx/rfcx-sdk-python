@@ -6,7 +6,7 @@ from six.moves import urllib
 logger = logging.getLogger(__name__)
 
 def tags(token, querry_type, labels, start, end, sites, limit, include_windows):
-    data = {'type': querry_type, 'labels[]': labels, 'starting_after_local': start, 'starting_before_local': end, 'sites[]': sites, 'limit': limit, 'include_windows': include_windows}
+    data = {'type': querry_type, 'values[]': labels, 'starting_after_local': start, 'starting_before_local': end, 'sites[]': sites, 'limit': limit, 'include_windows': include_windows}
     
     host = 'https://api.rfcx.org'  # TODO move to configuration
     path = '/v2/tags'
