@@ -1,12 +1,13 @@
 import httplib2
 import json
 import logging
+from six.moves import http_client
 from six.moves import urllib
 
 logger = logging.getLogger(__name__)
 
-def tags(token, querry_type, labels, start, end, sites, limit):
-    data = {'type': querry_type, 'labels[]': labels, 'starting_after_local': start, 'starting_before_local': end, 'sites[]': sites, 'limit': limit}
+def tags(token, type, labels, start, end, sites, limit):
+    data = {'type': type, 'labels[]': labels, 'starting_after_local': start, 'starting_before_local': end, 'sites[]': sites, 'limit': limit}
     
     host = 'https://api.rfcx.org'  # TODO move to configuration
     path = '/v2/tags'
@@ -20,9 +21,9 @@ def tags(token, querry_type, labels, start, end, sites, limit):
     http = httplib2.Http()
     resp, content = http.request(url, method='GET', headers=headers)
 
-    if resp["status"] == '200':
+    if resp.status == http_client.OK:
         return json.loads(content)
     
-    logger.error('HTTP status: ' + resp["status"])
+    logger.error('HTTP status: ' + resp.status)
 
     return None
