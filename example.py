@@ -9,6 +9,10 @@ client.authenticate()
 # chainsaws_last_30_days = client.tags('inference', ['chainsaw','vehicle'], sites=['osa'], limit=10)
 # print(chainsaws_last_30_days)
 
-guardians = client.guardians(sites=['cerroblanco'])
-for guardian in guardians:
-    print(guardian['guid'] + " " + guardian['shortname'])
+guardians = client.guardians(sites=['osa'])
+for guardian in guardians[:5]:
+    print(guardian['guid'] + " " + guardian['checkins']['guardian']['last_checkin_at'] + ' ' + guardian['shortname'])
+
+segments = client.guardianAudio('f49300264d7d', start='2020-01-01T00:00:00.000Z', limit=5, descending=False)
+for segment in segments:
+    print(segment['measured_at'] + ' ' + segment['guid'])

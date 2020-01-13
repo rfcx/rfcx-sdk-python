@@ -32,7 +32,6 @@ class Client(object):
         if path.exists(self.persisted_credentials_path):
             with open(self.persisted_credentials_path, 'r') as f:
                 lines = f.read().splitlines()
-            print(lines)
             if len(lines) == 5 and lines[0] == 'version 1':
                 token_expiry = datetime.datetime.strptime(lines[3], "%Y-%m-%dT%H:%M:%S.%fZ")
                 self._setup_credentials(lines[1], lines[2], token_expiry, lines[4])
@@ -87,6 +86,30 @@ class Client(object):
             sites = self.accessible_sites
 
         return api_rfcx.guardians(self.credentials.id_token, sites)
+
+    def guardianAudio(self, guardianId=None, start=None, end=None, limit=50, descending=True):
+        """Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)
+        
+        Args:
+            guardianId: (Required) The guid of a guardian
+            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: Maximum timestamp of the audio. If None then defaults to now.
+            limit: Maximum results to return. Defaults to 50. (TODO check if there is an upper limit on the API)
+            descending: Order by newest results first. Defaults to True.
+
+        Returns:
+            List of audio files (meta data showing audio id and recorded timestamp)
+        """
+        if self.credentials == None:
+            print('Not authenticated')
+            return
+
+        if start == None:
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).replace(microsecond=0).isoformat() + 'Z'
+        if end == None:
+            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+        
+        return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, descending)
 
     def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
         """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
