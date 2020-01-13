@@ -34,10 +34,13 @@ First time only:
 
 Increment the version in `setup.py`.
 
-To create a source distribution:
+To create a distribution (source and wheel):
 
-`python setup.py sdist`
+`python setup.py sdist bdist_wheel`
 
+Alternatively through docker:
+
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python python setup.py sdist bdist_wheel`
 
 ### Uploading
 

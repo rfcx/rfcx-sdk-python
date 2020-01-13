@@ -26,6 +26,7 @@
 </summary>
 <pre><code class="python">import getpass
 import datetime
+from os import path
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
@@ -38,8 +39,9 @@ class Client(object):
         self.credentials = None
         self.default_site = None
         self.accessible_sites = None
+        self.persisted_credentials_path = &#39;.rfcx_credentials&#39;
 
-    def authenticate(self):
+    def authenticate(self, persist=True):
         &#34;&#34;&#34;Authenticate an RFCx user to obtain a token
 
         Returns:
@@ -49,6 +51,18 @@ class Client(object):
         if self.credentials != None:
             print(&#39;Already authenticated&#39;)
             return
+
+        access_token = None
+
+        # Attempt to load the credentials from disk
+        if path.exists(self.persisted_credentials_path):
+            with open(self.persisted_credentials_path, &#39;r&#39;) as f:
+                lines = f.read().splitlines()
+            if len(lines) == 5 and lines[0] == &#39;version 1&#39;:
+                token_expiry = datetime.datetime.strptime(lines[3], &#34;%Y-%m-%dT%H:%M:%S.%fZ&#34;)
+                self._setup_credentials(lines[1], lines[2], token_expiry, lines[4])
+                print(&#39;Using persisted authenticatation&#39;)
+                return
 
         # Create a Code Verifier &amp; Challenge
         code_verifier = pkce.code_verifier()
@@ -66,23 +80,68 @@ class Client(object):
 
         # Perform the exchange
         access_token, refresh_token, token_expiry, id_token = api_auth.authcode_exchange(code.strip(), code_verifier, client_id, scope)
-
-        # Store the result in credentials
-        self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
+        self._setup_credentials(access_token, refresh_token, token_expiry, id_token)
+        
         print(&#39;Successfully authenticated&#39;)
+        print(&#39;Default site:&#39;, self.default_site)
+        print(&#39;Accessible sites:&#39;, self.accessible_sites)
+
+        # Write token to disk
+        if persist:
+            with open(self.persisted_credentials_path, &#39;w&#39;) as f:
+                f.write(&#39;version 1\n&#39;)
+                f.write(access_token + &#39;\n&#39; + (refresh_token if refresh_token != None else &#39;&#39;) + &#39;\n&#39; + token_expiry.isoformat() + &#39;Z\n&#39; + id_token + &#39;\n&#39;)
+
+    def _setup_credentials(self, access_token, token_expiry, refresh_token, id_token):
+        self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
         app_meta = self.credentials.id_object[&#39;https://rfcx.org/app_metadata&#39;]
         if app_meta:
             self.accessible_sites = app_meta[&#39;accessibleSites&#39;]
             self.default_site = app_meta[&#39;defaultSite&#39;]
-            print(&#39;Default site:&#39;, self.default_site)
-            print(&#39;Accessible sites:&#39;, self.accessible_sites)
 
+    def guardians(self, sites=None):
+        &#34;&#34;&#34;Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)
+        
+        Args:
+            sites: List of site shortnames (e.g. cerroblanco). Default (None) gets all your accessible sites.
+
+        Returns:
+            List of guardians&#34;&#34;&#34;
+
+        if sites == None:
+            sites = self.accessible_sites
+
+        return api_rfcx.guardians(self.credentials.id_token, sites)
+
+    def guardianAudio(self, guardianId=None, start=None, end=None, limit=50, descending=True):
+        &#34;&#34;&#34;Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)
+        
+        Args:
+            guardianId: (Required) The guid of a guardian
+            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: Maximum timestamp of the audio. If None then defaults to now.
+            limit: Maximum results to return. Defaults to 50. (TODO check if there is an upper limit on the API)
+            descending: Order by newest results first. Defaults to True.
+
+        Returns:
+            List of audio files (meta data showing audio id and recorded timestamp)
+        &#34;&#34;&#34;
+        if self.credentials == None:
+            print(&#39;Not authenticated&#39;)
+            return
+
+        if start == None:
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).replace(microsecond=0).isoformat() + &#39;Z&#39;
+        if end == None:
+            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + &#39;Z&#39;
+        
+        return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, descending)
 
     def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
         &#34;&#34;&#34;Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
         
         Args:
-            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirned, or inference:rejected
+            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected
             labels: List of labels. If None then returns tags of any label.
             start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the annotations. If None then defaults to now.
@@ -96,7 +155,7 @@ class Client(object):
             print(&#39;Not authenticated&#39;)
             return
 
-        if type not in [&#39;annotation&#39;, &#39;inference&#39;, &#39;inference:confirned&#39;, &#39;inference:rejected&#39;]:
+        if type not in [&#39;annotation&#39;, &#39;inference&#39;, &#39;inference:confirmed&#39;, &#39;inference:rejected&#39;]:
             print(&#39;Unrecognized type&#39;)
             return
 
@@ -133,8 +192,9 @@ class Client(object):
         self.credentials = None
         self.default_site = None
         self.accessible_sites = None
+        self.persisted_credentials_path = &#39;.rfcx_credentials&#39;
 
-    def authenticate(self):
+    def authenticate(self, persist=True):
         &#34;&#34;&#34;Authenticate an RFCx user to obtain a token
 
         Returns:
@@ -144,6 +204,18 @@ class Client(object):
         if self.credentials != None:
             print(&#39;Already authenticated&#39;)
             return
+
+        access_token = None
+
+        # Attempt to load the credentials from disk
+        if path.exists(self.persisted_credentials_path):
+            with open(self.persisted_credentials_path, &#39;r&#39;) as f:
+                lines = f.read().splitlines()
+            if len(lines) == 5 and lines[0] == &#39;version 1&#39;:
+                token_expiry = datetime.datetime.strptime(lines[3], &#34;%Y-%m-%dT%H:%M:%S.%fZ&#34;)
+                self._setup_credentials(lines[1], lines[2], token_expiry, lines[4])
+                print(&#39;Using persisted authenticatation&#39;)
+                return
 
         # Create a Code Verifier &amp; Challenge
         code_verifier = pkce.code_verifier()
@@ -161,23 +233,68 @@ class Client(object):
 
         # Perform the exchange
         access_token, refresh_token, token_expiry, id_token = api_auth.authcode_exchange(code.strip(), code_verifier, client_id, scope)
-
-        # Store the result in credentials
-        self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
+        self._setup_credentials(access_token, refresh_token, token_expiry, id_token)
+        
         print(&#39;Successfully authenticated&#39;)
+        print(&#39;Default site:&#39;, self.default_site)
+        print(&#39;Accessible sites:&#39;, self.accessible_sites)
+
+        # Write token to disk
+        if persist:
+            with open(self.persisted_credentials_path, &#39;w&#39;) as f:
+                f.write(&#39;version 1\n&#39;)
+                f.write(access_token + &#39;\n&#39; + (refresh_token if refresh_token != None else &#39;&#39;) + &#39;\n&#39; + token_expiry.isoformat() + &#39;Z\n&#39; + id_token + &#39;\n&#39;)
+
+    def _setup_credentials(self, access_token, token_expiry, refresh_token, id_token):
+        self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
         app_meta = self.credentials.id_object[&#39;https://rfcx.org/app_metadata&#39;]
         if app_meta:
             self.accessible_sites = app_meta[&#39;accessibleSites&#39;]
             self.default_site = app_meta[&#39;defaultSite&#39;]
-            print(&#39;Default site:&#39;, self.default_site)
-            print(&#39;Accessible sites:&#39;, self.accessible_sites)
 
+    def guardians(self, sites=None):
+        &#34;&#34;&#34;Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)
+        
+        Args:
+            sites: List of site shortnames (e.g. cerroblanco). Default (None) gets all your accessible sites.
+
+        Returns:
+            List of guardians&#34;&#34;&#34;
+
+        if sites == None:
+            sites = self.accessible_sites
+
+        return api_rfcx.guardians(self.credentials.id_token, sites)
+
+    def guardianAudio(self, guardianId=None, start=None, end=None, limit=50, descending=True):
+        &#34;&#34;&#34;Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)
+        
+        Args:
+            guardianId: (Required) The guid of a guardian
+            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: Maximum timestamp of the audio. If None then defaults to now.
+            limit: Maximum results to return. Defaults to 50. (TODO check if there is an upper limit on the API)
+            descending: Order by newest results first. Defaults to True.
+
+        Returns:
+            List of audio files (meta data showing audio id and recorded timestamp)
+        &#34;&#34;&#34;
+        if self.credentials == None:
+            print(&#39;Not authenticated&#39;)
+            return
+
+        if start == None:
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).replace(microsecond=0).isoformat() + &#39;Z&#39;
+        if end == None:
+            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + &#39;Z&#39;
+        
+        return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, descending)
 
     def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
         &#34;&#34;&#34;Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
         
         Args:
-            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirned, or inference:rejected
+            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected
             labels: List of labels. If None then returns tags of any label.
             start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the annotations. If None then defaults to now.
@@ -191,7 +308,7 @@ class Client(object):
             print(&#39;Not authenticated&#39;)
             return
 
-        if type not in [&#39;annotation&#39;, &#39;inference&#39;, &#39;inference:confirned&#39;, &#39;inference:rejected&#39;]:
+        if type not in [&#39;annotation&#39;, &#39;inference&#39;, &#39;inference:confirmed&#39;, &#39;inference:rejected&#39;]:
             print(&#39;Unrecognized type&#39;)
             return
 
@@ -205,7 +322,7 @@ class Client(object):
 <h3>Methods</h3>
 <dl>
 <dt id="rfcx.client.Client.authenticate"><code class="name flex">
-<span>def <span class="ident">authenticate</span></span>(<span>self)</span>
+<span>def <span class="ident">authenticate</span></span>(<span>self, persist=True)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Authenticate an RFCx user to obtain a token</p>
@@ -218,7 +335,7 @@ class Client(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def authenticate(self):
+<pre><code class="python">def authenticate(self, persist=True):
     &#34;&#34;&#34;Authenticate an RFCx user to obtain a token
 
     Returns:
@@ -228,6 +345,18 @@ class Client(object):
     if self.credentials != None:
         print(&#39;Already authenticated&#39;)
         return
+
+    access_token = None
+
+    # Attempt to load the credentials from disk
+    if path.exists(self.persisted_credentials_path):
+        with open(self.persisted_credentials_path, &#39;r&#39;) as f:
+            lines = f.read().splitlines()
+        if len(lines) == 5 and lines[0] == &#39;version 1&#39;:
+            token_expiry = datetime.datetime.strptime(lines[3], &#34;%Y-%m-%dT%H:%M:%S.%fZ&#34;)
+            self._setup_credentials(lines[1], lines[2], token_expiry, lines[4])
+            print(&#39;Using persisted authenticatation&#39;)
+            return
 
     # Create a Code Verifier &amp; Challenge
     code_verifier = pkce.code_verifier()
@@ -245,16 +374,103 @@ class Client(object):
 
     # Perform the exchange
     access_token, refresh_token, token_expiry, id_token = api_auth.authcode_exchange(code.strip(), code_verifier, client_id, scope)
-
-    # Store the result in credentials
-    self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
+    self._setup_credentials(access_token, refresh_token, token_expiry, id_token)
+    
     print(&#39;Successfully authenticated&#39;)
-    app_meta = self.credentials.id_object[&#39;https://rfcx.org/app_metadata&#39;]
-    if app_meta:
-        self.accessible_sites = app_meta[&#39;accessibleSites&#39;]
-        self.default_site = app_meta[&#39;defaultSite&#39;]
-        print(&#39;Default site:&#39;, self.default_site)
-        print(&#39;Accessible sites:&#39;, self.accessible_sites)</code></pre>
+    print(&#39;Default site:&#39;, self.default_site)
+    print(&#39;Accessible sites:&#39;, self.accessible_sites)
+
+    # Write token to disk
+    if persist:
+        with open(self.persisted_credentials_path, &#39;w&#39;) as f:
+            f.write(&#39;version 1\n&#39;)
+            f.write(access_token + &#39;\n&#39; + (refresh_token if refresh_token != None else &#39;&#39;) + &#39;\n&#39; + token_expiry.isoformat() + &#39;Z\n&#39; + id_token + &#39;\n&#39;)</code></pre>
+</details>
+</dd>
+<dt id="rfcx.client.Client.guardianAudio"><code class="name flex">
+<span>def <span class="ident">guardianAudio</span></span>(<span>self, guardianId=None, start=None, end=None, limit=50, descending=True)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>guardianId</code></strong></dt>
+<dd>(Required) The guid of a guardian</dd>
+<dt><strong><code>start</code></strong></dt>
+<dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dt><strong><code>end</code></strong></dt>
+<dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dt><strong><code>limit</code></strong></dt>
+<dd>Maximum results to return. Defaults to 50. (TODO check if there is an upper limit on the API)</dd>
+<dt><strong><code>descending</code></strong></dt>
+<dd>Order by newest results first. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code> of <code>audio</code> <code>files</code> (<code>meta</code> <code>data</code> <code>showing</code> <code>audio</code> <code>id</code> <code>and</code> <code>recorded</code> <code>timestamp</code>)</dt>
+<dd>&nbsp;</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def guardianAudio(self, guardianId=None, start=None, end=None, limit=50, descending=True):
+    &#34;&#34;&#34;Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)
+    
+    Args:
+        guardianId: (Required) The guid of a guardian
+        start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+        end: Maximum timestamp of the audio. If None then defaults to now.
+        limit: Maximum results to return. Defaults to 50. (TODO check if there is an upper limit on the API)
+        descending: Order by newest results first. Defaults to True.
+
+    Returns:
+        List of audio files (meta data showing audio id and recorded timestamp)
+    &#34;&#34;&#34;
+    if self.credentials == None:
+        print(&#39;Not authenticated&#39;)
+        return
+
+    if start == None:
+        start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).replace(microsecond=0).isoformat() + &#39;Z&#39;
+    if end == None:
+        end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + &#39;Z&#39;
+    
+    return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, descending)</code></pre>
+</details>
+</dd>
+<dt id="rfcx.client.Client.guardians"><code class="name flex">
+<span>def <span class="ident">guardians</span></span>(<span>self, sites=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>sites</code></strong></dt>
+<dd>List of site shortnames (e.g. cerroblanco). Default (None) gets all your accessible sites.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code> of <code>guardians</code></dt>
+<dd>&nbsp;</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def guardians(self, sites=None):
+    &#34;&#34;&#34;Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)
+    
+    Args:
+        sites: List of site shortnames (e.g. cerroblanco). Default (None) gets all your accessible sites.
+
+    Returns:
+        List of guardians&#34;&#34;&#34;
+
+    if sites == None:
+        sites = self.accessible_sites
+
+    return api_rfcx.guardians(self.credentials.id_token, sites)</code></pre>
 </details>
 </dd>
 <dt id="rfcx.client.Client.tags"><code class="name flex">
@@ -265,7 +481,7 @@ class Client(object):
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>type</code></strong></dt>
-<dd>(Required) Type of tag. Must be either: annotation, inference, inference:confirned, or inference:rejected</dd>
+<dd>(Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected</dd>
 <dt><strong><code>labels</code></strong></dt>
 <dd>List of labels. If None then returns tags of any label.</dd>
 <dt><strong><code>start</code></strong></dt>
@@ -290,7 +506,7 @@ class Client(object):
     &#34;&#34;&#34;Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
     
     Args:
-        type: (Required) Type of tag. Must be either: annotation, inference, inference:confirned, or inference:rejected
+        type: (Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected
         labels: List of labels. If None then returns tags of any label.
         start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.
         end: Maximum timestamp of the annotations. If None then defaults to now.
@@ -304,7 +520,7 @@ class Client(object):
         print(&#39;Not authenticated&#39;)
         return
 
-    if type not in [&#39;annotation&#39;, &#39;inference&#39;, &#39;inference:confirned&#39;, &#39;inference:rejected&#39;]:
+    if type not in [&#39;annotation&#39;, &#39;inference&#39;, &#39;inference:confirmed&#39;, &#39;inference:rejected&#39;]:
         print(&#39;Unrecognized type&#39;)
         return
 
@@ -338,6 +554,8 @@ class Client(object):
 <h4><code><a title="rfcx.client.Client" href="#rfcx.client.Client">Client</a></code></h4>
 <ul class="">
 <li><code><a title="rfcx.client.Client.authenticate" href="#rfcx.client.Client.authenticate">authenticate</a></code></li>
+<li><code><a title="rfcx.client.Client.guardianAudio" href="#rfcx.client.Client.guardianAudio">guardianAudio</a></code></li>
+<li><code><a title="rfcx.client.Client.guardians" href="#rfcx.client.Client.guardians">guardians</a></code></li>
 <li><code><a title="rfcx.client.Client.tags" href="#rfcx.client.Client.tags">tags</a></code></li>
 </ul>
 </li>
