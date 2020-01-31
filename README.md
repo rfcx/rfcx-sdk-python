@@ -2,24 +2,15 @@
 
 ## Getting started
 
-There are 2 ways to use the `rfcx` library
+TODO: Explain how to use this package...
 
-### Install via pip: 
-Currently, the `rfcx` library can not install directly using `pip` but it can install locally by the following step:
-
-   1. Using `python setup.py bdist_wheel` inside the directory to generate the `.whl` file
-
-   2. After got the `.whl`, it can install using `pip install rfcx-x.x.x-py3-none-any.whl` or ``
-
-### Install using docker:
-Another option for using the `rfcx` library is build a docker image following the step below:
-    1. Using 
+Build a docker image
 
 `docker build -t rfcx-sdk-python .`
 
 and run the example
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python example.py`
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python python example.py`
 
 ## Development
 
@@ -29,7 +20,7 @@ Running tests:
 
 If you want to use docker to create a separate environment for packaging then try:
 
-`docker run -it --rm -v ${PWD}:/app -w /app tensorflow/tensorflow:latest-py3 bash`
+`docker run -it --rm -v "$PWD":/app -w /app tensorflow/tensorflow:latest-py3 bash`
 
 
 ### Packaging
@@ -49,7 +40,7 @@ To create a distribution (source and wheel):
 
 Alternatively through docker:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python setup.py sdist bdist_wheel`
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python python setup.py sdist bdist_wheel`
 
 ### Uploading
 
@@ -67,7 +58,7 @@ Enter your username and password.
 
 #### Unit tests
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python setup.py test`
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python python setup.py test`
 
 #### Package tests
 
@@ -92,5 +83,5 @@ Better test:
 The documentation is generated from docstrings in the source code. To generate
 it, run:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --output-dir docs rfcx"`
+`docker run -it --rm -v "$PWD":/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --output-dir docs rfcx"`
 
