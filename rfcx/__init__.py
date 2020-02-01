@@ -1,3 +1,10 @@
+"""## Installation guide:
+
+    1. Using `python setup.py bdist_wheel` inside the directory to generate the `.whl` file
+
+    2. After got the `.whl`, it can install using `pip install rfcx-x.x.x-py3-none-any.whl`
+"""
+
 name = "rfcx"
 
 from .client import Client
