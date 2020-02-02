@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 host = 'https://api.rfcx.org'  # TODO move to configuration
 
 def guardians(token, sites):
-    data = {'sites[]': sites}
+    data = {'sites[]': sites, 'limit': 1000}
     path = '/v1/guardians'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
