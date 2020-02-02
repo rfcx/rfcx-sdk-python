@@ -66,7 +66,6 @@ def _request_token(post_data):
     resp, content = http.request('https://auth.rfcx.org/oauth/token', method='POST', body=body, headers=headers)
     d = _parse_exchange_token_response(content)
     if resp.status == http_client.OK and 'access_token' in d:
-        print(d)
         access_token = d['access_token']
         refresh_token = d.get('refresh_token', None)
         token_expiry = None
