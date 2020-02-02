@@ -138,7 +138,6 @@ def save_audio_file(destination_path, audio_id, source_audio_extension='opus'):
     
     """
     url = "https://assets.rfcx.org/audio/" + audio_id + "." + source_audio_extension
-    print(url)
     local_path = __local_audio_file_path(destination_path, audio_id, source_audio_extension)
     __save_file(url, local_path)
     print('File {}.{} saved to {}'.format(audio_id, source_audio_extension, destination_path))

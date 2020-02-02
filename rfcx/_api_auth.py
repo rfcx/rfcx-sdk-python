@@ -43,6 +43,19 @@ def authcode_exchange(code, code_verifier, client_id, scope):
         'redirect_uri': 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html',
         'scope': scope
     }
+    return _request_token(post_data)
+
+def refresh(refresh_token, client_id):
+    post_data = {
+        'grant_type': 'refresh_token',
+        'client_id': client_id,
+        'refresh_token': refresh_token
+    }
+    access_token, _, token_expiry, id_token = _request_token(post_data)
+    return access_token, refresh_token, token_expiry, id_token
+    
+
+def _request_token(post_data):
     body = urllib.parse.urlencode(post_data)
     headers = {
         'content-type': 'application/x-www-form-urlencoded',
@@ -53,6 +66,7 @@ def authcode_exchange(code, code_verifier, client_id, scope):
     resp, content = http.request('https://auth.rfcx.org/oauth/token', method='POST', body=body, headers=headers)
     d = _parse_exchange_token_response(content)
     if resp.status == http_client.OK and 'access_token' in d:
+        print(d)
         access_token = d['access_token']
         refresh_token = d.get('refresh_token', None)
         token_expiry = None
