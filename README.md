@@ -1,40 +1,36 @@
 # RFCx (Rainforest Connection) Client SDK for Python
 
-## Getting started
+If you are would like to use the SDK then please [see the documentation](https://rfcx.github.io/rfcx-sdk-python/) 
+or [try an example](https://gist.github.com/antonyharfield/93231b3df86cd58fecee4f4d1ec9cc5b).
 
-TODO: Explain how to use this package...
+This README is designed for developers who are building or contributing to the SDK.
 
-Build a docker image
+## Setup your development environment
+
+The easiest way (if you have Docker installed) is to first build the docker image:
 
 `docker build -t rfcx-sdk-python .`
 
-and run the example
+Then run scripts directly, for example:
 
 `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python example.py`
 
-## Development
+Or run a terminal and execute scripts inside the container:
 
-Running tests:
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python bash`
 
-`python setup.py test`
+`python example.py`
 
-If you want to use docker to create a separate environment for packaging then try:
-
-`docker run -it --rm -v ${PWD}:/app -w /app tensorflow/tensorflow:latest-py3 bash`
+(Scripts like example.py in the root directory can `import rfcx` from the source -- making it easy to develop new SDK features.)
 
 
-### Packaging
+### Packaging for distribution
 
-First time only:
-
-`pip install --user --upgrade setuptools`
-
-`python setup.py register`
-(not sure if this is needed)
+*To build a new version:*
 
 Increment the version in `setup.py`.
 
-To create a distribution (source and wheel):
+Create a distribution (source and wheel):
 
 `python setup.py sdist bdist_wheel`
 
@@ -42,7 +38,7 @@ Alternatively through docker:
 
 `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python setup.py sdist bdist_wheel`
 
-### Uploading
+### Uploading to Python Package Index (PyPI)
 
 First time only:
 
@@ -85,3 +81,4 @@ it, run:
 
 `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --output-dir docs rfcx"`
 
+Move the generated files into `/docs`.
