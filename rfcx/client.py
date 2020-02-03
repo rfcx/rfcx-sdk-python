@@ -74,7 +74,8 @@ class Client(object):
         
         print('Successfully authenticated')
         print('Default site:', self.default_site)
-        print('Accessible sites:', self.accessible_sites)
+        if len(self.accessible_sites) > 0:
+            print('Accessible sites:', ", ".join(self.accessible_sites))
 
         # Write token to disk
         if persist:
