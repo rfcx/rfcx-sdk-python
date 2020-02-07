@@ -43,11 +43,17 @@ class Client(object):
                     print('Using persisted authenticatation')
                     return
                 elif refresh_token != None:
-                    access_token, refresh_token, token_expiry, id_token = api_auth.refresh(refresh_token, client_id)
-                    self._setup_credentials(access_token, token_expiry, refresh_token, id_token)
-                    self._persist_credentials()
-                    print('Using persisted authenticatation (with token refresh)')
-                    return
+                    has_error = False
+                    try:
+                        access_token, refresh_token, token_expiry, id_token = api_auth.refresh(refresh_token, client_id)
+                    except api_auth.TokenError:
+                        has_error = True
+                    if not has_error:
+                        self._setup_credentials(access_token, token_expiry, refresh_token, id_token)
+                        self._persist_credentials()
+                        print('Using persisted authenticatation (with token refresh)')
+                        return
+                    
 
         # Create a Code Verifier & Challenge
         code_verifier = pkce.code_verifier()
@@ -68,7 +74,8 @@ class Client(object):
         
         print('Successfully authenticated')
         print('Default site:', self.default_site)
-        print('Accessible sites:', self.accessible_sites)
+        if len(self.accessible_sites) > 0:
+            print('Accessible sites:', ", ".join(self.accessible_sites))
 
         # Write token to disk
         if persist:

@@ -10,8 +10,8 @@ import rfcx._helper as helper
 class Error(Exception):
     """Base error for this module."""
 
-class FlowExchangeError(Error):
-    """Error trying to exchange an authorization grant for an access token."""
+class TokenError(Error):
+    """Error trying to exchange an authorization grant for an access token or refreshing a token."""
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +27,7 @@ def authcode_exchange(code, code_verifier, client_id, scope):
     Returns:
         An OAuth2Credentials object that can be used to authorize requests.
     Raises:
-        FlowExchangeError: if a problem occurred exchanging the code for a
-                            refresh_token.
+        TokenError: if a problem occurred obtaining a token.
         ValueError: if code and device_flow_info are both provided or both
                     missing.
     """
@@ -83,12 +82,10 @@ def _request_token(post_data):
         logger.info('Failed to retrieve access token: %s', content)
         if 'error' in d:
             # you never know what those providers got to say
-            error_msg = (str(d['error']) +
-                            str(d.get('error_description', '')))
-            print(d)
+            error_msg = (str(d['error']) + str(d.get('error_description', '')))
         else:
             error_msg = 'Invalid response: {0}.'.format(str(resp.status))
-        raise FlowExchangeError(error_msg)
+        raise TokenError(error_msg)
 
 def _parse_exchange_token_response(content):
     """Parses response of an exchange token request.
