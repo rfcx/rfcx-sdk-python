@@ -6,6 +6,7 @@ import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
 from rfcx._credentials import Credentials
 
+
 class Client(object):
     """Authenticate and perform requests against the RFCx platform"""
 
@@ -17,6 +18,9 @@ class Client(object):
 
     def authenticate(self, persist=True):
         """Authenticate an RFCx user to obtain a token
+
+        Args:
+            persist: Should save the user token to the filesystem (in current directory).
 
         Returns:
             Success if an access_token was obtained
@@ -36,24 +40,27 @@ class Client(object):
             if len(lines) == 5 and lines[0] == 'version 1':
                 access_token = lines[1]
                 refresh_token = lines[2] if lines[2] != '' else None
-                token_expiry = datetime.datetime.strptime(lines[3], "%Y-%m-%dT%H:%M:%S.%fZ")
+                token_expiry = datetime.datetime.strptime(
+                    lines[3], "%Y-%m-%dT%H:%M:%S.%fZ")
                 id_token = lines[4]
                 if token_expiry > datetime.datetime.now() + datetime.timedelta(hours=1):
-                    self._setup_credentials(access_token, token_expiry, refresh_token, id_token)
+                    self._setup_credentials(
+                        access_token, token_expiry, refresh_token, id_token)
                     print('Using persisted authenticatation')
                     return
                 elif refresh_token != None:
                     has_error = False
                     try:
-                        access_token, refresh_token, token_expiry, id_token = api_auth.refresh(refresh_token, client_id)
+                        access_token, refresh_token, token_expiry, id_token = api_auth.refresh(
+                            refresh_token, client_id)
                     except api_auth.TokenError:
                         has_error = True
                     if not has_error:
-                        self._setup_credentials(access_token, token_expiry, refresh_token, id_token)
+                        self._setup_credentials(
+                            access_token, token_expiry, refresh_token, id_token)
                         self._persist_credentials()
                         print('Using persisted authenticatation (with token refresh)')
                         return
-                    
 
         # Create a Code Verifier & Challenge
         code_verifier = pkce.code_verifier()
@@ -61,17 +68,21 @@ class Client(object):
 
         # See: https://auth0.com/docs/integrations/using-auth0-to-secure-a-cli
         url = 'https://auth.rfcx.org/authorize?response_type=code&code_challenge={0}&code_challenge_method=S256&client_id={1}&redirect_uri={2}&audience=https://rfcx.org&scope={3}'
-        redirect_uri = 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html' # TODO move to configuration
+        # TODO move to configuration
+        redirect_uri = 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html'
         scope = 'openid%20profile%20offline_access'
 
         # Prompt the user to open their browser. On completion, paste the auth code.
-        print('Go to this URL in a browser: ' + url.format(code_challenge, client_id, redirect_uri, scope))
+        print('Go to this URL in a browser: ' +
+              url.format(code_challenge, client_id, redirect_uri, scope))
         code = getpass.getpass('Enter your authorization code: ')
 
         # Perform the exchange
-        access_token, refresh_token, token_expiry, id_token = api_auth.authcode_exchange(code.strip(), code_verifier, client_id, scope)
-        self._setup_credentials(access_token, token_expiry, refresh_token, id_token)
-        
+        access_token, refresh_token, token_expiry, id_token = api_auth.authcode_exchange(
+            code.strip(), code_verifier, client_id, scope)
+        self._setup_credentials(
+            access_token, token_expiry, refresh_token, id_token)
+
         print('Successfully authenticated')
         print('Default site:', self.default_site)
         if len(self.accessible_sites) > 0:
@@ -82,7 +93,8 @@ class Client(object):
             self._persist_credentials()
 
     def _setup_credentials(self, access_token, token_expiry, refresh_token, id_token):
-        self.credentials = Credentials(access_token, token_expiry, refresh_token, id_token)
+        self.credentials = Credentials(
+            access_token, token_expiry, refresh_token, id_token)
         app_meta = self.credentials.id_object['https://rfcx.org/app_metadata']
         if app_meta:
             self.accessible_sites = app_meta.get('accessibleSites', [])
@@ -97,10 +109,9 @@ class Client(object):
             f.write(c.token_expiry.isoformat() + 'Z\n')
             f.write(c.id_token + '\n')
 
-
     def guardians(self, sites=None):
         """Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)
-        
+
         Args:
             sites: List of site shortnames (e.g. cerroblanco). Default (None) gets all your accessible sites.
 
@@ -114,7 +125,7 @@ class Client(object):
 
     def guardianAudio(self, guardianId=None, start=None, end=None, limit=50, descending=True):
         """Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)
-        
+
         Args:
             guardianId: (Required) The guid of a guardian
             start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
@@ -130,15 +141,16 @@ class Client(object):
             return
 
         if start == None:
-            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).replace(microsecond=0).isoformat() + 'Z'
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
+                     ).replace(microsecond=0).isoformat() + 'Z'
         if end == None:
             end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
-        
+
         return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, descending)
 
     def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
         """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
-        
+
         Args:
             type: (Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected
             labels: List of labels. If None then returns tags of any label.
@@ -159,8 +171,9 @@ class Client(object):
             return
 
         if start == None:
-            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).replace(microsecond=0).isoformat() + 'Z'
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
+                     ).replace(microsecond=0).isoformat() + 'Z'
         if end == None:
             end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
-        
+
         return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
