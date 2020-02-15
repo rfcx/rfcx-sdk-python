@@ -1,15 +1,16 @@
-"""## Installation guide:
+"""## Getting started
 
-    1. Using `python setup.py bdist_wheel` inside the directory to generate the `.whl` file
+1. Get the latest version from [RFCx's Github releases page](https://github.com/rfcx/rfcx-sdk-python/releases)
 
-    2. After got the `.whl`, it can install using `pip install rfcx-x.x.x-py3-none-any.whl`
+2. Install with pip: `pip install rfcx-x.x.x-py3-none-any.whl`
+
+3. Use `import rfcx` and [try an example](https://gist.github.com/antonyharfield/93231b3df86cd58fecee4f4d1ec9cc5b)
 """
 
-name = "rfcx"
-
-from .client import Client
-from .audio import csv_download
-from .audio import csv_slice_audio
-from .audio import praat_slice_audio
-from .audio import save_audio_file
 from ._textgrid import TextGrid
+from .audio import save_audio_file
+from .audio import praat_slice_audio
+from .audio import csv_slice_audio
+from .audio import csv_download
+from .client import Client
+name = "rfcx"

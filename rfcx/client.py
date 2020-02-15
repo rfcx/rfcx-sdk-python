@@ -19,8 +19,12 @@ class Client(object):
     def authenticate(self, persist=True):
         """Authenticate an RFCx user to obtain a token
 
+        If you want to persist/load the credentials to/from a custom path then set `persisted_credentials_path`
+        before calling `client.authenticate()`. E.g. `client.persisted_credentials_path = '/my/path/.rfcx_credentials'`
+
         Args:
-            persist: Should save the user token to the filesystem (in current directory).
+            persist: Should save the user token to the filesystem (in file specified by
+            persisted_credentials_path, defaults to .rfcx_credentials in the current directory).
 
         Returns:
             Success if an access_token was obtained
@@ -148,16 +152,16 @@ class Client(object):
 
         return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, descending)
 
-    def tags(self, type, labels=None, start=None, end=None, sites=None, limit=1000):
+    def tags(self, type, labels, start=None, end=None, sites=None, limit=1000):
         """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
 
         Args:
             type: (Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected
-            labels: List of labels. If None then returns tags of any label.
+            labels: (Required) List of labels. If None then returns tags of any label.
             start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the annotations. If None then defaults to now.
             sites: List of sites by shortname. If None then returns tags from any site.
-            limit: Maximum results to return. Defaults to 1000. (TODO check if there is an upper limit on the API)
+            limit: Maximum number of audio files to return (not the number of tags!). Defaults to 1000.
 
         Returns:
             List of tags

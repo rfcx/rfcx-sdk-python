@@ -79,6 +79,6 @@ Better test:
 The documentation is generated from docstrings in the source code. To generate
 it, run:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --output-dir docs rfcx"`
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --config show_source_code=False --output-dir docs rfcx"`
 
 Move the generated files into `/docs`.
