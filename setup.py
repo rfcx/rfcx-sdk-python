@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-REQUIRED_PACKAGES = ['pydub', 'librosa']
+REQUIRED_PACKAGES = ['httplib2', 'six', 'pydub', 'pandas']
 
 setup(name='rfcx',
       version='0.0.6',
@@ -14,10 +14,10 @@ setup(name='rfcx',
       long_description_content_type="text/markdown",
       packages=find_packages(exclude=['tests']),
       classifiers=[
-        'Development Status :: 1 - Planning',
-        'Intended Audience :: Science/Research',
-        'Programming Language :: Python :: 3',
-        'Operating System :: OS Independent',
+          'Development Status :: 1 - Planning',
+          'Intended Audience :: Science/Research',
+          'Programming Language :: Python :: 3',
+          'Operating System :: OS Independent',
       ],
       test_suite='nose.collector',
       tests_require=['nose'])
