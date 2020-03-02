@@ -103,6 +103,11 @@ class Client(object):
         if app_meta:
             self.accessible_sites = app_meta.get('accessibleSites', [])
             self.default_site = app_meta.get('defaultSite', 'derc')
+            # Check we have sufficient credentials
+            roles = app_meta.get('authorization', {}).get('roles', [])
+            if not "rfcxUser" in roles:
+                raise Exception(
+                    "User does not have sufficient privileges. Please check you have access to https://dashboard.rfcx.org or contact support.")
 
     def _persist_credentials(self):
         c = self.credentials
