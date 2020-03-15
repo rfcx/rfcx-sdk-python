@@ -1,3 +1,4 @@
 pandas
 httplib2
 pydub
+pdoc3

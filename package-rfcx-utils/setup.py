@@ -2,16 +2,14 @@ from setuptools import setup, find_packages
 
 REQUIRED_PACKAGES = ['httplib2', 'six', 'pydub', 'pandas']
 
-setup(name='rfcx',
+setup(name='rfcx-utils',
       version='0.0.6',
       url='https://github.com/rfcx/rfcx-sdk-python',
       license='None',
-      author='Antony Harfield',
+      author='Rainforest Connection',
       author_email='antony@rfcx.org',
       install_requires=REQUIRED_PACKAGES,
-      description='Python client SDK for connecting to the Rainforest Connection platform',
-      long_description=open('README.md').read(),
-      long_description_content_type="text/markdown",
+      description='Collection of utils for use with Rainforest Connection platform',
       packages=find_packages(exclude=['tests']),
       classifiers=[
           'Development Status :: 1 - Planning',
