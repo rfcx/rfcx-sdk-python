@@ -13,11 +13,11 @@ The easiest way (if you have Docker installed) is to first build the docker imag
 
 Then run scripts directly, for example:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python example.py`
+`docker run -it --rm -v ${PWD}/package-rfcx:/usr/src/app rfcx-sdk-python python example.py`
 
 Or run a terminal and execute scripts inside the container:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python bash`
+`docker run -it --rm -v ${PWD}/package-rfcx:/usr/src/app rfcx-sdk-python bash`
 
 `python example.py`
 
@@ -28,15 +28,19 @@ Or run a terminal and execute scripts inside the container:
 
 *To build a new version:*
 
-Increment the version in `setup.py`.
+Increment the version in `package-rfcx/setup.py` and `package-rfcx-utils/setup.py`.
 
 Create a distribution (source and wheel):
 
-`python setup.py sdist bdist_wheel`
+`python package-rfcx/setup.py sdist bdist_wheel`
+
+`python package-rfcx-utils/setup.py sdist bdist_wheel`
 
 Alternatively through docker:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python setup.py sdist bdist_wheel`
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx/setup.py sdist bdist_wheel`
+
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx-utils/setup.py sdist bdist_wheel`
 
 ### Uploading to Python Package Index (PyPI)
 
@@ -54,7 +58,7 @@ Enter your username and password.
 
 #### Unit tests
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python setup.py test`
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx-utils/setup.py test`
 
 #### Package tests
 
@@ -79,6 +83,6 @@ Better test:
 The documentation is generated from docstrings in the source code. To generate
 it, run:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python bash -c "pip install pdoc3 ; pdoc3 --html --force --config show_source_code=False --output-dir docs rfcx"`
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python pdoc3 --html --force --config show_source_code=False --output-dir docs package-rfcx/rfcx package-rfcx-utils/rfcx-utils`
 
 Move the generated files into `/docs`.
