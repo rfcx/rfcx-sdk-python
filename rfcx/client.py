@@ -74,7 +74,7 @@ class Client(object):
         url = 'https://auth.rfcx.org/authorize?response_type=code&code_challenge={0}&code_challenge_method=S256&client_id={1}&redirect_uri={2}&audience=https://rfcx.org&scope={3}'
         # TODO move to configuration
         redirect_uri = 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html'
-        scope = 'openid%20profile%20offline_access'
+        scope = 'openid%20email%20profile%20offline_access'
 
         # Prompt the user to open their browser. On completion, paste the auth code.
         print('Go to this URL in a browser: ' +
