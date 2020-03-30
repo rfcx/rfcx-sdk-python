@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 REQUIRED_PACKAGES = ['httplib2', 'six', 'pydub', 'pandas']
 
 setup(name='rfcx-utils',
-      version='0.0.6',
+      version='0.0.7',
       url='https://github.com/rfcx/rfcx-sdk-python',
       license='None',
       author='Rainforest Connection',
