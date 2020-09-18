@@ -1,10 +1,15 @@
-import urllib.request
+import requests
 import shutil
 
 def __save_file(url, local_path):
     """ Download the file from `url` and save it locally under `local_path` """
-    with urllib.request.urlopen(url) as response, open(local_path, 'wb') as out_file:
-        shutil.copyfileobj(response, out_file)
+    response = requests.get(url, stream=True)
+    if (response.status_code == 200):
+        with open(local_path, 'wb') as out_file:
+            response.raw.decode_content = True
+            shutil.copyfileobj(response.raw, out_file)
+    else:
+        print("Can not download {} with status {}".format(url, response.status_code))
 
 def __local_audio_file_path(path, audio_id, audio_extension):
     """ Create string for the name and the path """    
