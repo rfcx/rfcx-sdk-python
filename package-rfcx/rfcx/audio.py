@@ -2,8 +2,7 @@ import datetime
 import requests
 import shutil
 import os
-import multiprocessing as mp
-from functools import partial
+import concurrent.futures
 from rfcx._api_rfcx import guardianAudio
 
 def __save_file(url, local_path):
@@ -82,9 +81,12 @@ def downloadGuardianAudio(token, destination_path, guardian_id, min_date, max_da
 
         if segments:
             if(parallel):
-                pool = mp.Pool(processes=mp.cpu_count())
-                func = partial(__segmentDownload, audio_path, file_ext)
-                res = pool.map(func, segments)
+                with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+                    futures = []
+                    for segment in segments:
+                        futures.append(executor.submit(__segmentDownload, audio_path=audio_path, file_ext=file_ext, segment=segment))
+
+                    futures, _ = concurrent.futures.wait(futures)
             else:
                 for segment in segments:
                     __segmentDownload(audio_path, file_ext, segment)
