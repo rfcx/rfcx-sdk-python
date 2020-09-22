@@ -1,6 +1,8 @@
 import getpass
 import datetime
-from os import path
+import os
+import re
+import rfcx.audio as audio
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
@@ -38,7 +40,7 @@ class Client(object):
         access_token = None
 
         # Attempt to load the credentials from disk
-        if path.exists(self.persisted_credentials_path):
+        if os.path.exists(self.persisted_credentials_path):
             with open(self.persisted_credentials_path, 'r') as f:
                 lines = f.read().splitlines()
             if len(lines) == 5 and lines[0] == 'version 1':
@@ -186,3 +188,43 @@ class Client(object):
             end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
 
         return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
+
+    def downloadGuardianAudio(self, dest_path=None, guardian_id=None, min_date=None, max_date=None, file_ext='opus', parallel=True):
+        """Download audio using audio information from `guardianAudio`
+
+        Args:
+            dest_path: (Required) Path to save audio.
+            guardianId: (Required) The guid of a guardian
+            min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            max_date: Maximum timestamp of the audio. If None then defaults to now.
+            file_ext: Audio file extension. Default to `.opus`
+            parallel: Parallel download audio. Defaults to True.
+
+        Returns:
+            None.
+        """
+        if self.credentials == None:
+            print('Not authenticated')
+            return
+
+        if dest_path == None:
+            if not os.path.exists('./audios'):
+                os.makedirs('./audios')
+        if guardian_id == None:
+            print("Please specific the guardian id.")
+            return
+
+        if min_date == None:
+            min_date = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+        if not isinstance(min_date, datetime.datetime):
+            print("min_date is not type datetime")
+            return
+
+        if max_date == None:
+            max_date = datetime.datetime.utcnow()
+        if not isinstance(max_date, datetime.datetime):
+            print("max_date is not type datetime")
+            return
+
+        return audio.downloadGuardianAudio(self.credentials.id_token, dest_path, guardian_id, min_date, max_date, file_ext, parallel)
+
