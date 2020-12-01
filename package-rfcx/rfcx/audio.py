@@ -75,8 +75,18 @@ def downloadGuardianAudio(token, destination_path, guardian_id, min_date, max_da
         os.makedirs(audio_path)
     dates = __generate_date_list_in_isoformat(min_date, max_date)
 
-    for date in dates:
-        date_end = date.replace('00:00:00', '23:59:59')
+    for i, date in enumerate(dates):
+        time_scrap = date[-9:-1]
+        date_end = ""
+        if (i == 0):
+            date_end = date.replace(time_scrap, "23:59:59")
+        elif (i == len(dates) - 1):
+            date = date.replace(time_scrap, "00:00:00")
+            date_end = date.replace("00:00:00", time_scrap)
+        else:
+            date = date.replace(time_scrap, "00:00:00")
+            date_end = date.replace("00:00:00", "23:59:59")
+
         segments = guardianAudio(token, guardian_id, date, date_end, limit=1000, descending=False)
 
         if segments:
