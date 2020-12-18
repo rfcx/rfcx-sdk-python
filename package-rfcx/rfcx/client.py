@@ -134,7 +134,7 @@ class Client(object):
 
         return api_rfcx.guardians(self.credentials.id_token, sites)
 
-    def guardianAudio(self, guardianId=None, start=None, end=None, limit=50, descending=True):
+    def guardianAudio(self, guardianId=None, start=None, end=None, limit=50, offset=0, descending=True):
         """Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)
 
         Args:
@@ -157,7 +157,7 @@ class Client(object):
         if end == None:
             end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
 
-        return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, descending)
+        return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, offset, descending)
 
     def tags(self, type, labels, start=None, end=None, sites=None, limit=1000):
         """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API

@@ -44,6 +44,22 @@ def __generate_date_list_in_isoformat(start, end):
     dates = [(start + datetime.timedelta(days=i)).replace(microsecond=0).isoformat() + 'Z' for i in range(delta.days + 1)]
     return dates
 
+def __whole_day_segments(token, guardian_id, start, end):
+    all_segments = []
+    empty_segment = False
+    offset = 0
+
+    while not empty_segment:
+        # No data will return `None` from server
+        segments = guardianAudio(token, guardian_id, start, end, limit=1000, offset=offset, descending=False)
+        if segments:
+            all_segments.extend(segments)
+            offset = offset + 1000
+        else:
+            empty_segment = True
+
+    return all_segments
+
 def __segmentDownload(audio_path, file_ext, segment):
     audio_id = segment['guid']
     audio_name = "{}_{}_{}".format(segment['guardian_guid'], segment['measured_at'].replace(':', '-').replace('.', '-'), audio_id)
@@ -87,9 +103,10 @@ def downloadGuardianAudio(token, destination_path, guardian_id, min_date, max_da
             date = date.replace(time_scrap, "00:00:00")
             date_end = date.replace("00:00:00", "23:59:59")
 
-        segments = guardianAudio(token, guardian_id, date, date_end, limit=1000, descending=False)
+        segments = __whole_day_segments(token, guardian_id, date, date_end)
 
         if segments:
+            print("Downloading {} audio from {} on {}".format(len(segments), guardian_id, date[:-10]))
             if(parallel):
                 with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
                     futures = []
