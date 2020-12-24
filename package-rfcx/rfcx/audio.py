@@ -38,11 +38,25 @@ def save_audio_file(destination_path, audio_id, source_audio_extension='opus'):
     __save_file(url, local_path)
     print('File {}.{} saved to {}'.format(audio_id, source_audio_extension, destination_path))
 
-def __generate_date_list_in_isoformat(start, end):
-    """ Generate list of date in iso format ending with `Z` """
-    delta = end - start
-    dates = [(start + datetime.timedelta(days=i)).replace(microsecond=0).isoformat() + 'Z' for i in range(delta.days + 1)]
-    return dates
+def __generate_date_in_isoformat(date):
+    """ Generate date in iso format ending with `Z` """
+    return date.replace(microsecond=0).isoformat() + 'Z'
+
+def __get_all_segments(token, guardian_id, start, end):
+    all_segments = []
+    empty_segment = False
+    offset = 0
+
+    while not empty_segment:
+        # No data will return `None` from server
+        segments = guardianAudio(token, guardian_id, start, end, limit=1000, offset=offset, descending=False)
+        if segments:
+            all_segments.extend(segments)
+            offset = offset + 1000
+        else:
+            empty_segment = True
+
+    return all_segments
 
 def __segmentDownload(audio_path, file_ext, segment):
     audio_id = segment['guid']
@@ -73,23 +87,24 @@ def downloadGuardianAudio(token, destination_path, guardian_id, min_date, max_da
     audio_path = destination_path + '/' + guardian_id
     if not os.path.exists(audio_path):
         os.makedirs(audio_path)
-    dates = __generate_date_list_in_isoformat(min_date, max_date)
 
-    for date in dates:
-        date_end = date.replace('00:00:00', '23:59:59')
-        segments = guardianAudio(token, guardian_id, date, date_end, limit=1000, descending=False)
+    start = __generate_date_in_isoformat(min_date)
+    end = __generate_date_in_isoformat(max_date)
 
-        if segments:
-            if(parallel):
-                with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
-                    futures = []
-                    for segment in segments:
-                        futures.append(executor.submit(__segmentDownload, audio_path=audio_path, file_ext=file_ext, segment=segment))
+    segments = __get_all_segments(token, guardian_id, start, end)
 
-                    futures, _ = concurrent.futures.wait(futures)
-            else:
+    if segments:
+        print("Downloading {} audio from {}".format(len(segments), guardian_id))
+        if(parallel):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+                futures = []
                 for segment in segments:
-                    __segmentDownload(audio_path, file_ext, segment)
-            print("Finish download on", guardian_id, date[:-10])
+                    futures.append(executor.submit(__segmentDownload, audio_path=audio_path, file_ext=file_ext, segment=segment))
+
+                futures, _ = concurrent.futures.wait(futures)
         else:
-            print("No data on date:", date[:-10])
+            for segment in segments:
+                __segmentDownload(audio_path, file_ext, segment)
+        print("Finish download on {}".format(guardian_id))
+    else:
+        print("No data found on {} - {} at {}".format(start[:-10], end[:-10], guardian_id))
