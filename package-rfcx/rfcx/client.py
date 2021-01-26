@@ -120,6 +120,7 @@ class Client(object):
             f.write(c.token_expiry.isoformat() + 'Z\n')
             f.write(c.id_token + '\n')
 
+    # v1
     def guardians(self, sites=None):
         """Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)
 
@@ -228,3 +229,13 @@ class Client(object):
 
         return audio.downloadGuardianAudio(self.credentials.id_token, dest_path, guardian_id, min_date, max_date, file_ext, parallel)
 
+    # v2
+    def streams(self):
+        """Retrieve a list of streams
+
+        Args:
+
+        Returns:
+            List of streams"""
+
+        return api_rfcx.streams(self.credentials.id_token)

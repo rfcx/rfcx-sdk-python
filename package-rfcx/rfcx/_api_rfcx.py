@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 host = 'https://api.rfcx.org'  # TODO move to configuration
 
+# v1 api
 def guardians(token, sites):
     data = {'sites[]': sites, 'limit': 1000}
     path = '/v1/guardians'
@@ -25,8 +26,16 @@ def tags(token, type, labels, start, end, sites, limit):
     path = '/v2/tags'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
-    
-    
+
+# v2 api
+
+# TODO: Add the organizations/projects when the API support
+def streams(token, limit=1000):
+    data = {'limit': limit}
+    path = '/streams'
+    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    return _request(url, token=token)
+
 def _request(url, method='GET', token=None):
     logger.debug('get url: ' + url)
 
