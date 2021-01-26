@@ -120,6 +120,7 @@ class Client(object):
             f.write(c.token_expiry.isoformat() + 'Z\n')
             f.write(c.id_token + '\n')
 
+    # v1
     def guardians(self, sites=None):
         """Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)
 
@@ -228,3 +229,94 @@ class Client(object):
 
         return audio.downloadGuardianAudio(self.credentials.id_token, dest_path, guardian_id, min_date, max_date, file_ext, parallel)
 
+    # v2
+    def saveAudioFile(self, dest, audio_id, file_ext='opus'):
+        """ Prepare `url` and `local_path` and save it using function `__save_file` 
+        Args:
+            dest_path: Audio save path.
+            audio_id: RFCx audio id in format `{stream_id}_t{start time}.{end time}_g{audio gain}_f{audio format}`
+            file_ext: (optional, default= '.opus') Extension for saving audio files.
+
+        Returns:
+            None.
+
+        Raises:
+            TypeError: if missing required arguements.
+    
+        """
+        return audio.save_audio_file2(self.credentials.id_token, dest, audio_id, file_ext)
+
+    def streamAudio(self, streamId, start, end, limit=50, offset=0):
+        """Retrieve audio information about a specific stream
+
+        Args:
+            stream_id: (Required) The guid of a guardian.
+            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: Maximum timestamp of the audio. If None then defaults to now.
+            limit: Maximum results to return. Defaults to 50.
+            offset: Offset of the audio group.
+
+        Returns:
+            List of audio files (meta data showing audio id and recorded timestamp)
+        """
+        if self.credentials == None:
+            print('Not authenticated')
+            return
+
+        if streamId == None:
+            print('Require stream id')
+            return
+
+        if start == None:
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
+                     ).replace(microsecond=0).isoformat() + 'Z'
+        if end == None:
+            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+
+        return api_rfcx.streamAudio(self.credentials.id_token, streamId, start, end, limit, offset)
+
+    def downloadStreamAudio(self, dest_path=None, stream_id=None, min_date=None, max_date=None, gain=1, file_ext='opus', parallel=True):
+        """Download audio using audio information from `guardianAudio`
+
+        Args:
+            dest_path: (Required) Path to save audio.
+            stream_id: (Required) The guid of a guardian
+            min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            max_date: Maximum timestamp of the audio. If None then defaults to now.
+            gain: (optional, default= 1) volumn gain
+            file_ext: (optional, default= '.opus') Audio file extension. Default to `.opus`
+            parallel: (optional, default= True) Parallel download audio. Defaults to True.
+
+        Returns:
+            None.
+        """
+        if self.credentials == None:
+            print('Not authenticated')
+            return
+
+        if stream_id == None:
+            print("Please specific the guardian id.")
+            return
+
+        if min_date == None:
+            min_date = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+
+        if not isinstance(min_date, datetime.datetime):
+            print("min_date is not type datetime")
+            return
+
+        if max_date == None:
+            max_date = datetime.datetime.utcnow()
+
+        if not isinstance(max_date, datetime.datetime):
+            print("max_date is not type datetime")
+            return
+        
+        if dest_path == None:
+            if not os.path.exists('./audios'):
+                os.makedirs('./audios')
+            else:
+                print('`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy')
+                return
+
+        return audio.downloadStreamAudio(self.credentials.id_token, dest_path, stream_id, min_date, max_date, gain, file_ext, parallel)

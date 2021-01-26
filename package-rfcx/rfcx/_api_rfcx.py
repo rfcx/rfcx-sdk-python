@@ -25,8 +25,14 @@ def tags(token, type, labels, start, end, sites, limit):
     path = '/v2/tags'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
-    
-    
+
+# v2
+def streamAudio(token, stream_id, start, end, limit, offset):
+    data = {'id': stream_id, 'start': start, 'end': end, 'limit': limit, 'offset': offset}
+    path = f'/streams/{stream_id}/stream-segments'
+    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    return _request(url, token=token)
+
 def _request(url, method='GET', token=None):
     logger.debug('get url: ' + url)
 
