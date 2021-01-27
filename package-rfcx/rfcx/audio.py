@@ -55,7 +55,7 @@ def save_audio_file(token, dest_path, stream_id, start_time, end_time, gain=1, f
                                                                                     end_time=end,
                                                                                     gain=gain,
                                                                                     file_ext=file_ext)
-    url = "https://api.rfcx.org/internal/assets/streams/" + audio_name + "." + file_ext
+    url = "https://media-api.rfcx.org/internal/assets/streams/" + audio_name + "." + file_ext
     local_path = __local_audio_file_path(dest_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
@@ -91,7 +91,7 @@ def __segmentDownload(save_path, gain, file_ext, segment, token):
                                                                                                 gain=gain,
                                                                                                 file_ext=file_ext)
     audio_name = "{}_{}_{}_gain{}".format(stream_id, start, segment['id'], gain)
-    url = "https://api.rfcx.org/internal/assets/streams/" + rfcx_audio_format + "." + file_ext
+    url = "https://media-api.rfcx.org/internal/assets/streams/" + rfcx_audio_format + "." + file_ext
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
