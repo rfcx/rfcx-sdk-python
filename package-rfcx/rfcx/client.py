@@ -151,12 +151,12 @@ class Client(object):
         return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
 
     def saveAudioFile(self, dest_path, stream_id, start_time, end_time, gain=1, file_ext='opus'):
-        """ Save audio to f` 
+        """ Save audio to local path` 
         Args:
             dest_path: Audio save path.
             stream_id: Stream id to get the segment.
             start_time: Minimum timestamp to get the audio.
-            end_time: Maximum timestamp to get the audio.
+            end_time: Maximum timestamp to get the audio. (Should not more than )
             gain: (optional, default = 1) Volumn gain
             file_ext: (optional, default = '.opus') Extension for saving audio files.
 

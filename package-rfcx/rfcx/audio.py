@@ -19,7 +19,9 @@ def __save_file(url, local_path, token):
             shutil.copyfileobj(response.raw, out_file)
             print('Saved {}'.format(local_path))
     else:
-        print("Can not download {} with status {}".format(url, response.status_code))
+        print("Can not download", url)
+        reason = response.json()
+        print("Reason:", response.status_code, reason["message"])
 
 def __local_audio_file_path(path, audio_name, audio_extension):
     """ Create string for the name and the path """    
@@ -32,9 +34,12 @@ def __generate_date_in_isoformat(date):
 def save_audio_file(token, dest_path, stream_id, start_time, end_time, gain=1, file_ext='opus'):
     """ Prepare `url` and `local_path` and save it using function `__save_file` 
         Args:
-            destination_path: Audio save path.
-            audio_id: RFCx audio id in format `{stream_id}_t{start time}.{end time}_g{audio gain}_f{audio format}`
-            source_audio_extension: (optional, default= '.opus') Extension for saving audio files.
+            dest_path: Audio save path.
+            stream_id: Stream id to get the segment.
+            start_time: Minimum timestamp to get the audio.
+            end_time: Maximum timestamp to get the audio.
+            gain: (optional, default = 1) Volumn gain
+            file_ext: (optional, default = '.opus') Extension for saving audio files.
 
         Returns:
             None.
