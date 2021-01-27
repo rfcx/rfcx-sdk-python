@@ -8,25 +8,12 @@ logger = logging.getLogger(__name__)
 
 host = 'https://api.rfcx.org'  # TODO move to configuration
 
-def guardians(token, sites):
-    data = {'sites[]': sites, 'limit': 1000}
-    path = '/v1/guardians'
-    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
-    return _request(url, token=token)
-
-def guardianAudio(token, guardianId, start, end, limit, offset=0, descending=True):
-    data = {'starting_after': start, 'ending_before': end, 'limit': limit, 'offset': offset, 'order': 'descending' if descending else 'ascending'}
-    path = f'/v1/guardians/{guardianId}/audio'
-    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
-    return _request(url, token=token)
-
 def tags(token, type, labels, start, end, sites, limit):
     data = {'type': type, 'values[]': labels, 'starting_after_local': start, 'starting_before_local': end, 'sites[]': sites, 'limit': limit}
     path = '/v2/tags'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 
-# v2
 def streamSegments(token, stream_id, start, end, limit, offset):
     data = {'id': stream_id, 'start': start, 'end': end, 'limit': limit, 'offset': offset}
     path = f'/streams/{stream_id}/stream-segments'

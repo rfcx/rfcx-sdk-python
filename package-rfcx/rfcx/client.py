@@ -120,46 +120,6 @@ class Client(object):
             f.write(c.token_expiry.isoformat() + 'Z\n')
             f.write(c.id_token + '\n')
 
-    # v1
-    def guardians(self, sites=None):
-        """Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)
-
-        Args:
-            sites: List of site shortnames (e.g. cerroblanco). Default (None) gets all your accessible sites.
-
-        Returns:
-            List of guardians"""
-
-        if sites == None:
-            sites = self.accessible_sites
-
-        return api_rfcx.guardians(self.credentials.id_token, sites)
-
-    def guardianAudio(self, guardianId=None, start=None, end=None, limit=50, offset=0, descending=True):
-        """Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)
-
-        Args:
-            guardianId: (Required) The guid of a guardian
-            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            end: Maximum timestamp of the audio. If None then defaults to now.
-            limit: Maximum results to return. Defaults to 50. (TODO check if there is an upper limit on the API)
-            descending: Order by newest results first. Defaults to True.
-
-        Returns:
-            List of audio files (meta data showing audio id and recorded timestamp)
-        """
-        if self.credentials == None:
-            print('Not authenticated')
-            return
-
-        if start == None:
-            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
-                     ).replace(microsecond=0).isoformat() + 'Z'
-        if end == None:
-            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
-
-        return api_rfcx.guardianAudio(self.credentials.id_token, guardianId, start, end, limit, offset, descending)
-
     def tags(self, type, labels, start=None, end=None, sites=None, limit=1000):
         """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
 
@@ -190,52 +150,15 @@ class Client(object):
 
         return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
 
-    def downloadGuardianAudio(self, dest_path=None, guardian_id=None, min_date=None, max_date=None, file_ext='opus', parallel=True):
-        """Download audio using audio information from `guardianAudio`
-
-        Args:
-            dest_path: (Required) Path to save audio.
-            guardianId: (Required) The guid of a guardian
-            min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            max_date: Maximum timestamp of the audio. If None then defaults to now.
-            file_ext: Audio file extension. Default to `.opus`
-            parallel: Parallel download audio. Defaults to True.
-
-        Returns:
-            None.
-        """
-        if self.credentials == None:
-            print('Not authenticated')
-            return
-
-        if dest_path == None:
-            if not os.path.exists('./audios'):
-                os.makedirs('./audios')
-        if guardian_id == None:
-            print("Please specific the guardian id.")
-            return
-
-        if min_date == None:
-            min_date = datetime.datetime.utcnow() - datetime.timedelta(days=30)
-        if not isinstance(min_date, datetime.datetime):
-            print("min_date is not type datetime")
-            return
-
-        if max_date == None:
-            max_date = datetime.datetime.utcnow()
-        if not isinstance(max_date, datetime.datetime):
-            print("max_date is not type datetime")
-            return
-
-        return audio.downloadGuardianAudio(self.credentials.id_token, dest_path, guardian_id, min_date, max_date, file_ext, parallel)
-
-    # v2
-    def saveAudioFile(self, dest, audio_id, file_ext='opus'):
-        """ Prepare `url` and `local_path` and save it using function `__save_file` 
+    def saveAudioFile(self, dest_path, stream_id, start_time, end_time, gain=1, file_ext='opus'):
+        """ Save audio to f` 
         Args:
             dest_path: Audio save path.
-            audio_id: RFCx audio id in format `{stream_id}_t{start time}.{end time}_g{audio gain}_f{audio format}`
-            file_ext: (optional, default= '.opus') Extension for saving audio files.
+            stream_id: Stream id to get the segment.
+            start_time: Minimum timestamp to get the audio.
+            end_time: Maximum timestamp to get the audio.
+            gain: (optional, default = 1) Volumn gain
+            file_ext: (optional, default = '.opus') Extension for saving audio files.
 
         Returns:
             None.
@@ -244,7 +167,15 @@ class Client(object):
             TypeError: if missing required arguements.
     
         """
-        return audio.save_audio_file2(self.credentials.id_token, dest, audio_id, file_ext)
+        if not isinstance(start_time, datetime.datetime):
+            print("start_time is not type datetime")
+            return
+
+        if not isinstance(end_time, datetime.datetime):
+            print("end_time is not type datetime")
+            return
+
+        return audio.save_audio_file(self.credentials.id_token, dest_path, stream_id, start_time, end_time, file_ext)
 
     def streamSegments(self, streamId, start, end, limit=50, offset=0):
         """Retrieve audio information about a specific stream
