@@ -27,7 +27,7 @@ def tags(token, type, labels, start, end, sites, limit):
     return _request(url, token=token)
 
 # v2
-def streamAudio(token, stream_id, start, end, limit, offset):
+def streamSegments(token, stream_id, start, end, limit, offset):
     data = {'id': stream_id, 'start': start, 'end': end, 'limit': limit, 'offset': offset}
     path = f'/streams/{stream_id}/stream-segments'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))

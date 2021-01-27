@@ -246,7 +246,7 @@ class Client(object):
         """
         return audio.save_audio_file2(self.credentials.id_token, dest, audio_id, file_ext)
 
-    def streamAudio(self, streamId, start, end, limit=50, offset=0):
+    def streamSegments(self, streamId, start, end, limit=50, offset=0):
         """Retrieve audio information about a specific stream
 
         Args:
@@ -273,9 +273,9 @@ class Client(object):
         if end == None:
             end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
 
-        return api_rfcx.streamAudio(self.credentials.id_token, streamId, start, end, limit, offset)
+        return api_rfcx.streamSegments(self.credentials.id_token, streamId, start, end, limit, offset)
 
-    def downloadStreamAudio(self, dest_path=None, stream_id=None, min_date=None, max_date=None, gain=1, file_ext='opus', parallel=True):
+    def downloadStreamSegments(self, dest_path=None, stream_id=None, min_date=None, max_date=None, gain=1, file_ext='opus', parallel=True):
         """Download audio using audio information from `guardianAudio`
 
         Args:
@@ -295,7 +295,7 @@ class Client(object):
             return
 
         if stream_id == None:
-            print("Please specific the guardian id.")
+            print("Please specific the stream id.")
             return
 
         if min_date == None:
@@ -319,4 +319,4 @@ class Client(object):
                 print('`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy')
                 return
 
-        return audio.downloadStreamAudio(self.credentials.id_token, dest_path, stream_id, min_date, max_date, gain, file_ext, parallel)
+        return audio.downloadStreamSegments(self.credentials.id_token, dest_path, stream_id, min_date, max_date, gain, file_ext, parallel)

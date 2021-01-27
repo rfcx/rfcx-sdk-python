@@ -3,7 +3,7 @@ import requests
 import shutil
 import os
 import concurrent.futures
-from rfcx._api_rfcx import guardianAudio, streamAudio
+from rfcx._api_rfcx import guardianAudio, streamSegments
 
 # v1
 def __save_file(url, local_path, token=None):
@@ -77,7 +77,7 @@ def __segmentDownload(audio_path, file_ext, segment):
     __save_file(url, local_path)
 
 def downloadGuardianAudio(token, destination_path, guardian_id, min_date, max_date, file_ext='opus', parallel=True):
-    """ Download RFCx audio on specific time range using `guardianAudio` to get audio segments information (TO BE DEPRECATED - use downloadStreamAudio in future)
+    """ Download RFCx audio on specific time range using `guardianAudio` to get audio segments information (TO BE DEPRECATED - use downloadStreamSegments in future)
         and save it using function `__save_file`
         Args:
             token: RFCx client token.
@@ -152,7 +152,7 @@ def __get_all_segments2(token, stream_id, start, end):
 
     while not empty_segment:
         # No data will return empty array from server
-        segments = streamAudio(token, stream_id, start, end, limit=1000, offset=offset)
+        segments = streamSegments(token, stream_id, start, end, limit=1000, offset=offset)
         if segments:
             all_segments.extend(segments)
             offset = offset + 1000
@@ -176,8 +176,8 @@ def __segmentDownload2(save_path, gain, file_ext, segment, token):
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
-def downloadStreamAudio(token, dest_path, stream_id, min_date, max_date, gain=1, file_ext='opus', parallel=True):
-    """ Download RFCx audio on specific time range using `streamAudio` to get audio segments information
+def downloadStreamSegments(token, dest_path, stream_id, min_date, max_date, gain=1, file_ext='opus', parallel=True):
+    """ Download RFCx audio on specific time range using `streamSegments` to get audio segments information
         and save it using function `__save_file`
         Args:
             token: RFCx client token.
