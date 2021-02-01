@@ -229,13 +229,15 @@ class Client(object):
 
         return audio.downloadGuardianAudio(self.credentials.id_token, dest_path, guardian_id, min_date, max_date, file_ext, parallel)
 
-    # v2
-    def streams(self):
+    def streams(self, keyword='', limit=1000, offset=0):
         """Retrieve a list of streams
 
         Args:
+            keyword:(optional, default= '') Match streams with name
+            limit: (optional, default= 1000) Maximum number of  results to return
+            offset: (optional, default= 0) Number of results to skip
 
         Returns:
             List of streams"""
 
-        return api_rfcx.streams(self.credentials.id_token)
+        return api_rfcx.streams(self.credentials.id_token, keyword, limit, offset)
