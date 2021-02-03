@@ -21,7 +21,7 @@ def tags(token, type, labels, start, end, sites, limit):
     return _request(url, token=token)
 
 # TODO: Add the organizations/projects when the API support
-def streams(token, keyword='', limit=1000, offset=0):
+def streams(token, keyword=None, limit=1000, offset=0):
     data = {'keyword': keyword, 'limit': limit, 'offset': offset}
     path = '/streams'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))

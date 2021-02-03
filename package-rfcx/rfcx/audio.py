@@ -31,15 +31,15 @@ def __generate_date_in_isoformat(date):
     """ Generate date in iso format ending with `Z` """
     return date.replace(microsecond=0).isoformat() + 'Z'
 
-def save_audio_file(token, dest_path, stream_id, start_time, end_time, gain=1, file_ext='opus'):
+def save_audio_file(token, dest_path, stream_id, start_time, end_time, gain=1, file_ext='wav'):
     """ Prepare `url` and `local_path` and save it using function `__save_file` 
         Args:
             dest_path: Audio save path.
             stream_id: Stream id to get the segment.
             start_time: Minimum timestamp to get the audio.
-            end_time: Maximum timestamp to get the audio.
-            gain: (optional, default = 1) Volumn gain
-            file_ext: (optional, default = '.opus') Extension for saving audio files.
+            end_time: Maximum timestamp to get the audio. (Should not more than 15 min range)
+            gain: (optional, default = 1) Input channel tone loudness
+            file_ext: (optional, default = 'wav') Extension for saving audio files.
 
         Returns:
             None.
@@ -95,7 +95,7 @@ def __segmentDownload(save_path, gain, file_ext, segment, token):
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
-def downloadStreamSegments(token, dest_path, stream_id, min_date, max_date, gain=1, file_ext='opus', parallel=True):
+def downloadStreamSegments(token, dest_path, stream_id, min_date, max_date, gain=1, file_ext='wav', parallel=True):
     """ Download RFCx audio on specific time range using `streamSegments` to get audio segments information
         and save it using function `__save_file`
         Args:
@@ -104,8 +104,8 @@ def downloadStreamSegments(token, dest_path, stream_id, min_date, max_date, gain
             stream_id: RFCx guardian id
             min_date: Download start date
             max_date: Download end date
-            gain: (optional, default= 1) volumn gain.
-            file_ext: (optional, default= '.opus') Extension for saving audio file.
+            gain: (optional, default= 1) Input channel tone loudness
+            file_ext: (optional, default= 'wav') Extension for saving audio file.
             parallel: (optional, default= True) Enable to parallel download audio from RFCx
 
         Returns:
