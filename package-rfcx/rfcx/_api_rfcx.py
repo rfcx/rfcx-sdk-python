@@ -8,15 +8,22 @@ logger = logging.getLogger(__name__)
 
 host = 'https://api.rfcx.org'  # TODO move to configuration
 
+def streamSegments(token, stream_id, start, end, limit, offset):
+    data = {'id': stream_id, 'start': start, 'end': end, 'limit': limit, 'offset': offset}
+    path = f'/streams/{stream_id}/stream-segments'
+    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    return _request(url, token=token)
+
 def tags(token, type, labels, start, end, sites, limit):
     data = {'type': type, 'values[]': labels, 'starting_after_local': start, 'starting_before_local': end, 'sites[]': sites, 'limit': limit}
     path = '/v2/tags'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 
-def streamSegments(token, stream_id, start, end, limit, offset):
-    data = {'id': stream_id, 'start': start, 'end': end, 'limit': limit, 'offset': offset}
-    path = f'/streams/{stream_id}/stream-segments'
+# TODO: Add the organizations/projects when the API support
+def streams(token, keyword=None, limit=1000, offset=0):
+    data = {'keyword': keyword, 'limit': limit, 'offset': offset}
+    path = '/streams'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 

@@ -150,15 +150,15 @@ class Client(object):
 
         return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
 
-    def saveAudioFile(self, dest_path, stream_id, start_time, end_time, gain=1, file_ext='opus'):
+    def saveAudioFile(self, dest_path, stream_id, start_time, end_time, gain=1, file_ext='wav'):
         """ Save audio to local path` 
         Args:
             dest_path: Audio save path.
             stream_id: Stream id to get the segment.
             start_time: Minimum timestamp to get the audio.
-            end_time: Maximum timestamp to get the audio. (Should not more than )
-            gain: (optional, default = 1) Volumn gain
-            file_ext: (optional, default = '.opus') Extension for saving audio files.
+            end_time: Maximum timestamp to get the audio. (Should not more than 15 min range)
+            gain: (optional, default = 1) Input channel tone loudness
+            file_ext: (optional, default = 'wav') Extension for saving audio files.
 
         Returns:
             None.
@@ -206,7 +206,7 @@ class Client(object):
 
         return api_rfcx.streamSegments(self.credentials.id_token, streamId, start, end, limit, offset)
 
-    def downloadStreamSegments(self, dest_path=None, stream_id=None, min_date=None, max_date=None, gain=1, file_ext='opus', parallel=True):
+    def downloadStreamSegments(self, dest_path=None, stream_id=None, min_date=None, max_date=None, gain=1, file_ext='wav', parallel=True):
         """Download audio using audio information from `guardianAudio`
 
         Args:
@@ -214,8 +214,8 @@ class Client(object):
             stream_id: (Required) The guid of a guardian
             min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             max_date: Maximum timestamp of the audio. If None then defaults to now.
-            gain: (optional, default= 1) volumn gain
-            file_ext: (optional, default= '.opus') Audio file extension. Default to `.opus`
+            gain: (optional, default= 1) Input channel tone loudness
+            file_ext: (optional, default= 'wav') Audio file extension. Default to `wav`
             parallel: (optional, default= True) Parallel download audio. Defaults to True.
 
         Returns:
@@ -251,3 +251,16 @@ class Client(object):
                 return
 
         return audio.downloadStreamSegments(self.credentials.id_token, dest_path, stream_id, min_date, max_date, gain, file_ext, parallel)
+
+    def streams(self, keyword=None, limit=1000, offset=0):
+        """Retrieve a list of streams
+
+        Args:
+            keyword:(optional, default= '') Match streams with name
+            limit: (optional, default= 1000) Maximum number of  results to return
+            offset: (optional, default= 0) Number of results to skip
+
+        Returns:
+            List of streams"""
+
+        return api_rfcx.streams(self.credentials.id_token, keyword, limit, offset)
