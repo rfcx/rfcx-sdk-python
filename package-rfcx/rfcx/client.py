@@ -182,7 +182,7 @@ class Client(object):
         """Retrieve audio information about a specific stream
 
         Args:
-            stream_id: (Required) The guid of a guardian.
+            stream_id: (Required) RFCx stream id.
             start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the audio. If None then defaults to now.
             limit: Maximum results to return. Defaults to 50.
@@ -208,11 +208,11 @@ class Client(object):
         return api_rfcx.streamSegments(self.credentials.id_token, streamId, start, end, limit, offset)
 
     def downloadStreamSegments(self, dest_path=None, stream_id=None, min_date=None, max_date=None, gain=1, file_ext='wav', parallel=True):
-        """Download audio using audio information from `guardianAudio`
+        """Download RFCx on specific time range
 
         Args:
             dest_path: (Required) Path to save audio.
-            stream_id: (Required) The guid of a guardian
+            stream_id: (Required) RFCx stream id.
             min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             max_date: Maximum timestamp of the audio. If None then defaults to now.
             gain: (optional, default= 1) Input channel tone loudness
@@ -280,7 +280,7 @@ class Client(object):
 
         iso_regex = re.compile(regex).match
         if iso_regex(timestamp) == None:
-            print("Timestamp should be in iso format with milliseconds")
+            print("Timestamp should be in iso format with milliseconds. For example: 2020-01-01T00:00:00.000Z")
             return
 
         return ingest.ingest_audio(self.credentials.id_token, stream_id, filepath, timestamp)

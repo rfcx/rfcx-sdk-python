@@ -101,7 +101,7 @@ def downloadStreamSegments(token, dest_path, stream_id, min_date, max_date, gain
         Args:
             token: RFCx client token.
             dest_path: Audio save path.
-            stream_id: RFCx guardian id
+            stream_id: RFCx stream id
             min_date: Download start date
             max_date: Download end date
             gain: (optional, default= 1) Input channel tone loudness
