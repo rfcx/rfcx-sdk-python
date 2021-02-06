@@ -3,6 +3,7 @@ import datetime
 import os
 import re
 import rfcx.audio as audio
+import rfcx.ingest as ingest
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
@@ -264,3 +265,23 @@ class Client(object):
             List of streams"""
 
         return api_rfcx.streams(self.credentials.id_token, keyword, limit, offset)
+
+    def ingest_audio(self, stream_id, filepath, timestamp):
+        """ Ingest an audio to RFCx
+        Args:
+            stream_id: RFCx stream id
+            filepath: Local file path to be ingest
+            timestamp: Audio timestamp in iso format (with milliseconds)
+
+        Returns:
+            None.
+        """
+        regex = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?$'
+
+        iso_regex = re.compile(regex).match
+        if iso_regex(timestamp) == None:
+            print("Timestamp should be in iso format with milliseconds")
+            return
+
+        return ingest.ingest_audio(self.credentials.id_token, stream_id, filepath, timestamp)
+
