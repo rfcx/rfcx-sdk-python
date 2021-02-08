@@ -14,6 +14,12 @@ def streamSegments(token, stream_id, start, end, limit, offset):
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 
+def annotations(token, start, end, classifications=None, stream_id=None, limit=1000, offset=0):
+    data = {'start': start, 'end': end, 'classifications[]': classifications, 'stream_id': stream_id, 'limit': limit, 'offset': offset}
+    path = '/annotations'
+    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    return _request(url, token=token)
+
 def tags(token, type, labels, start, end, sites, limit):
     data = {'type': type, 'values[]': labels, 'starting_after_local': start, 'starting_before_local': end, 'sites[]': sites, 'limit': limit}
     path = '/v2/tags'

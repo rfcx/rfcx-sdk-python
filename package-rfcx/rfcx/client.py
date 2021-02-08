@@ -264,3 +264,25 @@ class Client(object):
             List of streams"""
 
         return api_rfcx.streams(self.credentials.id_token, keyword, limit, offset)
+
+    def annotations(self, start=None, end=None, classifications=None, stream_id=None, limit=1000, offset=0):
+        """Retrieve a list of annotations
+
+        Args:
+            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: Maximum timestamp of the audio. If None then defaults to now.
+            classifications: (optional, default= None) List of classification names.
+            stream_id: (optional,default= None) Limit results to a given stream.
+            limit: (optional, default= 1000) Maximum number of results to be return.
+            offset: (optional, default= 0) Number of results to skip.
+
+        Returns:
+            List of annotations"""
+
+        if start == None:
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
+                     ).replace(microsecond=0).isoformat() + 'Z'
+        if end == None:
+            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+
+        return api_rfcx.annotations(self.credentials.id_token, start, end, classifications, stream_id, limit, offset)
