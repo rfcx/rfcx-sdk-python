@@ -151,11 +151,11 @@ class Client(object):
 
         return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
 
-    def saveAudioFile(self, dest_path, stream_id, start_time, end_time, gain=1, file_ext='wav'):
+    def saveAudioFile(self, dest_path, stream, start_time, end_time, gain=1, file_ext='wav'):
         """ Save audio to local path` 
         Args:
             dest_path: Audio save path.
-            stream_id: Stream id to get the segment.
+            stream: Identifies a stream/site
             start_time: Minimum timestamp to get the audio.
             end_time: Maximum timestamp to get the audio. (Should not more than 15 min range)
             gain: (optional, default = 1) Input channel tone loudness
@@ -176,13 +176,13 @@ class Client(object):
             print("end_time is not type datetime")
             return
 
-        return audio.save_audio_file(self.credentials.id_token, dest_path, stream_id, start_time, end_time, file_ext)
+        return audio.save_audio_file(self.credentials.id_token, dest_path, stream, start_time, end_time, file_ext)
 
     def streamSegments(self, streamId, start, end, limit=50, offset=0):
         """Retrieve audio information about a specific stream
 
         Args:
-            stream_id: (Required) RFCx stream id.
+            stream: (Required) Identifies a stream/site.
             start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the audio. If None then defaults to now.
             limit: Maximum results to return. Defaults to 50.
@@ -207,14 +207,14 @@ class Client(object):
 
         return api_rfcx.streamSegments(self.credentials.id_token, streamId, start, end, limit, offset)
 
-    def downloadStreamSegments(self, dest_path=None, stream_id=None, min_date=None, max_date=None, gain=1, file_ext='wav', parallel=True):
+    def downloadStreamSegments(self, dest_path=None, stream=None, min_date=None, max_date=None, gain=1, file_ext='wav', parallel=True):
         """Download RFCx on specific time range
 
         Args:
             dest_path: (Required) Path to save audio.
-            stream_id: (Required) RFCx stream id.
-            min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            max_date: Maximum timestamp of the audio. If None then defaults to now.
+            stream: (Required) Identifies a stream/site.
+            min_date: Only include files starting after given timestamp (ISO format, e.g. 2021-01-20T01:02:30.000Z)
+            max_date: Only include files starting before given timestamp (ISO format, e.g. 2021-01-20T01:02:30.000Z)
             gain: (optional, default= 1) Input channel tone loudness
             file_ext: (optional, default= 'wav') Audio file extension. Default to `wav`
             parallel: (optional, default= True) Parallel download audio. Defaults to True.
@@ -226,7 +226,7 @@ class Client(object):
             print('Not authenticated')
             return
 
-        if stream_id == None:
+        if stream == None:
             print("Please specific the stream id.")
             return
 
@@ -251,7 +251,7 @@ class Client(object):
                 print('`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy')
                 return
 
-        return audio.downloadStreamSegments(self.credentials.id_token, dest_path, stream_id, min_date, max_date, gain, file_ext, parallel)
+        return audio.downloadStreamSegments(self.credentials.id_token, dest_path, stream, min_date, max_date, gain, file_ext, parallel)
 
     def streams(self, keyword=None, limit=1000, offset=0):
         """Retrieve a list of streams
@@ -266,22 +266,23 @@ class Client(object):
 
         return api_rfcx.streams(self.credentials.id_token, keyword, limit, offset)
 
-    def ingest_audio(self, stream_id, filepath, timestamp):
+
+    def ingest_audio(self, stream, filepath, timestamp):
         """ Ingest an audio to RFCx
         Args:
-            stream_id: RFCx stream id
+            stream: Identifies a stream/site
             filepath: Local file path to be ingest
-            timestamp: Audio timestamp in iso format (with milliseconds)
+            timestamp: Audio timestamp in datetime type
 
         Returns:
             None.
         """
-        regex = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)Z$'
 
-        iso_regex = re.compile(regex).match
-        if iso_regex(timestamp) == None:
-            print("Timestamp should be in iso format with milliseconds. For example: 2020-01-01T00:00:00.000Z")
+        if not isinstance(timestamp, datetime.datetime):
+            print("timestamp is not type datetime")
             return
 
-        return ingest.ingest_audio(self.credentials.id_token, stream_id, filepath, timestamp)
+        iso_timestamp = timestamp.replace(microsecond=0).isoformat() + 'Z'
+
+        return ingest.ingest_audio(self.credentials.id_token, stream, filepath, iso_timestamp)
 
