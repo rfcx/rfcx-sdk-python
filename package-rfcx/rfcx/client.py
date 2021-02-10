@@ -242,10 +242,10 @@ class Client(object):
         Args:
             start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the audio. If None then defaults to now.
-            classifications: (optional, default= None) List of classification names.
-            stream: (optional,default= None) Limit results to a given stream.
-            limit: (optional, default= 1000) Maximum number of results to be return.
-            offset: (optional, default= 0) Number of results to skip.
+            classifications: (optional, default=None) List of classification names.
+            stream: (optional, default=None) Limit results to a given stream.
+            limit: (optional, default=1000) Maximum number of results to be return.
+            offset: (optional, default=0) Number of results to skip.
 
         Returns:
             List of annotations"""
