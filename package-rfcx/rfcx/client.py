@@ -12,7 +12,6 @@ from rfcx._credentials import Credentials
 
 class Client(object):
     """Authenticate and perform requests against the RFCx platform"""
-
     def __init__(self):
         self.credentials = None
         self.default_site = None
@@ -50,9 +49,10 @@ class Client(object):
                 token_expiry = datetime.datetime.strptime(
                     lines[3], "%Y-%m-%dT%H:%M:%S.%fZ")
                 id_token = lines[4]
-                if token_expiry > datetime.datetime.now() + datetime.timedelta(hours=1):
-                    self._setup_credentials(
-                        access_token, token_expiry, refresh_token, id_token)
+                if token_expiry > datetime.datetime.now() + datetime.timedelta(
+                        hours=1):
+                    self._setup_credentials(access_token, token_expiry,
+                                            refresh_token, id_token)
                     print('Using persisted authenticatation')
                     return
                 elif refresh_token != None:
@@ -63,10 +63,12 @@ class Client(object):
                     except api_auth.TokenError:
                         has_error = True
                     if not has_error:
-                        self._setup_credentials(
-                            access_token, token_expiry, refresh_token, id_token)
+                        self._setup_credentials(access_token, token_expiry,
+                                                refresh_token, id_token)
                         self._persist_credentials()
-                        print('Using persisted authenticatation (with token refresh)')
+                        print(
+                            'Using persisted authenticatation (with token refresh)'
+                        )
                         return
 
         # Create a Code Verifier & Challenge
@@ -87,8 +89,8 @@ class Client(object):
         # Perform the exchange
         access_token, refresh_token, token_expiry, id_token = api_auth.authcode_exchange(
             code.strip(), code_verifier, client_id, scope)
-        self._setup_credentials(
-            access_token, token_expiry, refresh_token, id_token)
+        self._setup_credentials(access_token, token_expiry, refresh_token,
+                                id_token)
 
         print('Successfully authenticated')
         print('Default site:', self.default_site)
@@ -99,9 +101,10 @@ class Client(object):
         if persist:
             self._persist_credentials()
 
-    def _setup_credentials(self, access_token, token_expiry, refresh_token, id_token):
-        self.credentials = Credentials(
-            access_token, token_expiry, refresh_token, id_token)
+    def _setup_credentials(self, access_token, token_expiry, refresh_token,
+                           id_token):
+        self.credentials = Credentials(access_token, token_expiry,
+                                       refresh_token, id_token)
         app_meta = self.credentials.id_object['https://rfcx.org/app_metadata']
         if app_meta:
             self.accessible_sites = app_meta.get('accessibleSites', [])
@@ -110,52 +113,31 @@ class Client(object):
             roles = app_meta.get('authorization', {}).get('roles', [])
             if not "rfcxUser" in roles:
                 raise Exception(
-                    "User does not have sufficient privileges. Please check you have access to https://dashboard.rfcx.org or contact support.")
+                    "User does not have sufficient privileges. Please check you have access to https://dashboard.rfcx.org or contact support."
+                )
 
     def _persist_credentials(self):
         c = self.credentials
         with open(self.persisted_credentials_path, 'w') as f:
             f.write('version 1\n')
             f.write(c.access_token + '\n')
-            f.write((c.refresh_token if c.refresh_token != None else '') + '\n')
+            f.write((c.refresh_token if c.refresh_token != None else '') +
+                    '\n')
             f.write(c.token_expiry.isoformat() + 'Z\n')
             f.write(c.id_token + '\n')
 
-    def tags(self, type, labels, start=None, end=None, sites=None, limit=1000):
-        """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
 
-        Args:
-            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected
-            labels: (Required) List of labels. If None then returns tags of any label.
-            start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.
-            end: Maximum timestamp of the annotations. If None then defaults to now.
-            sites: List of sites by shortname. If None then returns tags from any site.
-            limit: Maximum number of audio files to return (not the number of tags!). Defaults to 1000.
-
-        Returns:
-            List of tags
-        """
-        if self.credentials == None:
-            print('Not authenticated')
-            return
-
-        if type not in ['annotation', 'inference', 'inference:confirmed', 'inference:rejected']:
-            print('Unrecognized type')
-            return
-
-        if start == None:
-            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
-                     ).replace(microsecond=0).isoformat() + 'Z'
-        if end == None:
-            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
-
-        return api_rfcx.tags(self.credentials.id_token, type, labels, start, end, sites, limit)
-
-    def saveAudioFile(self, dest_path, stream, start_time, end_time, gain=1, file_ext='wav'):
+    def saveAudioFile(self,
+                      dest_path,
+                      stream,
+                      start_time,
+                      end_time,
+                      gain=1,
+                      file_ext='wav'):
         """ Save audio to local path` 
         Args:
             dest_path: Audio save path.
-            stream: Identifies a stream/site
+            stream: Identifies a stream/site.
             start_time: Minimum timestamp to get the audio.
             end_time: Maximum timestamp to get the audio. (Should not more than 15 min range)
             gain: (optional, default = 1) Input channel tone loudness
@@ -166,7 +148,7 @@ class Client(object):
 
         Raises:
             TypeError: if missing required arguements.
-    
+
         """
         if not isinstance(start_time, datetime.datetime):
             print("start_time is not type datetime")
@@ -176,9 +158,11 @@ class Client(object):
             print("end_time is not type datetime")
             return
 
-        return audio.save_audio_file(self.credentials.id_token, dest_path, stream, start_time, end_time, file_ext)
+        return audio.save_audio_file(self.credentials.id_token, dest_path,
+                                     stream_id, start_time, end_time, file_ext)
 
-    def streamSegments(self, streamId, start, end, limit=50, offset=0):
+
+    def streamSegments(self, stream, start, end, limit=50, offset=0):
         """Retrieve audio information about a specific stream
 
         Args:
@@ -195,7 +179,7 @@ class Client(object):
             print('Not authenticated')
             return
 
-        if streamId == None:
+        if stream == None:
             print('Require stream id')
             return
 
@@ -203,18 +187,28 @@ class Client(object):
             start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
                      ).replace(microsecond=0).isoformat() + 'Z'
         if end == None:
-            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+            end = datetime.datetime.utcnow().replace(
+                microsecond=0).isoformat() + 'Z'
 
-        return api_rfcx.streamSegments(self.credentials.id_token, streamId, start, end, limit, offset)
+        return api_rfcx.streamSegments(self.credentials.id_token, streamId,
+                                       start, end, limit, offset)
 
-    def downloadStreamSegments(self, dest_path=None, stream=None, min_date=None, max_date=None, gain=1, file_ext='wav', parallel=True):
-        """Download RFCx on specific time range
+
+    def downloadStreamSegments(self,
+                               dest_path=None,
+                               stream=None,
+                               min_date=None,
+                               max_date=None,
+                               gain=1,
+                               file_ext='wav',
+                               parallel=True):
+        """Download audio using audio information from `guardianAudio`
 
         Args:
             dest_path: (Required) Path to save audio.
-            stream: (Required) Identifies a stream/site.
-            min_date: Only include files starting after given timestamp (ISO format, e.g. 2021-01-20T01:02:30.000Z)
-            max_date: Only include files starting before given timestamp (ISO format, e.g. 2021-01-20T01:02:30.000Z)
+            stream: (Required) Identifies a stream/site
+            min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            max_date: Maximum timestamp of the audio. If None then defaults to now.
             gain: (optional, default= 1) Input channel tone loudness
             file_ext: (optional, default= 'wav') Audio file extension. Default to `wav`
             parallel: (optional, default= True) Parallel download audio. Defaults to True.
@@ -243,28 +237,51 @@ class Client(object):
         if not isinstance(max_date, datetime.datetime):
             print("max_date is not type datetime")
             return
-        
+
         if dest_path == None:
             if not os.path.exists('./audios'):
                 os.makedirs('./audios')
             else:
-                print('`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy')
+                print(
+                    '`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy'
+                )
                 return
+        return audio.downloadStreamSegments(self.credentials.id_token,
+                                            dest_path, stream, min_date,
+                                            max_date, gain, file_ext, parallel)
 
-        return audio.downloadStreamSegments(self.credentials.id_token, dest_path, stream, min_date, max_date, gain, file_ext, parallel)
 
-    def streams(self, keyword=None, limit=1000, offset=0):
+    def streams(self,
+                organizations=None,
+                projects=None,
+                created_by=None,
+                keyword=None,
+                is_public=True,
+                is_deleted=False,
+                limit=1000,
+                offset=0):
         """Retrieve a list of streams
 
         Args:
-            keyword:(optional, default= '') Match streams with name
-            limit: (optional, default= 1000) Maximum number of  results to return
-            offset: (optional, default= 0) Number of results to skip
+            organizations: List of organization ids
+            projects: List of organization ids
+            created_by: The stream owner. Have 3 options: None, me, or collaborators
+            keyword: Match streams name with keyword
+            is_public: (optional, default=True) Match public or private streams
+            is_deleted: (optional, default=False) Match deleted streams
+            limit: (optional, default=1000) Maximum number of  results to return
+            offset: (optional, default=0) Number of results to skip
 
         Returns:
             List of streams"""
 
-        return api_rfcx.streams(self.credentials.id_token, keyword, limit, offset)
+        if created_by is not None and created_by not in ["me", "collaborators"]:
+            print("created_by can be only None, me, or collaborators")
+            return
+ 
+        return api_rfcx.streams(self.credentials.id_token, organizations,
+                                projects, is_public, is_deleted, created_by,
+                                keyword, limit, offset)
 
 
     def ingest_audio(self, stream, filepath, timestamp):
@@ -286,3 +303,25 @@ class Client(object):
 
         return ingest.ingest_audio(self.credentials.id_token, stream, filepath, iso_timestamp)
 
+
+    def annotations(self, start=None, end=None, classifications=None, stream=None, limit=1000, offset=0):
+        """Retrieve a list of annotations
+
+        Args:
+            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: Maximum timestamp of the audio. If None then defaults to now.
+            classifications: (optional, default=None) List of classification names.
+            stream: (optional, default=None) Limit results to a given stream.
+            limit: (optional, default=1000) Maximum number of results to be return.
+            offset: (optional, default=0) Number of results to skip.
+
+        Returns:
+            List of annotations"""
+
+        if start == None:
+            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
+                     ).replace(microsecond=0).isoformat() + 'Z'
+        if end == None:
+            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+
+        return api_rfcx.annotations(self.credentials.id_token, start, end, classifications, stream, limit, offset)
