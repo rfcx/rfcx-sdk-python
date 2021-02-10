@@ -95,13 +95,13 @@ def __segmentDownload(save_path, gain, file_ext, segment, token):
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
-def downloadStreamSegments(token, dest_path, stream_id, min_date, max_date, gain=1, file_ext='wav', parallel=True):
+def downloadStreamSegments(token, dest_path, stream, min_date, max_date, gain=1, file_ext='wav', parallel=True):
     """ Download RFCx audio on specific time range using `streamSegments` to get audio segments information
         and save it using function `__save_file`
         Args:
             token: RFCx client token.
             dest_path: Audio save path.
-            stream_id: RFCx guardian id
+            stream: Identifies a stream/site
             min_date: Download start date
             max_date: Download end date
             gain: (optional, default= 1) Input channel tone loudness
@@ -114,17 +114,17 @@ def downloadStreamSegments(token, dest_path, stream_id, min_date, max_date, gain
         Raises:
             TypeError: if missing required arguements.
     """
-    save_path = dest_path + '/' + stream_id
+    save_path = dest_path + '/' + stream
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
     start = __generate_date_in_isoformat(min_date)
     end = __generate_date_in_isoformat(max_date)
 
-    segments = __get_all_segments(token, stream_id, start, end)
+    segments = __get_all_segments(token, stream, start, end)
 
     if segments:
-        print("Downloading {} audio from {}".format(len(segments), stream_id))
+        print("Downloading {} audio from {}".format(len(segments), stream))
         if(parallel):
             with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
                 futures = []
@@ -135,6 +135,6 @@ def downloadStreamSegments(token, dest_path, stream_id, min_date, max_date, gain
         else:
             for segment in segments:
                 __segmentDownload(save_path, gain, file_ext, segment, token)
-        print("Finish download on {}".format(stream_id))
+        print("Finish download on {}".format(stream))
     else:
-        print("No data found on {} - {} at {}".format(start[:-10], end[:-10], stream_id))
+        print("No data found on {} - {} at {}".format(start[:-10], end[:-10], stream))

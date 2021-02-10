@@ -3,6 +3,7 @@ import datetime
 import os
 import re
 import rfcx.audio as audio
+import rfcx.ingest as ingest
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
@@ -160,11 +161,12 @@ class Client(object):
         return audio.save_audio_file(self.credentials.id_token, dest_path,
                                      stream_id, start_time, end_time, file_ext)
 
-    def streamSegments(self, streamId, start, end, limit=50, offset=0):
+
+    def streamSegments(self, stream, start, end, limit=50, offset=0):
         """Retrieve audio information about a specific stream
 
         Args:
-            stream_id: (Required) The guid of a guardian.
+            stream: (Required) Identifies a stream/site.
             start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the audio. If None then defaults to now.
             limit: Maximum results to return. Defaults to 50.
@@ -177,7 +179,7 @@ class Client(object):
             print('Not authenticated')
             return
 
-        if streamId == None:
+        if stream == None:
             print('Require stream id')
             return
 
@@ -190,6 +192,7 @@ class Client(object):
 
         return api_rfcx.streamSegments(self.credentials.id_token, streamId,
                                        start, end, limit, offset)
+
 
     def downloadStreamSegments(self,
                                dest_path=None,
@@ -243,10 +246,10 @@ class Client(object):
                     '`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy'
                 )
                 return
-
         return audio.downloadStreamSegments(self.credentials.id_token,
                                             dest_path, stream, min_date,
                                             max_date, gain, file_ext, parallel)
+
 
     def streams(self,
                 organizations=None,
@@ -275,10 +278,30 @@ class Client(object):
         if created_by is not None and created_by not in ["me", "collaborators"]:
             print("created_by can be only None, me, or collaborators")
             return
-
+ 
         return api_rfcx.streams(self.credentials.id_token, organizations,
                                 projects, is_public, is_deleted, created_by,
                                 keyword, limit, offset)
+
+
+    def ingest_audio(self, stream, filepath, timestamp):
+        """ Ingest an audio to RFCx
+        Args:
+            stream: Identifies a stream/site
+            filepath: Local file path to be ingest
+            timestamp: Audio timestamp in datetime type
+
+        Returns:
+            None.
+        """
+
+        if not isinstance(timestamp, datetime.datetime):
+            print("timestamp is not type datetime")
+            return
+
+        iso_timestamp = timestamp.replace(microsecond=0).isoformat() + 'Z'
+
+        return ingest.ingest_audio(self.credentials.id_token, stream, filepath, iso_timestamp)
 
 
     def annotations(self, start=None, end=None, classifications=None, stream=None, limit=1000, offset=0):
