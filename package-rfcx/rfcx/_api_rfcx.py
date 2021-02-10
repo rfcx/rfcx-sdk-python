@@ -14,8 +14,8 @@ def guardians(token, sites):
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 
-def guardianAudio(token, guardianId, start, end, limit, descending):
-    data = {'starting_after': start, 'ending_before': end, 'limit': limit, 'order': 'descending' if descending else 'ascending'}
+def guardianAudio(token, guardianId, start, end, limit, offset=0, descending=True):
+    data = {'starting_after': start, 'ending_before': end, 'limit': limit, 'offset': offset, 'order': 'descending' if descending else 'ascending'}
     path = f'/v1/guardians/{guardianId}/audio'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
