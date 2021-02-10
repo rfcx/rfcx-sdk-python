@@ -22,20 +22,6 @@ def streamSegments(token, stream_id, start, end, limit, offset):
     return _request(url, token=token)
 
 
-def tags(token, type, labels, start, end, sites, limit):
-    data = {
-        'type': type,
-        'values[]': labels,
-        'starting_after_local': start,
-        'starting_before_local': end,
-        'sites[]': sites,
-        'limit': limit
-    }
-    path = '/v2/tags'
-    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
-    return _request(url, token=token)
-
-
 def streams(token,
             organizations=None,
             projects=None,

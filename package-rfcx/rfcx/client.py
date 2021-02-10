@@ -125,44 +125,10 @@ class Client(object):
             f.write(c.token_expiry.isoformat() + 'Z\n')
             f.write(c.id_token + '\n')
 
-    def tags(self, type, labels, start=None, end=None, sites=None, limit=1000):
-        """Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API
-
-        Args:
-            type: (Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected
-            labels: (Required) List of labels. If None then returns tags of any label.
-            start: Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.
-            end: Maximum timestamp of the annotations. If None then defaults to now.
-            sites: List of sites by shortname. If None then returns tags from any site.
-            limit: Maximum number of audio files to return (not the number of tags!). Defaults to 1000.
-
-        Returns:
-            List of tags
-        """
-        if self.credentials == None:
-            print('Not authenticated')
-            return
-
-        if type not in [
-                'annotation', 'inference', 'inference:confirmed',
-                'inference:rejected'
-        ]:
-            print('Unrecognized type')
-            return
-
-        if start == None:
-            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
-                     ).replace(microsecond=0).isoformat() + 'Z'
-        if end == None:
-            end = datetime.datetime.utcnow().replace(
-                microsecond=0).isoformat() + 'Z'
-
-        return api_rfcx.tags(self.credentials.id_token, type, labels, start,
-                             end, sites, limit)
 
     def saveAudioFile(self,
                       dest_path,
-                      stream_id,
+                      stream,
                       start_time,
                       end_time,
                       gain=1,
@@ -170,7 +136,7 @@ class Client(object):
         """ Save audio to local path` 
         Args:
             dest_path: Audio save path.
-            stream_id: Stream id to get the segment.
+            stream: Identifies a stream/site.
             start_time: Minimum timestamp to get the audio.
             end_time: Maximum timestamp to get the audio. (Should not more than 15 min range)
             gain: (optional, default = 1) Input channel tone loudness
@@ -227,7 +193,7 @@ class Client(object):
 
     def downloadStreamSegments(self,
                                dest_path=None,
-                               stream_id=None,
+                               stream=None,
                                min_date=None,
                                max_date=None,
                                gain=1,
@@ -237,7 +203,7 @@ class Client(object):
 
         Args:
             dest_path: (Required) Path to save audio.
-            stream_id: (Required) The guid of a guardian
+            stream: (Required) Identifies a stream/site
             min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             max_date: Maximum timestamp of the audio. If None then defaults to now.
             gain: (optional, default= 1) Input channel tone loudness
@@ -251,7 +217,7 @@ class Client(object):
             print('Not authenticated')
             return
 
-        if stream_id == None:
+        if stream == None:
             print("Please specific the stream id.")
             return
 
@@ -279,7 +245,7 @@ class Client(object):
                 return
 
         return audio.downloadStreamSegments(self.credentials.id_token,
-                                            dest_path, stream_id, min_date,
+                                            dest_path, stream, min_date,
                                             max_date, gain, file_ext, parallel)
 
     def streams(self,
@@ -298,10 +264,10 @@ class Client(object):
             projects: List of organization ids
             created_by: The stream owner. Have 3 options: None, me, or collaborators
             keyword: Match streams name with keyword
-            is_public: (optional, default= True) Match public or private streams
-            is_deleted: (optional, default= False) Match deleted streams
-            limit: (optional, default= 1000) Maximum number of  results to return
-            offset: (optional, default= 0) Number of results to skip
+            is_public: (optional, default=True) Match public or private streams
+            is_deleted: (optional, default=False) Match deleted streams
+            limit: (optional, default=1000) Maximum number of  results to return
+            offset: (optional, default=0) Number of results to skip
 
         Returns:
             List of streams"""
