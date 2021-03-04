@@ -4,6 +4,7 @@ import os
 import re
 import rfcx.audio as audio
 import rfcx.ingest as ingest
+import rfcx._util as util
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
 import rfcx._api_auth as api_auth
@@ -159,7 +160,7 @@ class Client(object):
             return
 
         return audio.save_audio_file(self.credentials.id_token, dest_path,
-                                     stream_id, start_time, end_time, file_ext)
+                                     stream, start_time, end_time, file_ext)
 
 
     def streamSegments(self, stream, start, end, limit=50, offset=0):
@@ -184,13 +185,11 @@ class Client(object):
             return
 
         if start == None:
-            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
-                     ).replace(microsecond=0).isoformat() + 'Z'
+            start = util.date_before()
         if end == None:
-            end = datetime.datetime.utcnow().replace(
-                microsecond=0).isoformat() + 'Z'
+            end = util.date_now()
 
-        return api_rfcx.streamSegments(self.credentials.id_token, streamId,
+        return api_rfcx.streamSegments(self.credentials.id_token, stream,
                                        start, end, limit, offset)
 
 
@@ -319,9 +318,30 @@ class Client(object):
             List of annotations"""
 
         if start == None:
-            start = (datetime.datetime.utcnow() - datetime.timedelta(days=30)
-                     ).replace(microsecond=0).isoformat() + 'Z'
+            start = util.date_before()
         if end == None:
-            end = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+            end = util.date_now()
 
         return api_rfcx.annotations(self.credentials.id_token, start, end, classifications, stream, limit, offset)
+
+
+    def detections(self, start=None, end=None, classifications=None, streams=None, min_confidence=None, limit=1000, offset=0):
+        """Retrieve a list of detections
+
+        Args:
+            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: Maximum timestamp of the audio. If None then defaults to now.
+            classifications: (optional, default=None) List of classification names.
+            streams: (optional, default=None) List of stream ids.
+            min_confidence (optional, default=None): The minimum confidence to be return. If none will use the minimum from event strategy
+            limit: (optional, default=1000) Maximum number of results to be return.
+            offset: (optional, default=0) Number of results to skip.
+
+        Returns:
+            List of detections"""
+
+        if start == None:
+            start = util.date_before()
+        if end == None:
+            end = util.date_now()
+

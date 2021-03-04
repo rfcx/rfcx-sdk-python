@@ -22,9 +22,44 @@ def streamSegments(token, stream_id, start, end, limit, offset):
     return _request(url, token=token)
 
 
-def annotations(token, start, end, classifications=None, stream=None, limit=1000, offset=0):
-    data = {'start': start, 'end': end, 'classifications[]': classifications, 'stream_id': stream, 'limit': limit, 'offset': offset}
+def annotations(token,
+                start,
+                end,
+                classifications=None,
+                stream=None,
+                limit=1000,
+                offset=0):
+    data = {
+        'start': start,
+        'end': end,
+        'classifications[]': classifications,
+        'stream_id': stream,
+        'limit': limit,
+        'offset': offset
+    }
     path = '/annotations'
+    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    return _request(url, token=token)
+
+
+def detections(token,
+               start,
+               end,
+               classifications=None,
+               streams=None,
+               min_confidence=None,
+               limit=1000,
+               offset=0):
+    data = {
+        'start': start,
+        'end': end,
+        'classifications[]': classifications,
+        'streams[]': streams,
+        'min_confidence': min_confidence,
+        'limit': limit,
+        'offset': offset
+    }
+    path = '/detections'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 
