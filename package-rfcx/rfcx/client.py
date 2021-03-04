@@ -325,7 +325,7 @@ class Client(object):
         return api_rfcx.annotations(self.credentials.id_token, start, end, classifications, stream, limit, offset)
 
 
-    def detections(self, start=None, end=None, classifications=None, streams=None, min_confidence=None, limit=1000, offset=0):
+    def detections(self, start=None, end=None, classifications=None, streams=None, min_confidence=0.5, limit=1000, offset=0):
         """Retrieve a list of detections
 
         Args:
@@ -333,7 +333,7 @@ class Client(object):
             end: Maximum timestamp of the audio. If None then defaults to now.
             classifications: (optional, default=None) List of classification names.
             streams: (optional, default=None) List of stream ids.
-            min_confidence (optional, default=None): The minimum confidence to be return. If none will use the minimum from event strategy
+            min_confidence (optional, default=0.5): The minimum confidence to be return.
             limit: (optional, default=1000) Maximum number of results to be return.
             offset: (optional, default=0) Number of results to skip.
 
@@ -345,3 +345,4 @@ class Client(object):
         if end == None:
             end = util.date_now()
 
+        return api_rfcx.detections(self.credentials.id_token, start, end, classifications, streams, min_confidence, limit, offset)

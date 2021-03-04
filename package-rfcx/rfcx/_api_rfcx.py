@@ -37,6 +37,7 @@ def annotations(token,
         'limit': limit,
         'offset': offset
     }
+    data = dict(filter(lambda i: i[1] is not None, data.items()))
     path = '/annotations'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
@@ -47,7 +48,7 @@ def detections(token,
                end,
                classifications=None,
                streams=None,
-               min_confidence=None,
+               min_confidence=0.5,
                limit=1000,
                offset=0):
     data = {
@@ -59,6 +60,7 @@ def detections(token,
         'limit': limit,
         'offset': offset
     }
+    data = dict(filter(lambda i: i[1] is not None, data.items()))
     path = '/detections'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
