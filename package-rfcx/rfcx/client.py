@@ -317,6 +317,9 @@ class Client(object):
         Returns:
             List of annotations"""
 
+        if (limit > 1000):
+            raise Exception("Please give the value <= 1000")
+
         if start == None:
             start = util.date_before()
         if end == None:
@@ -339,6 +342,9 @@ class Client(object):
 
         Returns:
             List of detections"""
+
+        if (limit > 1000):
+            raise Exception("Please give the value <= 1000")
 
         if start == None:
             start = util.date_before()

@@ -32,8 +32,6 @@ def annotations(token,
     data = {
         'start': start,
         'end': end,
-        'classifications[]': classifications,
-        'stream_id': stream,
         'limit': limit,
         'offset': offset
     }
@@ -41,7 +39,6 @@ def annotations(token,
         data['classifications[]'] = classifications
     if (stream):
         data['stream_id'] = stream
-    data = dict(filter(lambda i: i[1] is not None, data.items()))
     path = '/annotations'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
