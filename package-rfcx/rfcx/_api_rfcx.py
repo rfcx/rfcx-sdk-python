@@ -27,7 +27,7 @@ def annotations(token,
                 end,
                 classifications=None,
                 stream=None,
-                limit=1000,
+                limit=50,
                 offset=0):
     data = {
         'start': start,
@@ -37,6 +37,10 @@ def annotations(token,
         'limit': limit,
         'offset': offset
     }
+    if (classifications):
+        data['classifications[]'] = classifications
+    if (stream):
+        data['stream_id'] = stream
     data = dict(filter(lambda i: i[1] is not None, data.items()))
     path = '/annotations'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
@@ -48,19 +52,21 @@ def detections(token,
                end,
                classifications=None,
                streams=None,
-               min_confidence=0.5,
-               limit=1000,
+               min_confidence=None,
+               limit=50,
                offset=0):
     data = {
         'start': start,
         'end': end,
-        'classifications[]': classifications,
-        'streams[]': streams,
-        'min_confidence': min_confidence,
         'limit': limit,
         'offset': offset
     }
-    data = dict(filter(lambda i: i[1] is not None, data.items()))
+    if (classifications):
+        data['classifications[]'] = classifications
+    if (streams):
+        data['streams[]'] = streams
+    if (min_confidence):
+        data['min_confidence'] = min_confidence
     path = '/detections'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)

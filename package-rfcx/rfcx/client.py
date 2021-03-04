@@ -303,15 +303,15 @@ class Client(object):
         return ingest.ingest_audio(self.credentials.id_token, stream, filepath, iso_timestamp)
 
 
-    def annotations(self, start=None, end=None, classifications=None, stream=None, limit=1000, offset=0):
+    def annotations(self, start=None, end=None, classifications=None, stream=None, limit=50, offset=0):
         """Retrieve a list of annotations
 
         Args:
             start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the audio. If None then defaults to now.
-            classifications: (optional, default=None) List of classification names.
-            stream: (optional, default=None) Limit results to a given stream.
-            limit: (optional, default=1000) Maximum number of results to be return.
+            classifications: (optional, default=None) List of classification names e.g. orca, chainsaw.
+            stream: (optional, default=None) Limit results to a given stream id.
+            limit: (optional, default=50) Maximum number of results to be return.
             offset: (optional, default=0) Number of results to skip.
 
         Returns:
@@ -325,16 +325,16 @@ class Client(object):
         return api_rfcx.annotations(self.credentials.id_token, start, end, classifications, stream, limit, offset)
 
 
-    def detections(self, start=None, end=None, classifications=None, streams=None, min_confidence=0.5, limit=1000, offset=0):
+    def detections(self, start=None, end=None, classifications=None, streams=None, min_confidence=None, limit=50, offset=0):
         """Retrieve a list of detections
 
         Args:
             start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the audio. If None then defaults to now.
-            classifications: (optional, default=None) List of classification names.
+            classifications: (optional, default=None) List of classification names e.g. orca, chainsaw.
             streams: (optional, default=None) List of stream ids.
-            min_confidence (optional, default=0.5): The minimum confidence to be return.
-            limit: (optional, default=1000) Maximum number of results to be return.
+            min_confidence (optional, default=None): Return the detection which equal or greater than given value. If None, it will use default in event strategy.
+            limit: (optional, default=50) Maximum number of results to be return. The maximum value is 1000.
             offset: (optional, default=0) Number of results to skip.
 
         Returns:
