@@ -128,7 +128,7 @@ class Client(object):
             f.write(c.id_token + '\n')
 
 
-    def save_audio_file(self,
+    def download_file(self,
                       dest_path,
                       stream,
                       start_time,
@@ -162,7 +162,7 @@ class Client(object):
             print("end_time is not type datetime")
             return
 
-        return audio.save_audio_file(self.credentials.id_token, dest_path,
+        return audio.download_file(self.credentials.id_token, dest_path,
                                      stream, start_time, end_time, gain, file_ext)
 
 
@@ -196,7 +196,7 @@ class Client(object):
                                        start, end, limit, offset)
 
 
-    def download_stream_segments(self,
+    def download_file_segments(self,
                                dest_path=None,
                                stream=None,
                                min_date=None,
@@ -248,7 +248,7 @@ class Client(object):
                     '`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy'
                 )
                 return
-        return audio.download_stream_segments(self.credentials.id_token,
+        return audio.download_file_segments(self.credentials.id_token,
                                             dest_path, stream, min_date,
                                             max_date, gain, file_ext, parallel)
 
@@ -286,7 +286,7 @@ class Client(object):
                                 is_public, is_deleted, limit, offset)
 
 
-    def ingest_audio(self, stream, filepath, timestamp):
+    def ingest_file(self, stream, filepath, timestamp):
         """ Ingest an audio to RFCx
         Args:
             stream: Identifies a stream/site
@@ -303,7 +303,7 @@ class Client(object):
 
         iso_timestamp = timestamp.replace(microsecond=0).isoformat() + 'Z'
 
-        return ingest.ingest_audio(self.credentials.id_token, stream, filepath, iso_timestamp)
+        return ingest.ingest_file(self.credentials.id_token, stream, filepath, iso_timestamp)
 
 
     def annotations(self, start=None, end=None, classifications=None, stream=None, limit=50, offset=0):

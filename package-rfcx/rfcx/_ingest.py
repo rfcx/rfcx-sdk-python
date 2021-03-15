@@ -26,7 +26,7 @@ def _get_file_status(token, upload_url, upload_id):
     resp = requests.get(url, headers=headers, timeout=90)
     return resp.json()
 
-def ingest_audio(token, stream_id, filepath, timestamp):
+def ingest_file(token, stream_id, filepath, timestamp):
     """ Ingest an audio to RFCx
         Args:
             token: RFCx client token.

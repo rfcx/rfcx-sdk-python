@@ -4,9 +4,8 @@
 
 2. Install with pip: `pip install rfcx-x.x.x-py3-none-any.whl`
 
-3. Use `import rfcx` and [try an example](https://gist.github.com/antonyharfield/93231b3df86cd58fecee4f4d1ec9cc5b)
+3. Use `import rfcx`
 """
 
-from .audio import save_audio_file
 from .client import Client
 name = "rfcx"

@@ -31,7 +31,7 @@ def __generate_date_in_isoformat(date):
     """ Generate date in iso format ending with `Z` """
     return date.replace(microsecond=0).isoformat() + 'Z'
 
-def save_audio_file(token, dest_path, stream_id, start_time, end_time, gain=1, file_ext='wav'):
+def download_file(token, dest_path, stream_id, start_time, end_time, gain=1, file_ext='wav'):
     """ Prepare `url` and `local_path` and save it using function `__save_file` 
         Args:
             dest_path: Audio save path.
@@ -95,7 +95,7 @@ def __segment_download(save_path, gain, file_ext, segment, token):
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
-def download_stream_segments(token, dest_path, stream, min_date, max_date, gain=1, file_ext='wav', parallel=True):
+def download_file_segments(token, dest_path, stream, min_date, max_date, gain=1, file_ext='wav', parallel=True):
     """ Download RFCx audio on specific time range using `stream_segments` to get audio segments information
         and save it using function `__save_file`
         Args:
