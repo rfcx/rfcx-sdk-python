@@ -3,7 +3,7 @@ import requests
 import shutil
 import os
 import concurrent.futures
-from rfcx._api_rfcx import streamSegments
+from rfcx._api_rfcx import stream_segments
 
 def __save_file(url, local_path, token):
     """ Download the file from `url` and save it locally under `local_path` """
@@ -48,8 +48,8 @@ def save_audio_file(token, dest_path, stream_id, start_time, end_time, gain=1, f
             TypeError: if missing required arguements.
     
     """
-    start = iso_to_rfcx_custom_format(__generate_date_in_isoformat(start_time))
-    end = iso_to_rfcx_custom_format(__generate_date_in_isoformat(end_time))
+    start = __iso_to_rfcx_custom_format(__generate_date_in_isoformat(start_time))
+    end = __iso_to_rfcx_custom_format(__generate_date_in_isoformat(end_time))
     audio_name = "{stream_id}_t{start_time}.{end_time}_g{gain}_f{file_ext}".format(stream_id=stream_id,
                                                                                     start_time=start,
                                                                                     end_time=end,
@@ -59,7 +59,7 @@ def save_audio_file(token, dest_path, stream_id, start_time, end_time, gain=1, f
     local_path = __local_audio_file_path(dest_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
-def iso_to_rfcx_custom_format(time):
+def __iso_to_rfcx_custom_format(time):
     """Convert RFCx iso format to RFCx custom format"""
     return time.replace('-', '').replace(':', '').replace('.', '')
 
@@ -71,7 +71,7 @@ def __get_all_segments(token, stream_id, start, end):
 
     while not empty_segment:
         # No data will return empty array from server
-        segments = streamSegments(token, stream_id, start, end, limit=1000, offset=offset)
+        segments = stream_segments(token, stream_id, start, end, limit=1000, offset=offset)
         if segments:
             all_segments.extend(segments)
             offset = offset + 1000
@@ -80,11 +80,11 @@ def __get_all_segments(token, stream_id, start, end):
 
     return all_segments
 
-def __segmentDownload(save_path, gain, file_ext, segment, token):
+def __segment_download(save_path, gain, file_ext, segment, token):
     """Download audio using the core api(v2)"""
     stream_id = segment['stream']['id']
-    start = iso_to_rfcx_custom_format(segment['start'])
-    end = iso_to_rfcx_custom_format(segment['end'])
+    start = __iso_to_rfcx_custom_format(segment['start'])
+    end = __iso_to_rfcx_custom_format(segment['end'])
     custom_time_range = start + '.' + end
     rfcx_audio_format = "{stream_id}_t{time}_rfull_g{gain}_f{file_ext}".format(stream_id=stream_id,
                                                                                                 time=custom_time_range,
@@ -95,8 +95,8 @@ def __segmentDownload(save_path, gain, file_ext, segment, token):
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
-def downloadStreamSegments(token, dest_path, stream, min_date, max_date, gain=1, file_ext='wav', parallel=True):
-    """ Download RFCx audio on specific time range using `streamSegments` to get audio segments information
+def download_stream_segments(token, dest_path, stream, min_date, max_date, gain=1, file_ext='wav', parallel=True):
+    """ Download RFCx audio on specific time range using `stream_segments` to get audio segments information
         and save it using function `__save_file`
         Args:
             token: RFCx client token.
@@ -129,12 +129,12 @@ def downloadStreamSegments(token, dest_path, stream, min_date, max_date, gain=1,
             with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
                 futures = []
                 for segment in segments:
-                    futures.append(executor.submit(__segmentDownload, save_path, gain, file_ext, segment, token))
+                    futures.append(executor.submit(__segment_download, save_path, gain, file_ext, segment, token))
 
                 futures, _ = concurrent.futures.wait(futures)
         else:
             for segment in segments:
-                __segmentDownload(save_path, gain, file_ext, segment, token)
+                __segment_download(save_path, gain, file_ext, segment, token)
         print("Finish download on {}".format(stream))
     else:
         print("No data found on {} - {} at {}".format(start[:-10], end[:-10], stream))

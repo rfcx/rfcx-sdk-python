@@ -128,7 +128,7 @@ class Client(object):
             f.write(c.id_token + '\n')
 
 
-    def saveAudioFile(self,
+    def save_audio_file(self,
                       dest_path,
                       stream,
                       start_time,
@@ -151,6 +151,9 @@ class Client(object):
             TypeError: if missing required arguements.
 
         """
+        if not os.path.exists(dest_path):
+            os.makedirs(dest_path)
+
         if not isinstance(start_time, datetime.datetime):
             print("start_time is not type datetime")
             return
@@ -160,10 +163,10 @@ class Client(object):
             return
 
         return audio.save_audio_file(self.credentials.id_token, dest_path,
-                                     stream, start_time, end_time, file_ext)
+                                     stream, start_time, end_time, gain, file_ext)
 
 
-    def streamSegments(self, stream, start, end, limit=50, offset=0):
+    def stream_segments(self, stream, start, end, limit=50, offset=0):
         """Retrieve audio information about a specific stream
 
         Args:
@@ -189,11 +192,11 @@ class Client(object):
         if end == None:
             end = util.date_now()
 
-        return api_rfcx.streamSegments(self.credentials.id_token, stream,
+        return api_rfcx.stream_segments(self.credentials.id_token, stream,
                                        start, end, limit, offset)
 
 
-    def downloadStreamSegments(self,
+    def download_stream_segments(self,
                                dest_path=None,
                                stream=None,
                                min_date=None,
@@ -201,7 +204,7 @@ class Client(object):
                                gain=1,
                                file_ext='wav',
                                parallel=True):
-        """Download audio using audio information from `guardianAudio`
+        """Download audio using audio information from `stream_segments`
 
         Args:
             dest_path: (Required) Path to save audio.
@@ -245,7 +248,7 @@ class Client(object):
                     '`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy'
                 )
                 return
-        return audio.downloadStreamSegments(self.credentials.id_token,
+        return audio.download_stream_segments(self.credentials.id_token,
                                             dest_path, stream, min_date,
                                             max_date, gain, file_ext, parallel)
 
@@ -263,7 +266,7 @@ class Client(object):
 
         Args:
             organizations: List of organization ids
-            projects: List of organization ids
+            projects: List of project ids
             created_by: The stream owner. Have 3 options: None, me, or collaborators
             keyword: Match streams name with keyword
             is_public: (optional, default=True) Match public or private streams
@@ -279,8 +282,8 @@ class Client(object):
             return
  
         return api_rfcx.streams(self.credentials.id_token, organizations,
-                                projects, is_public, is_deleted, created_by,
-                                keyword, limit, offset)
+                                projects, created_by, keyword,
+                                is_public, is_deleted, limit, offset)
 
 
     def ingest_audio(self, stream, filepath, timestamp):
