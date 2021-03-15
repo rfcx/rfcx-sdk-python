@@ -2,8 +2,8 @@ import getpass
 import datetime
 import os
 import re
-import rfcx.audio as audio
-import rfcx.ingest as ingest
+import rfcx._audio as audio
+import rfcx._ingest as ingest
 import rfcx._util as util
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
