@@ -84,3 +84,10 @@ The documentation is generated from docstrings in the source code. To generate
 it, run:
 
 `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python pdoc3 --html --force --template-dir docs_src/template --output-dir docs package-rfcx/rfcx package-rfcx-utils/rfcx-utils`
+
+To generate a PDF:
+
+```
+docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python pdoc3 --pdf --force --template-dir docs_src/template package-rfcx/rfcx package-rfcx-utils/rfcx-utils > docs.md
+docker run --rm -v ${PWD}:/data pandoc/latex docs.md -o docs.pdf
+```
