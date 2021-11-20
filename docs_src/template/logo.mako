@@ -1,3 +1,3 @@
-<a title="RFCx Python SDK" href="../">
-    <h2 class="title">RFCx Python SDK</h2>
+<a title="Rainforest Connection SDK for Python" href="../">
+    <h2 class="title">Rainforest Connection® SDK for Python</h2>
 </a>
