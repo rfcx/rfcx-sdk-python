@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 host = 'https://api.rfcx.org'  # TODO move to configuration
 
 
-def streamSegments(token, stream_id, start, end, limit, offset):
+def stream_segments(token, stream_id, start, end, limit, offset):
     data = {
         'id': stream_id,
         'start': start,
@@ -29,12 +29,7 @@ def annotations(token,
                 stream=None,
                 limit=50,
                 offset=0):
-    data = {
-        'start': start,
-        'end': end,
-        'limit': limit,
-        'offset': offset
-    }
+    data = {'start': start, 'end': end, 'limit': limit, 'offset': offset}
     if (classifications):
         data['classifications[]'] = classifications
     if (stream):
@@ -48,18 +43,16 @@ def detections(token,
                start,
                end,
                classifications=None,
+               classifiers=None,
                streams=None,
                min_confidence=None,
                limit=50,
                offset=0):
-    data = {
-        'start': start,
-        'end': end,
-        'limit': limit,
-        'offset': offset
-    }
+    data = {'start': start, 'end': end, 'limit': limit, 'offset': offset}
     if (classifications):
         data['classifications[]'] = classifications
+    if (classifiers):
+        data['classifiers[]'] = classifiers
     if (streams):
         data['streams[]'] = streams
     if (min_confidence):
@@ -79,15 +72,19 @@ def streams(token,
             limit=1000,
             offset=0):
     data = {
-        'organizations[]': organizations,
-        'projects[]': projects,
-        'created_by': created_by,
-        'keyword': keyword,
         'is_public': is_public,
         'is_deleted': is_deleted,
         'limit': limit,
         'offset': offset
     }
+    if (organizations):
+        data['organizations[]'] = organizations
+    if (projects):
+        data['projects[]'] = projects
+    if (created_by):
+        data['created_by'] = created_by
+    if (keyword):
+        data['keyword'] = keyword
     path = '/streams'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
@@ -108,5 +105,8 @@ def _request(url, method='GET', token=None):
         return json.loads(content)
 
     logger.error(f'HTTP status: {resp.status}')
+
+    if (resp.status == 403):
+        logger.error('No permission on given parameter(s)')
 
     return None

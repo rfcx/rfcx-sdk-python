@@ -2,8 +2,8 @@ import getpass
 import datetime
 import os
 import re
-import rfcx.audio as audio
-import rfcx.ingest as ingest
+import rfcx._audio as audio
+import rfcx._ingest as ingest
 import rfcx._util as util
 import rfcx._pkce as pkce
 import rfcx._api_rfcx as api_rfcx
@@ -128,7 +128,7 @@ class Client(object):
             f.write(c.id_token + '\n')
 
 
-    def saveAudioFile(self,
+    def download_file(self,
                       dest_path,
                       stream,
                       start_time,
@@ -151,6 +151,9 @@ class Client(object):
             TypeError: if missing required arguements.
 
         """
+        if not os.path.exists(dest_path):
+            os.makedirs(dest_path)
+
         if not isinstance(start_time, datetime.datetime):
             print("start_time is not type datetime")
             return
@@ -159,11 +162,11 @@ class Client(object):
             print("end_time is not type datetime")
             return
 
-        return audio.save_audio_file(self.credentials.id_token, dest_path,
-                                     stream, start_time, end_time, file_ext)
+        return audio.download_file(self.credentials.id_token, dest_path,
+                                     stream, start_time, end_time, gain, file_ext)
 
 
-    def streamSegments(self, stream, start, end, limit=50, offset=0):
+    def stream_segments(self, stream, start, end, limit=50, offset=0):
         """Retrieve audio information about a specific stream
 
         Args:
@@ -189,11 +192,11 @@ class Client(object):
         if end == None:
             end = util.date_now()
 
-        return api_rfcx.streamSegments(self.credentials.id_token, stream,
+        return api_rfcx.stream_segments(self.credentials.id_token, stream,
                                        start, end, limit, offset)
 
 
-    def downloadStreamSegments(self,
+    def download_file_segments(self,
                                dest_path=None,
                                stream=None,
                                min_date=None,
@@ -201,7 +204,7 @@ class Client(object):
                                gain=1,
                                file_ext='wav',
                                parallel=True):
-        """Download audio using audio information from `guardianAudio`
+        """Download audio using audio information from `stream_segments`
 
         Args:
             dest_path: (Required) Path to save audio.
@@ -245,7 +248,7 @@ class Client(object):
                     '`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy'
                 )
                 return
-        return audio.downloadStreamSegments(self.credentials.id_token,
+        return audio.download_file_segments(self.credentials.id_token,
                                             dest_path, stream, min_date,
                                             max_date, gain, file_ext, parallel)
 
@@ -263,7 +266,7 @@ class Client(object):
 
         Args:
             organizations: List of organization ids
-            projects: List of organization ids
+            projects: List of project ids
             created_by: The stream owner. Have 3 options: None, me, or collaborators
             keyword: Match streams name with keyword
             is_public: (optional, default=True) Match public or private streams
@@ -279,11 +282,11 @@ class Client(object):
             return
  
         return api_rfcx.streams(self.credentials.id_token, organizations,
-                                projects, is_public, is_deleted, created_by,
-                                keyword, limit, offset)
+                                projects, created_by, keyword,
+                                is_public, is_deleted, limit, offset)
 
 
-    def ingest_audio(self, stream, filepath, timestamp):
+    def ingest_file(self, stream, filepath, timestamp):
         """ Ingest an audio to RFCx
         Args:
             stream: Identifies a stream/site
@@ -300,7 +303,7 @@ class Client(object):
 
         iso_timestamp = timestamp.replace(microsecond=0).isoformat() + 'Z'
 
-        return ingest.ingest_audio(self.credentials.id_token, stream, filepath, iso_timestamp)
+        return ingest.ingest_file(self.credentials.id_token, stream, filepath, iso_timestamp)
 
 
     def annotations(self, start=None, end=None, classifications=None, stream=None, limit=50, offset=0):
@@ -328,13 +331,14 @@ class Client(object):
         return api_rfcx.annotations(self.credentials.id_token, start, end, classifications, stream, limit, offset)
 
 
-    def detections(self, start=None, end=None, classifications=None, streams=None, min_confidence=None, limit=50, offset=0):
+    def detections(self, start=None, end=None, classifications=None, classifiers=None, streams=None, min_confidence=None, limit=50, offset=0):
         """Retrieve a list of detections
 
         Args:
             start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
             end: Maximum timestamp of the audio. If None then defaults to now.
             classifications: (optional, default=None) List of classification names e.g. orca, chainsaw.
+            classifiers: (optional, default=None) List of classifier ids (integer) e.g. 93, 94.
             streams: (optional, default=None) List of stream ids.
             min_confidence (optional, default=None): Return the detection which equal or greater than given value. If None, it will use default in event strategy.
             limit: (optional, default=50) Maximum number of results to be return. The maximum value is 1000.
@@ -351,4 +355,4 @@ class Client(object):
         if end == None:
             end = util.date_now()
 
-        return api_rfcx.detections(self.credentials.id_token, start, end, classifications, streams, min_confidence, limit, offset)
+        return api_rfcx.detections(self.credentials.id_token, start, end, classifications, classifiers, streams, min_confidence, limit, offset)
