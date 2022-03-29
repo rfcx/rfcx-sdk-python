@@ -43,6 +43,7 @@ def detections(token,
                start,
                end,
                classifications=None,
+               classifiers=None,
                streams=None,
                min_confidence=None,
                limit=50,
@@ -50,6 +51,8 @@ def detections(token,
     data = {'start': start, 'end': end, 'limit': limit, 'offset': offset}
     if (classifications):
         data['classifications[]'] = classifications
+    if (classifiers):
+        data['classifiers[]'] = classifiers
     if (streams):
         data['streams[]'] = streams
     if (min_confidence):
