@@ -1,0 +1,133 @@
+"""RFCx authentication"""
+import os
+import logging
+from time import sleep
+from datetime import datetime, timedelta
+
+import rfcx._api_auth as api_auth
+from rfcx._credentials import Credentials
+from rfcx._util import date_after
+
+CLIENT_ID = "LS4dJlP8J2iOBr2snzm6N8I5u7FLSUGd"
+PERSISTED_CREDENTIALS_PATH = '.rfcx_credentials'
+ALLOW_ROLES = ['rfcxUser', 'systemUser']
+
+DEVICE_ERROR_STATUS = {
+    'pending': 'authorization_pending',
+    'slow': 'slow_down',
+    'expired': 'expired_token',
+    'denied': 'access_denied'
+}
+
+logger = logging.getLogger(__name__)
+
+class Authentication(object):
+    """Authenticate the RFCx SDK platform"""
+    def __init__(self, persist=True, persisted_credentials_path='.rfcx_credentials'):
+        self.credentials = None
+        self.default_site = None
+        self.accessible_sites = None
+        self.persist = persist
+        self.persisted_credentials_path = persisted_credentials_path
+
+    def authentication(self):
+        """Authenticate an RFCx user to obtain a token
+
+        If you want to persist/load the credentials to/from a custom path then set `persisted_credentials_path`
+        Args:
+            persist: Should save the user token to the filesystem (in file specified by
+            persisted_credentials_path, defaults to .rfcx_credentials in the current directory).
+
+        Returns:
+            Success if an access_token was obtained
+        """
+        if os.path.exists(self.persisted_credentials_path):
+            is_token_loaded = self.__load_token_from_credentials_file()
+            if is_token_loaded:
+                return
+        self.__generate_new_token()
+
+    def __load_token_from_credentials_file(self):
+        with open(self.persisted_credentials_path, 'r', encoding='utf-8') as f:
+            lines = f.read().splitlines()
+        if len(lines) == 5 and lines[0] == 'version 1':
+            access_token = lines[1]
+            token_expiry = datetime.strptime(lines[3], "%Y-%m-%dT%H:%M:%S.%fZ")
+            refresh_token = lines[2] if lines[2] != '' else None
+            id_token = lines[4]
+            if token_expiry > datetime.now() + timedelta(hours=1):
+                self.__setup_credentials(access_token, token_expiry,
+                                         refresh_token, id_token)
+                print('Using persisted authenticatation')
+                return True
+
+            if refresh_token is not None:
+                try:
+                    access_token, refresh_token, token_expiry, id_token = api_auth.refresh(
+                        refresh_token, CLIENT_ID)
+                    self.__setup_credentials(access_token, token_expiry,
+                                             refresh_token, id_token)
+                    self.__persist_credentials()
+                    print(
+                        'Using persisted authenticatation (with token refresh)'
+                    )
+                except api_auth.TokenError:
+                    pass
+                return True
+
+        return False
+
+    def __setup_credentials(self, access_token, token_expiry, refresh_token,
+                            id_token):
+        self.credentials = Credentials(access_token, token_expiry,
+                                       refresh_token, id_token)
+        app_meta = self.credentials.id_object['https://rfcx.org/app_metadata']
+        if app_meta:
+            self.accessible_sites = app_meta.get('accessibleSites', [])
+            self.default_site = app_meta.get('defaultSite', 'derc')
+            roles = app_meta.get('authorization', {}).get('roles', [])
+            if not any(role in roles for role in ALLOW_ROLES):
+                raise Exception(
+                    "User does not have sufficient privileges. Please check you have access to https://dashboard.rfcx.org or contact support."
+                )
+
+    def __persist_credentials(self):
+        credentials = self.credentials
+        with open(self.persisted_credentials_path, 'w', encoding='utf-8') as f:
+            f.write('version 1\n')
+            f.write(credentials.access_token + '\n')
+            f.write((credentials.refresh_token if credentials.
+                     refresh_token is not None else '') + '\n')
+            f.write(credentials.token_expiry.isoformat() + 'Z\n')
+            f.write(credentials.id_token + '\n')
+
+    def __generate_new_token(self):
+        response = api_auth.device_auth(CLIENT_ID)
+        print('Go to this URL in a browser: ',
+              response['verification_uri_complete'])
+
+        token_response, error = self.__get_device_request_token(
+            device_code=response['device_code'], interval=response['interval'])
+        if error:
+            logger.error('Obtain token failed: %s', token_response)
+            raise Exception('Obtain token failed. Please retry again later or contact support.')
+        access_token = token_response['access_token']
+        token_expiry = date_after(token_response['expires_in'])
+        refresh_token = token_response['refresh_token']
+        id_token = token_response['id_token']
+        self.__setup_credentials(access_token, token_expiry, refresh_token,
+                                 id_token)
+
+        # Write token to disk
+        if self.persist:
+            self.__persist_credentials()
+
+    def __get_device_request_token(self, device_code: str, interval: int = 5):
+        error = 'authorization_pending'
+        resp = None
+        while error == DEVICE_ERROR_STATUS[
+                'pending'] or error == DEVICE_ERROR_STATUS['slow']:
+            sleep(interval)
+            resp = api_auth.device_request_token(device_code, CLIENT_ID)
+            error = resp['error'] if 'error' in resp else None
+        return resp, error

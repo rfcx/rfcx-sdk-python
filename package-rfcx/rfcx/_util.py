@@ -8,3 +8,8 @@ def date_before(days=30):
 
 def date_now():
     return datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+
+
+def date_after(seconds):
+    delta = datetime.timedelta(seconds=seconds)
+    return delta + datetime.datetime.utcnow()

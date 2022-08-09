@@ -1,6 +1,16 @@
 import json
 import rfcx._helper as helper
 
+class VerifyJwtTokenError(Exception):
+    """Exception raised when the id token is invalid."""
+    def __init__(self, id_token: str, message: str = 'Wrong number of segments in token') -> None:
+        self.id_token = id_token
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return f'{self.message}: {self.id_token}'
+
 class Credentials(object):
 
     def __init__(self, access_token, token_expiry, refresh_token=None, id_token=None):
@@ -26,7 +36,6 @@ class Credentials(object):
             segments = id_token.split(u'.')
 
         if len(segments) != 3:
-            raise VerifyJwtTokenError(
-                'Wrong number of segments in token: {0}'.format(id_token))
+            raise VerifyJwtTokenError(id_token)
 
         return json.loads(helper._urlsafe_b64decode(segments[1]))

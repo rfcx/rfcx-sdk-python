@@ -10,10 +10,68 @@ import rfcx._helper as helper
 class Error(Exception):
     """Base error for this module."""
 
+
 class TokenError(Error):
     """Error trying to exchange an authorization grant for an access token or refreshing a token."""
 
+
 logger = logging.getLogger(__name__)
+
+
+def device_auth(client_id):
+    """Get Auth0 device code response
+    Args:
+        None.
+
+    Returns:
+        Auth0 device code json object contains device_code, user_code, expires_in, interval, verification_uri, and verification_uri_complete.
+    """
+    post_data = {
+        'client_id': client_id,
+        'scope': 'openid email profile offline_access',
+        'audience': 'https://rfcx.org'
+    }
+
+    headers = {'content-type': "application/x-www-form-urlencoded"}
+    body = urllib.parse.urlencode(post_data)
+
+    http = httplib2.Http()
+    resp, content = http.request('https://rfcx.eu.auth0.com/oauth/device/code',
+                                 method='POST',
+                                 body=body,
+                                 headers=headers)
+    if resp.status == http_client.OK:
+        return _parse_exchange_token_response(content)
+
+    return None
+
+def device_request_token(device_code, client_id):
+    """Get Auth0 request device token response
+    Args:
+        device_code: (required) Auth0 device code
+        interval: (optional, default=5) Number of sleep time while waiting api
+
+    Returns:
+        Auth0 request token object contains access_token, refresh_token, id_token, scope, expires_in, and token_type.
+    """
+    post_data = {
+        'grant_type': 'urn:ietf:params:oauth:grant-type:device_code',
+        'device_code': device_code,
+        'client_id': client_id
+    }
+
+    headers = {'content-type': "application/x-www-form-urlencoded"}
+    body = urllib.parse.urlencode(post_data)
+
+    http = httplib2.Http()
+
+    _, content = http.request('https://rfcx.eu.auth0.com/oauth/token',
+                                 method='POST',
+                                 body=body,
+                                 headers=headers)
+
+    return _parse_exchange_token_response(content)
+
 
 def authcode_exchange(code, code_verifier, client_id, scope):
     """Exchanges a code for OAuth2Credentials.
@@ -33,16 +91,18 @@ def authcode_exchange(code, code_verifier, client_id, scope):
     """
     if code is None:
         raise ValueError('No code provided.')
-    
+
     post_data = {
         'grant_type': 'authorization_code',
         'client_id': client_id,
         'code': code,
         'code_verifier': code_verifier,
-        'redirect_uri': 'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html',
+        'redirect_uri':
+        'https://rfcx-app.s3.eu-west-1.amazonaws.com/login/cli.html',
         'scope': scope
     }
     return _request_token(post_data)
+
 
 def refresh(refresh_token, client_id):
     post_data = {
@@ -52,7 +112,7 @@ def refresh(refresh_token, client_id):
     }
     access_token, _, token_expiry, id_token = _request_token(post_data)
     return access_token, refresh_token, token_expiry, id_token
-    
+
 
 def _request_token(post_data):
     body = urllib.parse.urlencode(post_data)
@@ -62,7 +122,10 @@ def _request_token(post_data):
 
     http = httplib2.Http()
 
-    resp, content = http.request('https://auth.rfcx.org/oauth/token', method='POST', body=body, headers=headers)
+    resp, content = http.request('https://auth.rfcx.org/oauth/token',
+                                 method='POST',
+                                 body=body,
+                                 headers=headers)
     d = _parse_exchange_token_response(content)
     if resp.status == http_client.OK and 'access_token' in d:
         access_token = d['access_token']
@@ -86,6 +149,7 @@ def _request_token(post_data):
         else:
             error_msg = 'Invalid response: {0}.'.format(str(resp.status))
         raise TokenError(error_msg)
+
 
 def _parse_exchange_token_response(content):
     """Parses response of an exchange token request.
