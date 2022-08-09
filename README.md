@@ -32,9 +32,11 @@ Increment the version in `package-rfcx/setup.py` and `package-rfcx-utils/setup.p
 
 Create a distribution (source and wheel):
 
-`python package-rfcx/setup.py sdist bdist_wheel`
+- Enter to `package-rfcx` directory and `python setup.py sdist bdist_wheel`
 
-`python package-rfcx-utils/setup.py sdist bdist_wheel`
+- Enter to `package-rfcx-utils` directory and `python setup.py sdist bdist_wheel`
+
+The generated files will be in your `dist` of each directory
 
 Alternatively through docker:
 
