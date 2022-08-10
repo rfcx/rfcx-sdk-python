@@ -9,7 +9,7 @@ import rfcx._api_auth as api_auth
 from rfcx._credentials import Credentials
 from rfcx._util import date_after
 
-CLIENT_ID = "LS4dJlP8J2iOBr2snzm6N8I5u7FLSUGd"
+DEFAULT_CLIENT_ID = "LS4dJlP8J2iOBr2snzm6N8I5u7FLSUGd"
 PERSISTED_CREDENTIALS_PATH = '.rfcx_credentials'
 ALLOW_ROLES = ['rfcxUser', 'systemUser']
 
@@ -29,10 +29,9 @@ class Authentication(object):
                  persist=True,
                  persisted_credentials_path='.rfcx_credentials'):
         self.credentials = None
-        self.default_site = None
-        self.accessible_sites = None
         self.persist = persist
         self.persisted_credentials_path = persisted_credentials_path
+        self.client_id = os.getenv('AUTH0_CLIENT_ID', DEFAULT_CLIENT_ID)
 
     def authentication(self):
         """Authenticate an RFCx user to obtain a token
@@ -45,7 +44,7 @@ class Authentication(object):
         Returns:
             Success if an access_token was obtained
         """
-        if os.getenv('IS_MACHINE', 'False') == 'True':
+        if os.getenv('AUTH0_CLIENT_SECRET'):
             self.__generate_new_machine_token()
             return
 
@@ -73,7 +72,7 @@ class Authentication(object):
             if refresh_token is not None:
                 try:
                     access_token, refresh_token, token_expiry, id_token = api_auth.refresh(
-                        refresh_token, CLIENT_ID)
+                        refresh_token, self.client_id)
                     self.__setup_credentials(access_token, token_expiry,
                                              refresh_token, id_token)
                     self.__persist_credentials()
@@ -96,8 +95,6 @@ class Authentication(object):
         app_meta = self.credentials.id_object[
             'https://rfcx.org/app_metadata'] if self.credentials.id_object else None
         if app_meta:
-            self.accessible_sites = app_meta.get('accessibleSites', [])
-            self.default_site = app_meta.get('defaultSite', 'derc')
             roles = app_meta.get('authorization', {}).get('roles', [])
             if not any(role in roles for role in ALLOW_ROLES):
                 raise Exception(
@@ -121,18 +118,24 @@ class Authentication(object):
         self.__setup_credentials(access_token, token_expiry)
 
     def __generate_new_user_token(self):
-        response = api_auth.device_auth(CLIENT_ID)
+        response = api_auth.device_auth(self.client_id)
         if response is None:
             raise Exception(
                 'Obtain device code failed. Please retry again later or contact support.'
             )
 
+        device_code = response['device_code']
+        user_code = response['user_code']
+        interval = response['interval']
         verification_uri = response['verification_uri_complete']
-        print('Go to this URL in a browser:', verification_uri)
+
+        print(
+            f'Go to this URL in a browser: {verification_uri} \nYour code is: {user_code}'
+        )
         webbrowser.open(verification_uri, new=2)
 
         token_response, error = self.__get_device_request_token(
-            device_code=response['device_code'], interval=response['interval'])
+            device_code=device_code, interval=interval)
         if error:
             logger.error('Obtain token failed: %s', token_response)
             raise Exception(
@@ -157,6 +160,6 @@ class Authentication(object):
         while error == DEVICE_ERROR_STATUS[
                 'pending'] or error == DEVICE_ERROR_STATUS['slow']:
             sleep(interval)
-            resp = api_auth.device_request_token(device_code, CLIENT_ID)
+            resp = api_auth.device_request_token(device_code, self.client_id)
             error = resp['error'] if 'error' in resp else None
         return resp, error

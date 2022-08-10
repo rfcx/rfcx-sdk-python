@@ -17,7 +17,7 @@ class TokenError(Error):
 
 logger = logging.getLogger(__name__)
 
-AUTH_DOMAIN = 'https://rfcx.eu.auth0.com'
+AUTH_DOMAIN = 'https://auth.rfcx.org'
 
 def machine_auth():
     """Get Auth0 request machine to machine token response
@@ -37,7 +37,7 @@ def machine_auth():
         'grant_type': 'client_credentials',
         'client_id': auth0_client_id,
         'client_secret': auth0_client_secret,
-        'audience': 'https://rfcx.org/api/v2/'
+        'audience': 'https://rfcx.org'
     }
 
     headers = {'content-type': 'application/x-www-form-urlencoded'}
@@ -63,7 +63,7 @@ def device_auth(client_id):
     post_data = {
         'client_id': client_id,
         'scope': 'openid email profile offline_access',
-        'audience': 'https://rfcx.org/api/v2/'
+        'audience': 'https://rfcx.org'
     }
 
     headers = {'content-type': "application/x-www-form-urlencoded"}

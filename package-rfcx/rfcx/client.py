@@ -12,8 +12,6 @@ class Client(object):
     """Authenticate and perform requests against the RFCx platform"""
     def __init__(self):
         self.credentials = None
-        self.default_site = None
-        self.accessible_sites = None
 
     def authentication(self,
                        persist=True,
@@ -31,8 +29,6 @@ class Client(object):
         auth = Authentication(persist, persisted_credentials_path)
         auth.authentication()
         self.credentials = auth.credentials
-        self.default_site = auth.default_site
-        self.accessible_sites = auth.accessible_sites
 
     def download_file(self,
                       dest_path,
