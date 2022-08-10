@@ -124,7 +124,12 @@ class Authentication(object):
         print(
             f'Go to this URL in a browser: {verification_uri} \nYour code is: {user_code}'
         )
-        webbrowser.open(verification_uri, new=2)
+
+        try:
+            webbrowser.get()
+            webbrowser.open(verification_uri, new=2)
+        except webbrowser.Error:
+            pass
 
         token_response, error = self.__get_device_request_token(
             device_code=device_code, interval=interval)
