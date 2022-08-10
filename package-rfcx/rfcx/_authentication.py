@@ -42,7 +42,7 @@ class Authentication(object):
             persisted_credentials_path, defaults to .rfcx_credentials in the current directory).
 
         Returns:
-            Success if an access_token was obtained
+            None.
         """
         if os.getenv('AUTH0_CLIENT_SECRET'):
             self.__generate_new_machine_token()

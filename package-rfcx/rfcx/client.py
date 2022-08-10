@@ -24,7 +24,7 @@ class Client(object):
             persisted_credentials_path, defaults to .rfcx_credentials in the current directory).
 
         Returns:
-            Success if an access_token was obtained
+            None.
         """
         auth = Authentication(persist, persisted_credentials_path)
         auth.authentication()
