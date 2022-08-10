@@ -1,6 +1,7 @@
 """RFCx authentication"""
 import os
 import logging
+import webbrowser
 from time import sleep
 from datetime import datetime, timedelta
 
@@ -21,9 +22,12 @@ DEVICE_ERROR_STATUS = {
 
 logger = logging.getLogger(__name__)
 
+
 class Authentication(object):
     """Authenticate the RFCx SDK platform"""
-    def __init__(self, persist=True, persisted_credentials_path='.rfcx_credentials'):
+    def __init__(self,
+                 persist=True,
+                 persisted_credentials_path='.rfcx_credentials'):
         self.credentials = None
         self.default_site = None
         self.accessible_sites = None
@@ -82,11 +86,15 @@ class Authentication(object):
 
         return False
 
-    def __setup_credentials(self, access_token, token_expiry, refresh_token=None,
+    def __setup_credentials(self,
+                            access_token,
+                            token_expiry,
+                            refresh_token=None,
                             id_token=None):
         self.credentials = Credentials(access_token, token_expiry,
                                        refresh_token, id_token)
-        app_meta = self.credentials.id_object['https://rfcx.org/app_metadata'] if self.credentials.id_object else None
+        app_meta = self.credentials.id_object[
+            'https://rfcx.org/app_metadata'] if self.credentials.id_object else None
         if app_meta:
             self.accessible_sites = app_meta.get('accessibleSites', [])
             self.default_site = app_meta.get('defaultSite', 'derc')
@@ -106,29 +114,36 @@ class Authentication(object):
             f.write(credentials.token_expiry.isoformat() + 'Z\n')
             f.write(credentials.id_token + '\n')
 
-
     def __generate_new_machine_token(self):
         response = api_auth.machine_auth()
         access_token = response['access_token']
         token_expiry = date_after(response['expires_in'])
         self.__setup_credentials(access_token, token_expiry)
 
-
     def __generate_new_user_token(self):
         response = api_auth.device_auth(CLIENT_ID)
-        print('Go to this URL in a browser: ',
-              response['verification_uri_complete'])
+        if response is None:
+            raise Exception(
+                'Obtain device code failed. Please retry again later or contact support.'
+            )
+
+        verification_uri = response['verification_uri_complete']
+        print('Go to this URL in a browser:', verification_uri)
+        webbrowser.open(verification_uri, new=2)
 
         token_response, error = self.__get_device_request_token(
             device_code=response['device_code'], interval=response['interval'])
-        print(token_response, error)
         if error:
             logger.error('Obtain token failed: %s', token_response)
-            raise Exception('Obtain token failed. Please retry again later or contact support.')
+            raise Exception(
+                'Obtain token failed. Please retry again later or contact support.'
+            )
         access_token = token_response['access_token']
         token_expiry = date_after(token_response['expires_in'])
-        refresh_token = token_response['refresh_token'] if 'refresh_token' in token_response else None
-        id_token = token_response['id_token'] if 'id_token' in token_response else None
+        refresh_token = token_response[
+            'refresh_token'] if 'refresh_token' in token_response else None
+        id_token = token_response[
+            'id_token'] if 'id_token' in token_response else None
         self.__setup_credentials(access_token, token_expiry, refresh_token,
                                  id_token)
 
