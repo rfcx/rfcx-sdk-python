@@ -41,7 +41,7 @@ class Authentication(object):
         Returns:
             Success if an access_token was obtained
         """
-        if os.getenv('IS_MACHINE'):
+        if os.getenv('IS_MACHINE', 'False') == 'True':
             self.__generate_new_machine_token()
             return
 
@@ -86,7 +86,7 @@ class Authentication(object):
                             id_token=None):
         self.credentials = Credentials(access_token, token_expiry,
                                        refresh_token, id_token)
-        app_meta = self.credentials.id_object['https://rfcx.org/app_metadata']
+        app_meta = self.credentials.id_object['https://rfcx.org/app_metadata'] if self.credentials.id_object else None
         if app_meta:
             self.accessible_sites = app_meta.get('accessibleSites', [])
             self.default_site = app_meta.get('defaultSite', 'derc')
@@ -121,13 +121,14 @@ class Authentication(object):
 
         token_response, error = self.__get_device_request_token(
             device_code=response['device_code'], interval=response['interval'])
+        print(token_response, error)
         if error:
             logger.error('Obtain token failed: %s', token_response)
             raise Exception('Obtain token failed. Please retry again later or contact support.')
         access_token = token_response['access_token']
         token_expiry = date_after(token_response['expires_in'])
-        refresh_token = token_response['refresh_token']
-        id_token = token_response['id_token']
+        refresh_token = token_response['refresh_token'] if 'refresh_token' in token_response else None
+        id_token = token_response['id_token'] if 'id_token' in token_response else None
         self.__setup_credentials(access_token, token_expiry, refresh_token,
                                  id_token)
 

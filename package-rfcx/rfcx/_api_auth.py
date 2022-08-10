@@ -18,8 +18,6 @@ class TokenError(Error):
 logger = logging.getLogger(__name__)
 
 AUTH_DOMAIN = 'https://rfcx.eu.auth0.com'
-AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
-AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
 
 def machine_auth():
     """Get Auth0 request machine to machine token response
@@ -29,14 +27,16 @@ def machine_auth():
     Returns:
         Auth0 request token object contains access_token, expires_in, and token_type.
     """
+    auth0_client_id = os.getenv('AUTH0_CLIENT_ID')
+    auth0_client_secret = os.getenv('AUTH0_CLIENT_SECRET')
 
-    if AUTH0_CLIENT_ID is None or AUTH0_CLIENT_SECRET is None:
+    if auth0_client_id is None or auth0_client_secret is None:
         raise TokenError('Not giving `AUTH0_CLIENT_ID` or `AUTH0_CLIENT_SECRET`')
 
     post_data = {
         'grant_type': 'client_credentials',
-        'client_id': AUTH0_CLIENT_ID,
-        'client_secret': AUTH0_CLIENT_SECRET,
+        'client_id': auth0_client_id,
+        'client_secret': auth0_client_secret,
         'audience': 'https://rfcx.org/api/v2/'
     }
 
