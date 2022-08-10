@@ -68,7 +68,7 @@ class Client(object):
             print("end_time is not type datetime")
             return
 
-        return audio.download_file(self.credentials.id_token, dest_path,
+        return audio.download_file(self.credentials.token, dest_path,
                                    stream, start_time, end_time, gain,
                                    file_ext)
 
@@ -98,7 +98,7 @@ class Client(object):
         if end is None:
             end = util.date_now()
 
-        return api_rfcx.stream_segments(self.credentials.id_token, stream,
+        return api_rfcx.stream_segments(self.credentials.token, stream,
                                         start, end, limit, offset)
 
     def download_file_segments(self,
@@ -153,7 +153,7 @@ class Client(object):
                     '`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy'
                 )
                 return
-        return audio.download_file_segments(self.credentials.id_token,
+        return audio.download_file_segments(self.credentials.token,
                                             dest_path, stream, min_date,
                                             max_date, gain, file_ext, parallel)
 
@@ -187,7 +187,7 @@ class Client(object):
             print("created_by can be only None, me, or collaborators")
             return
 
-        return api_rfcx.streams(self.credentials.id_token, organizations,
+        return api_rfcx.streams(self.credentials.token, organizations,
                                 projects, created_by, keyword, is_public,
                                 is_deleted, limit, offset)
 
@@ -208,7 +208,7 @@ class Client(object):
 
         iso_timestamp = timestamp.replace(microsecond=0).isoformat() + 'Z'
 
-        return ingest.ingest_file(self.credentials.id_token, stream, filepath,
+        return ingest.ingest_file(self.credentials.token, stream, filepath,
                                   iso_timestamp)
 
     def annotations(self,
@@ -239,7 +239,7 @@ class Client(object):
         if end == None:
             end = util.date_now()
 
-        return api_rfcx.annotations(self.credentials.id_token, start, end,
+        return api_rfcx.annotations(self.credentials.token, start, end,
                                     classifications, stream, limit, offset)
 
     def detections(self,
@@ -274,6 +274,6 @@ class Client(object):
         if end is None:
             end = util.date_now()
 
-        return api_rfcx.detections(self.credentials.id_token, start, end,
+        return api_rfcx.detections(self.credentials.token, start, end,
                                    classifications, classifiers, streams,
                                    min_confidence, limit, offset)

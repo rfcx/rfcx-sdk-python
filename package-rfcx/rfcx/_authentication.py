@@ -41,11 +41,16 @@ class Authentication(object):
         Returns:
             Success if an access_token was obtained
         """
+        if os.getenv('IS_MACHINE'):
+            self.__generate_new_machine_token()
+            return
+
         if os.path.exists(self.persisted_credentials_path):
             is_token_loaded = self.__load_token_from_credentials_file()
             if is_token_loaded:
                 return
-        self.__generate_new_token()
+
+        self.__generate_new_user_token()
 
     def __load_token_from_credentials_file(self):
         with open(self.persisted_credentials_path, 'r', encoding='utf-8') as f:
@@ -77,8 +82,8 @@ class Authentication(object):
 
         return False
 
-    def __setup_credentials(self, access_token, token_expiry, refresh_token,
-                            id_token):
+    def __setup_credentials(self, access_token, token_expiry, refresh_token=None,
+                            id_token=None):
         self.credentials = Credentials(access_token, token_expiry,
                                        refresh_token, id_token)
         app_meta = self.credentials.id_object['https://rfcx.org/app_metadata']
@@ -101,7 +106,15 @@ class Authentication(object):
             f.write(credentials.token_expiry.isoformat() + 'Z\n')
             f.write(credentials.id_token + '\n')
 
-    def __generate_new_token(self):
+
+    def __generate_new_machine_token(self):
+        response = api_auth.machine_auth()
+        access_token = response['access_token']
+        token_expiry = date_after(response['expires_in'])
+        self.__setup_credentials(access_token, token_expiry)
+
+
+    def __generate_new_user_token(self):
         response = api_auth.device_auth(CLIENT_ID)
         print('Go to this URL in a browser: ',
               response['verification_uri_complete'])

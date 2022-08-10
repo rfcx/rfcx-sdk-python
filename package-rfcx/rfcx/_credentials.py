@@ -14,6 +14,7 @@ class VerifyJwtTokenError(Exception):
 class Credentials(object):
 
     def __init__(self, access_token, token_expiry, refresh_token=None, id_token=None):
+        self.token = id_token if id_token else access_token
         self.access_token = access_token
         self.token_expiry = token_expiry
         self.refresh_token = refresh_token
