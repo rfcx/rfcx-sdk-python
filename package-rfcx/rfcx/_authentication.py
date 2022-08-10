@@ -92,14 +92,6 @@ class Authentication(object):
                             id_token=None):
         self.credentials = Credentials(access_token, token_expiry,
                                        refresh_token, id_token)
-        app_meta = self.credentials.id_object[
-            'https://rfcx.org/app_metadata'] if self.credentials.id_object else None
-        if app_meta:
-            roles = app_meta.get('authorization', {}).get('roles', [])
-            if not any(role in roles for role in ALLOW_ROLES):
-                raise Exception(
-                    "User does not have sufficient privileges. Please check you have access to https://dashboard.rfcx.org or contact support."
-                )
 
     def __persist_credentials(self):
         credentials = self.credentials
