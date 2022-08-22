@@ -76,9 +76,6 @@ Better test:
 
     rfcx.name
     ```
-- Result should be:
-    ![Example in colab](docs/images/package-test-colab.png?raw=true)
-
 
 ### Building documentation
 
