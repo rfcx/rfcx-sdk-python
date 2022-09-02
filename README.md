@@ -1,4 +1,4 @@
-# RFCx (Rainforest Connection) Client SDK for Python
+# Rainforest Connection SDK for Python
 
 If you are would like to use the SDK then please [see the documentation](https://rfcx.github.io/rfcx-sdk-python/) 
 or [try an example](https://gist.github.com/antonyharfield/93231b3df86cd58fecee4f4d1ec9cc5b).
