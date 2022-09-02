@@ -20,8 +20,8 @@ class Client(object):
 
         If you want to persist/load the credentials to/from a custom path then set `persisted_credentials_path`
         Args:
-            persist: Should save the user token to the filesystem (in file specified by
-            persisted_credentials_path, defaults to .rfcx_credentials in the current directory).
+            persist: (optional, default= True) Should save the user token to the filesystem.
+            persisted_credentials_path: (optional, default= '.rfcx_credentials') File path for saving user token.
 
         Returns:
             None.
@@ -30,20 +30,20 @@ class Client(object):
         auth.authentication()
         self.credentials = auth.credentials
 
-    def download_file(self,
-                      dest_path,
+    def download_audio_file(self,
                       stream,
+                      dest_path,
                       start_time,
                       end_time,
                       gain=1,
                       file_ext='wav'):
-        """ Save audio to local path
+        """ Download single audio. Duration can not be more than 15 minutes.
         Args:
-            dest_path: Audio save path.
-            stream: Identifies a stream/site.
-            start_time: Minimum timestamp to get the audio.
-            end_time: Maximum timestamp to get the audio. (Should not more than 15 min range)
-            gain: (optional, default = 1) Input channel tone loudness
+            stream: (required) Identifies a stream/site.
+            dest_path: (required) Audio save path.
+            start_time: (required) Minimum timestamp to get the audio.
+            end_time: (required) Maximum timestamp to get the audio.
+            gain: (optional, default = 1) Input channel tone loudness.
             file_ext: (optional, default = 'wav') Extension for saving audio files.
 
         Returns:
@@ -68,51 +68,22 @@ class Client(object):
                                    stream, start_time, end_time, gain,
                                    file_ext)
 
-    def stream_segments(self, stream, start, end, limit=50, offset=0):
-        """Retrieve audio information about a specific stream
-
-        Args:
-            stream: (Required) Identifies a stream/site.
-            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            end: Maximum timestamp of the audio. If None then defaults to now.
-            limit: Maximum results to return. Defaults to 50.
-            offset: Offset of the audio group.
-
-        Returns:
-            List of audio files (meta data showing audio id and recorded timestamp)
-        """
-        if self.credentials is None:
-            print('Not authenticated')
-            return
-
-        if stream is None:
-            print('Require stream id')
-            return
-
-        if start is None:
-            start = util.date_before()
-        if end is None:
-            end = util.date_now()
-
-        return api_rfcx.stream_segments(self.credentials.token, stream,
-                                        start, end, limit, offset)
-
-    def download_file_segments(self,
-                               dest_path=None,
-                               stream=None,
+    def download_audio_files(self,
+                               stream,
+                               dest_path='./audios',
                                min_date=None,
                                max_date=None,
                                gain=1,
                                file_ext='wav',
                                parallel=True):
-        """Download audio using audio information from `stream_segments`
+        """Download multiple audio in giving time range.
 
         Args:
-            dest_path: (Required) Path to save audio.
-            stream: (Required) Identifies a stream/site
-            min_date: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            max_date: Maximum timestamp of the audio. If None then defaults to now.
-            gain: (optional, default= 1) Input channel tone loudness
+            stream: (required) Identifies a stream/site
+            dest_path: (optional, default= './audios') Path to save audio.
+            min_date: (optional, default= None) Minimum timestamp to get the audio. If None then defaults to exactly 30 days ago.
+            max_date: (optional, default= None) Maximum timestamp to get the audio. If None then defaults to now.
+            gain: (optional, default= 1) Input channel tone loudness.
             file_ext: (optional, default= 'wav') Audio file extension. Default to `wav`
             parallel: (optional, default= True) Parallel download audio. Defaults to True.
 
@@ -141,17 +112,44 @@ class Client(object):
             print("max_date is not type datetime")
             return
 
-        if dest_path is None:
-            if not os.path.exists('./audios'):
-                os.makedirs('./audios')
-            else:
-                print(
-                    '`audios` directory is already exits. Please specific the directory to save audio path or remove `audios` directoy'
-                )
-                return
+        if not os.path.exists(dest_path):
+            os.makedirs(dest_path)
+        elif len(os.listdir(dest_path)) > 0:
+            print(f'{dest_path} directory is not empty. Please change or empty directory.')
+            return
+
         return audio.download_file_segments(self.credentials.token,
                                             dest_path, stream, min_date,
                                             max_date, gain, file_ext, parallel)
+
+    def stream_segments(self, stream, start=None, end=None, limit=50, offset=0):
+        """Retrieve audio information about a specific stream
+
+        Args:
+            stream: (required) Identifies a stream/site.
+            start: (optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: (optional, default= None) Maximum timestamp of the audio. If None then defaults to now.
+            limit: (optional, default= 50) Maximum results to return. Defaults to 50.
+            offset: (optional, default= 0) Offset of the audio group.
+
+        Returns:
+            List of audio files (meta data showing audio id and recorded timestamp)
+        """
+        if self.credentials is None:
+            print('Not authenticated')
+            return
+
+        if stream is None:
+            print('Require stream id')
+            return
+
+        if start is None:
+            start = util.date_before()
+        if end is None:
+            end = util.date_now()
+
+        return api_rfcx.stream_segments(self.credentials.token, stream,
+                                        start, end, limit, offset)
 
     def streams(self,
                 organizations=None,
@@ -165,17 +163,18 @@ class Client(object):
         """Retrieve a list of streams
 
         Args:
-            organizations: List of organization ids
-            projects: List of project ids
-            created_by: The stream owner. Have 3 options: None, me, or collaborators
-            keyword: Match streams name with keyword
+            organizations: (optional, default= None) List of organization ids
+            projects: (optional, default= None) List of project ids
+            created_by: (optional, default= None) The stream owner. Have 3 options: None, me, or collaborators
+            keyword: (optional, default= None) Match streams name with keyword
             is_public: (optional, default=True) Match public or private streams
             is_deleted: (optional, default=False) Match deleted streams
             limit: (optional, default=1000) Maximum number of  results to return
             offset: (optional, default=0) Number of results to skip
 
         Returns:
-            List of streams"""
+            List of streams
+        """
 
         if created_by is not None and created_by not in [
                 "me", "collaborators"
@@ -190,9 +189,9 @@ class Client(object):
     def ingest_file(self, stream, filepath, timestamp):
         """ Ingest an audio to RFCx
         Args:
-            stream: Identifies a stream/site
-            filepath: Local file path to be ingest
-            timestamp: Audio timestamp in datetime type
+            stream: (required) Identifies a stream/site
+            filepath: (required) Local file path to be ingest
+            timestamp: (required) Audio timestamp in datetime type
 
         Returns:
             None.
@@ -217,8 +216,8 @@ class Client(object):
         """Retrieve a list of annotations
 
         Args:
-            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            end: Maximum timestamp of the audio. If None then defaults to now.
+            start: (optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: (optional, default= None) Maximum timestamp of the audio. If None then defaults to now.
             classifications: (optional, default=None) List of classification names e.g. orca, chainsaw.
             stream: (optional, default=None) Limit results to a given stream id.
             limit: (optional, default=50) Maximum number of results to be return.
@@ -239,8 +238,8 @@ class Client(object):
                                     classifications, stream, limit, offset)
 
     def detections(self,
-                   start=None,
-                   end=None,
+                   min_date=None,
+                   max_date=None,
                    classifications=None,
                    classifiers=None,
                    streams=None,
@@ -250,8 +249,8 @@ class Client(object):
         """Retrieve a list of detections
 
         Args:
-            start: Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            end: Maximum timestamp of the audio. If None then defaults to now.
+            min_date: (optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            max_date: (optional, default= None) Maximum timestamp of the audio. If None then defaults to now.
             classifications: (optional, default=None) List of classification names e.g. orca, chainsaw.
             classifiers: (optional, default=None) List of classifier ids (integer) e.g. 93, 94.
             streams: (optional, default=None) List of stream ids.
@@ -265,11 +264,11 @@ class Client(object):
         if limit > 1000:
             raise Exception("Please give the value <= 1000")
 
-        if start is None:
-            start = util.date_before()
-        if end is None:
-            end = util.date_now()
+        if min_date is None:
+            min_date = util.date_before()
+        if max_date is None:
+            max_date = util.date_now()
 
-        return api_rfcx.detections(self.credentials.token, start, end,
+        return api_rfcx.detections(self.credentials.token, min_date, max_date,
                                    classifications, classifiers, streams,
                                    min_confidence, limit, offset)

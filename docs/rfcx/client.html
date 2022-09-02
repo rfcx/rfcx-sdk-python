@@ -46,9 +46,9 @@
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>start</code></strong></dt>
-<dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dd>(optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
 <dt><strong><code>end</code></strong></dt>
-<dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dd>(optional, default= None) Maximum timestamp of the audio. If None then defaults to now.</dd>
 <dt><strong><code>classifications</code></strong></dt>
 <dd>(optional, default=None) List of classification names e.g. orca, chainsaw.</dd>
 <dt><strong><code>stream</code></strong></dt>
@@ -73,23 +73,24 @@
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>persist</code></strong></dt>
-<dd>Should save the user token to the filesystem (in file specified by</dd>
+<dd>(optional, default= True) Should save the user token to the filesystem.</dd>
+<dt><strong><code>persisted_credentials_path</code></strong></dt>
+<dd>(optional, default= '.rfcx_credentials') File path for saving user token.</dd>
 </dl>
-<p>persisted_credentials_path, defaults to .rfcx_credentials in the current directory).</p>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
 <dt id="rfcx.client.Client.detections"><code class="name flex">
-<span>def <span class="ident">detections</span></span>(<span>self, start=None, end=None, classifications=None, classifiers=None, streams=None, min_confidence=None, limit=50, offset=0)</span>
+<span>def <span class="ident">detections</span></span>(<span>self, min_date=None, max_date=None, classifications=None, classifiers=None, streams=None, min_confidence=None, limit=50, offset=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Retrieve a list of detections</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>start</code></strong></dt>
-<dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
-<dt><strong><code>end</code></strong></dt>
-<dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dt><strong><code>min_date</code></strong></dt>
+<dd>(optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dt><strong><code>max_date</code></strong></dt>
+<dd>(optional, default= None) Maximum timestamp of the audio. If None then defaults to now.</dd>
 <dt><strong><code>classifications</code></strong></dt>
 <dd>(optional, default=None) List of classification names e.g. orca, chainsaw.</dd>
 <dt><strong><code>classifiers</code></strong></dt>
@@ -109,23 +110,23 @@
 <dd>&nbsp;</dd>
 </dl></div>
 </dd>
-<dt id="rfcx.client.Client.download_file"><code class="name flex">
-<span>def <span class="ident">download_file</span></span>(<span>self, dest_path, stream, start_time, end_time, gain=1, file_ext='wav')</span>
+<dt id="rfcx.client.Client.download_audio_file"><code class="name flex">
+<span>def <span class="ident">download_audio_file</span></span>(<span>self, stream, dest_path, start_time, end_time, gain=1, file_ext='wav')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Save audio to local path</p>
+<div class="desc"><p>Download single audio. Duration can not be more than 15 minutes.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>dest_path</code></strong></dt>
-<dd>Audio save path.</dd>
 <dt><strong><code>stream</code></strong></dt>
-<dd>Identifies a stream/site.</dd>
+<dd>(required) Identifies a stream/site.</dd>
+<dt><strong><code>dest_path</code></strong></dt>
+<dd>(required) Audio save path.</dd>
 <dt><strong><code>start_time</code></strong></dt>
-<dd>Minimum timestamp to get the audio.</dd>
+<dd>(required) Minimum timestamp to get the audio.</dd>
 <dt><strong><code>end_time</code></strong></dt>
-<dd>Maximum timestamp to get the audio. (Should not more than 15 min range)</dd>
+<dd>(required) Maximum timestamp to get the audio.</dd>
 <dt><strong><code>gain</code></strong></dt>
-<dd>(optional, default = 1) Input channel tone loudness</dd>
+<dd>(optional, default = 1) Input channel tone loudness.</dd>
 <dt><strong><code>file_ext</code></strong></dt>
 <dd>(optional, default = 'wav') Extension for saving audio files.</dd>
 </dl>
@@ -137,23 +138,23 @@
 <dd>if missing required arguements.</dd>
 </dl></div>
 </dd>
-<dt id="rfcx.client.Client.download_file_segments"><code class="name flex">
-<span>def <span class="ident">download_file_segments</span></span>(<span>self, dest_path=None, stream=None, min_date=None, max_date=None, gain=1, file_ext='wav', parallel=True)</span>
+<dt id="rfcx.client.Client.download_audio_files"><code class="name flex">
+<span>def <span class="ident">download_audio_files</span></span>(<span>self, stream, dest_path='./audios', min_date=None, max_date=None, gain=1, file_ext='wav', parallel=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Download audio using audio information from <code>stream_segments</code></p>
+<div class="desc"><p>Download multiple audio in giving time range.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>dest_path</code></strong></dt>
-<dd>(Required) Path to save audio.</dd>
 <dt><strong><code>stream</code></strong></dt>
-<dd>(Required) Identifies a stream/site</dd>
+<dd>(required) Identifies a stream/site</dd>
+<dt><strong><code>dest_path</code></strong></dt>
+<dd>(optional, default= './audios') Path to save audio.</dd>
 <dt><strong><code>min_date</code></strong></dt>
-<dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dd>(optional, default= None) Minimum timestamp to get the audio. If None then defaults to exactly 30 days ago.</dd>
 <dt><strong><code>max_date</code></strong></dt>
-<dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dd>(optional, default= None) Maximum timestamp to get the audio. If None then defaults to now.</dd>
 <dt><strong><code>gain</code></strong></dt>
-<dd>(optional, default= 1) Input channel tone loudness</dd>
+<dd>(optional, default= 1) Input channel tone loudness.</dd>
 <dt><strong><code>file_ext</code></strong></dt>
 <dd>(optional, default= 'wav') Audio file extension. Default to <code>wav</code></dd>
 <dt><strong><code>parallel</code></strong></dt>
@@ -170,32 +171,32 @@
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>stream</code></strong></dt>
-<dd>Identifies a stream/site</dd>
+<dd>(required) Identifies a stream/site</dd>
 <dt><strong><code>filepath</code></strong></dt>
-<dd>Local file path to be ingest</dd>
+<dd>(required) Local file path to be ingest</dd>
 <dt><strong><code>timestamp</code></strong></dt>
-<dd>Audio timestamp in datetime type</dd>
+<dd>(required) Audio timestamp in datetime type</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
 <dt id="rfcx.client.Client.stream_segments"><code class="name flex">
-<span>def <span class="ident">stream_segments</span></span>(<span>self, stream, start, end, limit=50, offset=0)</span>
+<span>def <span class="ident">stream_segments</span></span>(<span>self, stream, start=None, end=None, limit=50, offset=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Retrieve audio information about a specific stream</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>stream</code></strong></dt>
-<dd>(Required) Identifies a stream/site.</dd>
+<dd>(required) Identifies a stream/site.</dd>
 <dt><strong><code>start</code></strong></dt>
-<dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dd>(optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
 <dt><strong><code>end</code></strong></dt>
-<dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dd>(optional, default= None) Maximum timestamp of the audio. If None then defaults to now.</dd>
 <dt><strong><code>limit</code></strong></dt>
-<dd>Maximum results to return. Defaults to 50.</dd>
+<dd>(optional, default= 50) Maximum results to return. Defaults to 50.</dd>
 <dt><strong><code>offset</code></strong></dt>
-<dd>Offset of the audio group.</dd>
+<dd>(optional, default= 0) Offset of the audio group.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -211,13 +212,13 @@
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>organizations</code></strong></dt>
-<dd>List of organization ids</dd>
+<dd>(optional, default= None) List of organization ids</dd>
 <dt><strong><code>projects</code></strong></dt>
-<dd>List of project ids</dd>
+<dd>(optional, default= None) List of project ids</dd>
 <dt><strong><code>created_by</code></strong></dt>
-<dd>The stream owner. Have 3 options: None, me, or collaborators</dd>
+<dd>(optional, default= None) The stream owner. Have 3 options: None, me, or collaborators</dd>
 <dt><strong><code>keyword</code></strong></dt>
-<dd>Match streams name with keyword</dd>
+<dd>(optional, default= None) Match streams name with keyword</dd>
 <dt><strong><code>is_public</code></strong></dt>
 <dd>(optional, default=True) Match public or private streams</dd>
 <dt><strong><code>is_deleted</code></strong></dt>
@@ -240,8 +241,8 @@ results to return</dd>
 </section>
 </article>
 <nav id="sidebar">
-<a title="RFCx Python SDK" href="../">
-<h2 class="title">RFCx Python SDK</h2>
+<a title="Rainforest Connection SDK for Python" href="../">
+<h2 class="title">Rainforest Connection® SDK for Python</h2>
 </a>
 <h1>Index</h1>
 <div class="toc">
@@ -261,8 +262,8 @@ results to return</dd>
 <li><code><a title="rfcx.client.Client.annotations" href="#rfcx.client.Client.annotations">annotations</a></code></li>
 <li><code><a title="rfcx.client.Client.authentication" href="#rfcx.client.Client.authentication">authentication</a></code></li>
 <li><code><a title="rfcx.client.Client.detections" href="#rfcx.client.Client.detections">detections</a></code></li>
-<li><code><a title="rfcx.client.Client.download_file" href="#rfcx.client.Client.download_file">download_file</a></code></li>
-<li><code><a title="rfcx.client.Client.download_file_segments" href="#rfcx.client.Client.download_file_segments">download_file_segments</a></code></li>
+<li><code><a title="rfcx.client.Client.download_audio_file" href="#rfcx.client.Client.download_audio_file">download_audio_file</a></code></li>
+<li><code><a title="rfcx.client.Client.download_audio_files" href="#rfcx.client.Client.download_audio_files">download_audio_files</a></code></li>
 <li><code><a title="rfcx.client.Client.ingest_file" href="#rfcx.client.Client.ingest_file">ingest_file</a></code></li>
 <li><code><a title="rfcx.client.Client.stream_segments" href="#rfcx.client.Client.stream_segments">stream_segments</a></code></li>
 <li><code><a title="rfcx.client.Client.streams" href="#rfcx.client.Client.streams">streams</a></code></li>

@@ -46,7 +46,6 @@ def download_file(token, dest_path, stream_id, start_time, end_time, gain=1, fil
 
         Raises:
             TypeError: if missing required arguements.
-    
     """
     start = __iso_to_rfcx_custom_format(__generate_date_in_isoformat(start_time))
     end = __iso_to_rfcx_custom_format(__generate_date_in_isoformat(end_time))
@@ -102,8 +101,8 @@ def download_file_segments(token, dest_path, stream, min_date, max_date, gain=1,
             token: RFCx client token.
             dest_path: Audio save path.
             stream: Identifies a stream/site
-            min_date: Download start date
-            max_date: Download end date
+            min_date: Minimum timestamp to get the audio.
+            max_date: Maximum timestamp to get the audio.
             gain: (optional, default= 1) Input channel tone loudness
             file_ext: (optional, default= 'wav') Extension for saving audio file.
             parallel: (optional, default= True) Enable to parallel download audio from RFCx
