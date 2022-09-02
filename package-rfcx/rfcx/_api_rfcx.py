@@ -30,9 +30,9 @@ def annotations(token,
                 limit=50,
                 offset=0):
     data = {'start': start, 'end': end, 'limit': limit, 'offset': offset}
-    if (classifications):
+    if classifications:
         data['classifications[]'] = classifications
-    if (stream):
+    if stream:
         data['stream_id'] = stream
     path = '/annotations'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
@@ -49,13 +49,13 @@ def detections(token,
                limit=50,
                offset=0):
     data = {'start': start, 'end': end, 'limit': limit, 'offset': offset}
-    if (classifications):
+    if classifications:
         data['classifications[]'] = classifications
-    if (classifiers):
+    if classifiers:
         data['classifiers[]'] = classifiers
-    if (streams):
+    if streams:
         data['streams[]'] = streams
-    if (min_confidence):
+    if min_confidence:
         data['min_confidence'] = min_confidence
     path = '/detections'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
@@ -77,13 +77,13 @@ def streams(token,
         'limit': limit,
         'offset': offset
     }
-    if (organizations):
+    if organizations:
         data['organizations[]'] = organizations
-    if (projects):
+    if projects:
         data['projects[]'] = projects
-    if (created_by):
+    if created_by:
         data['created_by'] = created_by
-    if (keyword):
+    if keyword:
         data['keyword'] = keyword
     path = '/streams'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
@@ -91,9 +91,9 @@ def streams(token,
 
 
 def _request(url, method='GET', token=None):
-    logger.debug('get url: ' + url)
+    logger.debug('get url: %s', url)
 
-    if token != None:
+    if token is not None:
         headers = {'Authorization': 'Bearer ' + token}
     else:
         headers = {}
@@ -104,9 +104,9 @@ def _request(url, method='GET', token=None):
     if resp.status == http_client.OK:
         return json.loads(content)
 
-    logger.error(f'HTTP status: {resp.status}')
+    logger.error('HTTP status: %s', resp.status)
 
-    if (resp.status == 403):
+    if resp.status == 403:
         logger.error('No permission on given parameter(s)')
 
     return None

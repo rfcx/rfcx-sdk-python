@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.5" />
+<meta name="generator" content="pdoc 0.8.1" />
 <title>rfcx.client API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="RFCx client" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
 <body>
@@ -20,6 +20,7 @@
 <h1 class="title">Module <code>rfcx.client</code></h1>
 </header>
 <section id="section-intro">
+<p>RFCx client</p>
 </section>
 <section>
 </section>
@@ -34,16 +35,41 @@
 <span>class <span class="ident">Client</span></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Authenticate and perform requests against the RFCx platform</p></section>
+<div class="desc"><p>Authenticate and perform requests against the RFCx platform</p></div>
 <h3>Methods</h3>
 <dl>
-<dt id="rfcx.client.Client.authenticate"><code class="name flex">
-<span>def <span class="ident">authenticate</span></span>(<span>self, persist=True)</span>
+<dt id="rfcx.client.Client.annotations"><code class="name flex">
+<span>def <span class="ident">annotations</span></span>(<span>self, start=None, end=None, classifications=None, stream=None, limit=50, offset=0)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Authenticate an RFCx user to obtain a token</p>
-<p>If you want to persist/load the credentials to/from a custom path then set <code>persisted_credentials_path</code>
-before calling <code>client.authenticate()</code>. E.g. <code>client.persisted_credentials_path = '/my/path/.rfcx_credentials'</code></p>
+<div class="desc"><p>Retrieve a list of annotations</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>start</code></strong></dt>
+<dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dt><strong><code>end</code></strong></dt>
+<dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dt><strong><code>classifications</code></strong></dt>
+<dd>(optional, default=None) List of classification names e.g. orca, chainsaw.</dd>
+<dt><strong><code>stream</code></strong></dt>
+<dd>(optional, default=None) Limit results to a given stream id.</dd>
+<dt><strong><code>limit</code></strong></dt>
+<dd>(optional, default=50) Maximum number of results to be return.</dd>
+<dt><strong><code>offset</code></strong></dt>
+<dd>(optional, default=0) Number of results to skip.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code> of <code>annotations</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+<dt id="rfcx.client.Client.authentication"><code class="name flex">
+<span>def <span class="ident">authentication</span></span>(<span>self, persist=True, persisted_credentials_path='.rfcx_credentials')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Authenticate an RFCx user to obtain a token</p>
+<p>If you want to persist/load the credentials to/from a custom path then set <code>persisted_credentials_path</code></p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>persist</code></strong></dt>
@@ -51,76 +77,162 @@ before calling <code>client.authenticate()</code>. E.g. <code>client.persisted_c
 </dl>
 <p>persisted_credentials_path, defaults to .rfcx_credentials in the current directory).</p>
 <h2 id="returns">Returns</h2>
-<dl>
-<dt><code>Success</code> <code>if</code> <code>an</code> <code>access_token</code> <code>was</code> <code>obtained</code></dt>
-<dd>&nbsp;</dd>
-</dl></section>
+<p>None.</p></div>
 </dd>
-<dt id="rfcx.client.Client.guardianAudio"><code class="name flex">
-<span>def <span class="ident">guardianAudio</span></span>(<span>self, guardianId=None, start=None, end=None, limit=50, descending=True)</span>
+<dt id="rfcx.client.Client.detections"><code class="name flex">
+<span>def <span class="ident">detections</span></span>(<span>self, start=None, end=None, classifications=None, classifiers=None, streams=None, min_confidence=None, limit=50, offset=0)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Retrieve audio information about a specific guardian (TO BE DEPRECATED - use streams in future)</p>
+<div class="desc"><p>Retrieve a list of detections</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>guardianId</code></strong></dt>
-<dd>(Required) The guid of a guardian</dd>
+<dt><strong><code>start</code></strong></dt>
+<dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dt><strong><code>end</code></strong></dt>
+<dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dt><strong><code>classifications</code></strong></dt>
+<dd>(optional, default=None) List of classification names e.g. orca, chainsaw.</dd>
+<dt><strong><code>classifiers</code></strong></dt>
+<dd>(optional, default=None) List of classifier ids (integer) e.g. 93, 94.</dd>
+<dt><strong><code>streams</code></strong></dt>
+<dd>(optional, default=None) List of stream ids.</dd>
+<dt><strong><code>min_confidence</code></strong> :&ensp;<code>optional</code>, default=<code>None</code></dt>
+<dd>Return the detection which equal or greater than given value. If None, it will use default in event strategy.</dd>
+<dt><strong><code>limit</code></strong></dt>
+<dd>(optional, default=50) Maximum number of results to be return. The maximum value is 1000.</dd>
+<dt><strong><code>offset</code></strong></dt>
+<dd>(optional, default=0) Number of results to skip.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code> of <code>detections</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+<dt id="rfcx.client.Client.download_file"><code class="name flex">
+<span>def <span class="ident">download_file</span></span>(<span>self, dest_path, stream, start_time, end_time, gain=1, file_ext='wav')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Save audio to local path</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>dest_path</code></strong></dt>
+<dd>Audio save path.</dd>
+<dt><strong><code>stream</code></strong></dt>
+<dd>Identifies a stream/site.</dd>
+<dt><strong><code>start_time</code></strong></dt>
+<dd>Minimum timestamp to get the audio.</dd>
+<dt><strong><code>end_time</code></strong></dt>
+<dd>Maximum timestamp to get the audio. (Should not more than 15 min range)</dd>
+<dt><strong><code>gain</code></strong></dt>
+<dd>(optional, default = 1) Input channel tone loudness</dd>
+<dt><strong><code>file_ext</code></strong></dt>
+<dd>(optional, default = 'wav') Extension for saving audio files.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>if missing required arguements.</dd>
+</dl></div>
+</dd>
+<dt id="rfcx.client.Client.download_file_segments"><code class="name flex">
+<span>def <span class="ident">download_file_segments</span></span>(<span>self, dest_path=None, stream=None, min_date=None, max_date=None, gain=1, file_ext='wav', parallel=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Download audio using audio information from <code>stream_segments</code></p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>dest_path</code></strong></dt>
+<dd>(Required) Path to save audio.</dd>
+<dt><strong><code>stream</code></strong></dt>
+<dd>(Required) Identifies a stream/site</dd>
+<dt><strong><code>min_date</code></strong></dt>
+<dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dt><strong><code>max_date</code></strong></dt>
+<dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dt><strong><code>gain</code></strong></dt>
+<dd>(optional, default= 1) Input channel tone loudness</dd>
+<dt><strong><code>file_ext</code></strong></dt>
+<dd>(optional, default= 'wav') Audio file extension. Default to <code>wav</code></dd>
+<dt><strong><code>parallel</code></strong></dt>
+<dd>(optional, default= True) Parallel download audio. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="rfcx.client.Client.ingest_file"><code class="name flex">
+<span>def <span class="ident">ingest_file</span></span>(<span>self, stream, filepath, timestamp)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Ingest an audio to RFCx</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>stream</code></strong></dt>
+<dd>Identifies a stream/site</dd>
+<dt><strong><code>filepath</code></strong></dt>
+<dd>Local file path to be ingest</dd>
+<dt><strong><code>timestamp</code></strong></dt>
+<dd>Audio timestamp in datetime type</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="rfcx.client.Client.stream_segments"><code class="name flex">
+<span>def <span class="ident">stream_segments</span></span>(<span>self, stream, start, end, limit=50, offset=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Retrieve audio information about a specific stream</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>stream</code></strong></dt>
+<dd>(Required) Identifies a stream/site.</dd>
 <dt><strong><code>start</code></strong></dt>
 <dd>Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
 <dt><strong><code>end</code></strong></dt>
 <dd>Maximum timestamp of the audio. If None then defaults to now.</dd>
 <dt><strong><code>limit</code></strong></dt>
-<dd>Maximum results to return. Defaults to 50. (TODO check if there is an upper limit on the API)</dd>
-<dt><strong><code>descending</code></strong></dt>
-<dd>Order by newest results first. Defaults to True.</dd>
+<dd>Maximum results to return. Defaults to 50.</dd>
+<dt><strong><code>offset</code></strong></dt>
+<dd>Offset of the audio group.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code>List</code> of <code>audio</code> <code>files</code> (<code>meta</code> <code>data</code> <code>showing</code> <code>audio</code> <code>id</code> <code>and</code> <code>recorded</code> <code>timestamp</code>)</dt>
+<dt><code>List</code> of <code>audio files (meta data showing audio id and recorded timestamp)</code></dt>
 <dd>&nbsp;</dd>
-</dl></section>
+</dl></div>
 </dd>
-<dt id="rfcx.client.Client.guardians"><code class="name flex">
-<span>def <span class="ident">guardians</span></span>(<span>self, sites=None)</span>
+<dt id="rfcx.client.Client.streams"><code class="name flex">
+<span>def <span class="ident">streams</span></span>(<span>self, organizations=None, projects=None, created_by=None, keyword=None, is_public=True, is_deleted=False, limit=1000, offset=0)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Retrieve a list of guardians from a site (TO BE DEPRECATED - use streams in future)</p>
+<div class="desc"><p>Retrieve a list of streams</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>sites</code></strong></dt>
-<dd>List of site shortnames (e.g. cerroblanco). Default (None) gets all your accessible sites.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>List</code> of <code>guardians</code></dt>
-<dd>&nbsp;</dd>
-</dl></section>
-</dd>
-<dt id="rfcx.client.Client.tags"><code class="name flex">
-<span>def <span class="ident">tags</span></span>(<span>self, type, labels, start=None, end=None, sites=None, limit=1000)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Retrieve tags (annotations or confirmed/rejected reviews) from the RFCx API</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>type</code></strong></dt>
-<dd>(Required) Type of tag. Must be either: annotation, inference, inference:confirmed, or inference:rejected</dd>
-<dt><strong><code>labels</code></strong></dt>
-<dd>(Required) List of labels. If None then returns tags of any label.</dd>
-<dt><strong><code>start</code></strong></dt>
-<dd>Minimum timestamp of the annotations to be returned. If None then defaults to exactly 30 days ago.</dd>
-<dt><strong><code>end</code></strong></dt>
-<dd>Maximum timestamp of the annotations. If None then defaults to now.</dd>
-<dt><strong><code>sites</code></strong></dt>
-<dd>List of sites by shortname. If None then returns tags from any site.</dd>
+<dt><strong><code>organizations</code></strong></dt>
+<dd>List of organization ids</dd>
+<dt><strong><code>projects</code></strong></dt>
+<dd>List of project ids</dd>
+<dt><strong><code>created_by</code></strong></dt>
+<dd>The stream owner. Have 3 options: None, me, or collaborators</dd>
+<dt><strong><code>keyword</code></strong></dt>
+<dd>Match streams name with keyword</dd>
+<dt><strong><code>is_public</code></strong></dt>
+<dd>(optional, default=True) Match public or private streams</dd>
+<dt><strong><code>is_deleted</code></strong></dt>
+<dd>(optional, default=False) Match deleted streams</dd>
 <dt><strong><code>limit</code></strong></dt>
-<dd>Maximum number of audio files to return (not the number of tags!). Defaults to 1000.</dd>
+<dd>(optional, default=1000) Maximum number of
+results to return</dd>
+<dt><strong><code>offset</code></strong></dt>
+<dd>(optional, default=0) Number of results to skip</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code>List</code> of <code>tags</code></dt>
+<dt><code>List</code> of <code>streams</code></dt>
 <dd>&nbsp;</dd>
-</dl></section>
+</dl></div>
 </dd>
 </dl>
 </dd>
@@ -146,10 +258,14 @@ before calling <code>client.authenticate()</code>. E.g. <code>client.persisted_c
 <li>
 <h4><code><a title="rfcx.client.Client" href="#rfcx.client.Client">Client</a></code></h4>
 <ul class="">
-<li><code><a title="rfcx.client.Client.authenticate" href="#rfcx.client.Client.authenticate">authenticate</a></code></li>
-<li><code><a title="rfcx.client.Client.guardianAudio" href="#rfcx.client.Client.guardianAudio">guardianAudio</a></code></li>
-<li><code><a title="rfcx.client.Client.guardians" href="#rfcx.client.Client.guardians">guardians</a></code></li>
-<li><code><a title="rfcx.client.Client.tags" href="#rfcx.client.Client.tags">tags</a></code></li>
+<li><code><a title="rfcx.client.Client.annotations" href="#rfcx.client.Client.annotations">annotations</a></code></li>
+<li><code><a title="rfcx.client.Client.authentication" href="#rfcx.client.Client.authentication">authentication</a></code></li>
+<li><code><a title="rfcx.client.Client.detections" href="#rfcx.client.Client.detections">detections</a></code></li>
+<li><code><a title="rfcx.client.Client.download_file" href="#rfcx.client.Client.download_file">download_file</a></code></li>
+<li><code><a title="rfcx.client.Client.download_file_segments" href="#rfcx.client.Client.download_file_segments">download_file_segments</a></code></li>
+<li><code><a title="rfcx.client.Client.ingest_file" href="#rfcx.client.Client.ingest_file">ingest_file</a></code></li>
+<li><code><a title="rfcx.client.Client.stream_segments" href="#rfcx.client.Client.stream_segments">stream_segments</a></code></li>
+<li><code><a title="rfcx.client.Client.streams" href="#rfcx.client.Client.streams">streams</a></code></li>
 </ul>
 </li>
 </ul>
@@ -158,7 +274,7 @@ before calling <code>client.authenticate()</code>. E.g. <code>client.persisted_c
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

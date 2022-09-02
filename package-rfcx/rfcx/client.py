@@ -230,9 +230,9 @@ class Client(object):
         if limit > 1000:
             raise Exception("Please give the value <= 1000")
 
-        if start == None:
+        if start is None:
             start = util.date_before()
-        if end == None:
+        if end is None:
             end = util.date_now()
 
         return api_rfcx.annotations(self.credentials.token, start, end,
