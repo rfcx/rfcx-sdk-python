@@ -64,8 +64,8 @@
 <dd>&nbsp;</dd>
 </dl></div>
 </dd>
-<dt id="rfcx.client.Client.authentication"><code class="name flex">
-<span>def <span class="ident">authentication</span></span>(<span>self, persist=True, persisted_credentials_path='.rfcx_credentials')</span>
+<dt id="rfcx.client.Client.authenticate"><code class="name flex">
+<span>def <span class="ident">authenticate</span></span>(<span>self, persist=True, persisted_credentials_path='.rfcx_credentials')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Authenticate an RFCx user to obtain a token</p>
@@ -180,6 +180,33 @@
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
+<dt id="rfcx.client.Client.projects"><code class="name flex">
+<span>def <span class="ident">projects</span></span>(<span>self, keyword=None, created_by=None, only_public=None, only_deleted=None, limit=1000, offset=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Retrieve a list of projects</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>keyword</code></strong></dt>
+<dd>(optional, default= None) Match project name with keyword</dd>
+<dt><strong><code>created_by</code></strong></dt>
+<dd>(optional, default= None) The project owner. Have 3 options: None, me, or collaborator id</dd>
+<dt><strong><code>only_public</code></strong></dt>
+<dd>(optional, default= None) Return only public projects</dd>
+<dt><strong><code>only_deleted</code></strong></dt>
+<dd>(optional, default= None) Return only deleted projects</dd>
+<dt><strong><code>limit</code></strong></dt>
+<dd>(optional, default= 1000) Maximum number of
+results to return</dd>
+<dt><strong><code>offset</code></strong></dt>
+<dd>(optional, default= 0) Number of results to skip</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code> of <code>projects</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
 <dt id="rfcx.client.Client.stream_segments"><code class="name flex">
 <span>def <span class="ident">stream_segments</span></span>(<span>self, stream, start=None, end=None, limit=50, offset=0)</span>
 </code></dt>
@@ -205,7 +232,7 @@
 </dl></div>
 </dd>
 <dt id="rfcx.client.Client.streams"><code class="name flex">
-<span>def <span class="ident">streams</span></span>(<span>self, organizations=None, projects=None, created_by=None, keyword=None, is_public=True, is_deleted=False, limit=1000, offset=0)</span>
+<span>def <span class="ident">streams</span></span>(<span>self, organizations=None, projects=None, created_by=None, name=None, keyword=None, is_public=True, is_deleted=False, limit=1000, offset=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Retrieve a list of streams</p>
@@ -217,17 +244,19 @@
 <dd>(optional, default= None) List of project ids</dd>
 <dt><strong><code>created_by</code></strong></dt>
 <dd>(optional, default= None) The stream owner. Have 3 options: None, me, or collaborators</dd>
+<dt><strong><code>name</code></strong></dt>
+<dd>(optional, default= None) Match exact streams with name (support *)</dd>
 <dt><strong><code>keyword</code></strong></dt>
-<dd>(optional, default= None) Match streams name with keyword</dd>
+<dd>(optional, default= None) Match stream name with keyword</dd>
 <dt><strong><code>is_public</code></strong></dt>
 <dd>(optional, default=True) Match public or private streams</dd>
 <dt><strong><code>is_deleted</code></strong></dt>
 <dd>(optional, default=False) Match deleted streams</dd>
 <dt><strong><code>limit</code></strong></dt>
-<dd>(optional, default=1000) Maximum number of
+<dd>(optional, default= 1000) Maximum number of
 results to return</dd>
 <dt><strong><code>offset</code></strong></dt>
-<dd>(optional, default=0) Number of results to skip</dd>
+<dd>(optional, default= 0) Number of results to skip</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -260,11 +289,12 @@ results to return</dd>
 <h4><code><a title="rfcx.client.Client" href="#rfcx.client.Client">Client</a></code></h4>
 <ul class="">
 <li><code><a title="rfcx.client.Client.annotations" href="#rfcx.client.Client.annotations">annotations</a></code></li>
-<li><code><a title="rfcx.client.Client.authentication" href="#rfcx.client.Client.authentication">authentication</a></code></li>
+<li><code><a title="rfcx.client.Client.authenticate" href="#rfcx.client.Client.authenticate">authenticate</a></code></li>
 <li><code><a title="rfcx.client.Client.detections" href="#rfcx.client.Client.detections">detections</a></code></li>
 <li><code><a title="rfcx.client.Client.download_audio_file" href="#rfcx.client.Client.download_audio_file">download_audio_file</a></code></li>
 <li><code><a title="rfcx.client.Client.download_audio_files" href="#rfcx.client.Client.download_audio_files">download_audio_files</a></code></li>
 <li><code><a title="rfcx.client.Client.ingest_file" href="#rfcx.client.Client.ingest_file">ingest_file</a></code></li>
+<li><code><a title="rfcx.client.Client.projects" href="#rfcx.client.Client.projects">projects</a></code></li>
 <li><code><a title="rfcx.client.Client.stream_segments" href="#rfcx.client.Client.stream_segments">stream_segments</a></code></li>
 <li><code><a title="rfcx.client.Client.streams" href="#rfcx.client.Client.streams">streams</a></code></li>
 </ul>
