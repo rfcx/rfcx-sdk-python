@@ -64,7 +64,7 @@ class Client(object):
             print("end_time is not type datetime")
             return
 
-        return audio.download_file(self.credentials.token, dest_path, stream,
+        return audio.download_audio_file(self.credentials.token, dest_path, stream,
                                    start_time, end_time, gain, file_ext)
 
     def download_audio_files(self,
@@ -114,7 +114,7 @@ class Client(object):
         if not os.path.exists(dest_path):
             os.makedirs(dest_path)
 
-        return audio.download_file_segments(self.credentials.token, dest_path,
+        return audio.download_audio_files(self.credentials.token, dest_path,
                                             stream, min_date, max_date, gain,
                                             file_ext, parallel)
 
