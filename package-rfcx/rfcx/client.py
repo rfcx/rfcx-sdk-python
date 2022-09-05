@@ -13,9 +13,9 @@ class Client(object):
     def __init__(self):
         self.credentials = None
 
-    def authentication(self,
-                       persist=True,
-                       persisted_credentials_path='.rfcx_credentials'):
+    def authenticate(self,
+                     persist=True,
+                     persisted_credentials_path='.rfcx_credentials'):
         """Authenticate an RFCx user to obtain a token
 
         If you want to persist/load the credentials to/from a custom path then set `persisted_credentials_path`
@@ -27,16 +27,16 @@ class Client(object):
             None.
         """
         auth = Authentication(persist, persisted_credentials_path)
-        auth.authentication()
+        auth.authenticate()
         self.credentials = auth.credentials
 
     def download_audio_file(self,
-                      stream,
-                      dest_path,
-                      start_time,
-                      end_time,
-                      gain=1,
-                      file_ext='wav'):
+                            stream,
+                            dest_path,
+                            start_time,
+                            end_time,
+                            gain=1,
+                            file_ext='wav'):
         """ Download single audio. Duration can not be more than 15 minutes.
         Args:
             stream: (required) Identifies a stream/site.
@@ -64,18 +64,17 @@ class Client(object):
             print("end_time is not type datetime")
             return
 
-        return audio.download_file(self.credentials.token, dest_path,
-                                   stream, start_time, end_time, gain,
-                                   file_ext)
+        return audio.download_file(self.credentials.token, dest_path, stream,
+                                   start_time, end_time, gain, file_ext)
 
     def download_audio_files(self,
-                               stream,
-                               dest_path='./audios',
-                               min_date=None,
-                               max_date=None,
-                               gain=1,
-                               file_ext='wav',
-                               parallel=True):
+                             stream,
+                             dest_path='./audios',
+                             min_date=None,
+                             max_date=None,
+                             gain=1,
+                             file_ext='wav',
+                             parallel=True):
         """Download multiple audio in giving time range.
 
         Args:
@@ -114,15 +113,77 @@ class Client(object):
 
         if not os.path.exists(dest_path):
             os.makedirs(dest_path)
-        elif len(os.listdir(dest_path)) > 0:
-            print(f'{dest_path} directory is not empty. Please change or empty directory.')
+
+        return audio.download_file_segments(self.credentials.token, dest_path,
+                                            stream, min_date, max_date, gain,
+                                            file_ext, parallel)
+
+    def projects(self,
+                 keyword=None,
+                 created_by=None,
+                 only_public=None,
+                 only_deleted=None,
+                 limit=1000,
+                 offset=0):
+        """Retrieve a list of projects
+
+        Args:
+            keyword: (optional, default= None) Match project name with keyword
+            created_by: (optional, default= None) The project owner. Have 3 options: None, me, or collaborator id
+            only_public: (optional, default= None) Return only public projects
+            only_deleted: (optional, default= None) Return only deleted projects
+            limit: (optional, default= 1000) Maximum number of  results to return
+            offset: (optional, default= 0) Number of results to skip
+
+        Returns:
+            List of projects
+        """
+        return api_rfcx.projects(self.credentials.token, keyword, created_by,
+                                 only_public, only_deleted, limit, offset)
+
+    def streams(self,
+                organizations=None,
+                projects=None,
+                created_by=None,
+                name=None,
+                keyword=None,
+                is_public=True,
+                is_deleted=False,
+                limit=1000,
+                offset=0):
+        """Retrieve a list of streams
+
+        Args:
+            organizations: (optional, default= None) List of organization ids
+            projects: (optional, default= None) List of project ids
+            created_by: (optional, default= None) The stream owner. Have 3 options: None, me, or collaborators
+            name: (optional, default= None) Match exact streams with name (support *)
+            keyword: (optional, default= None) Match stream name with keyword
+            is_public: (optional, default=True) Match public or private streams
+            is_deleted: (optional, default=False) Match deleted streams
+            limit: (optional, default= 1000) Maximum number of  results to return
+            offset: (optional, default= 0) Number of results to skip
+
+        Returns:
+            List of streams
+        """
+
+        if created_by is not None and created_by not in [
+                "me", "collaborators"
+        ]:
+            print("created_by can be only None, me, or collaborators")
             return
 
-        return audio.download_file_segments(self.credentials.token,
-                                            dest_path, stream, min_date,
-                                            max_date, gain, file_ext, parallel)
+        return api_rfcx.streams(self.credentials.token, organizations,
+                                projects, created_by, name, keyword, is_public,
+                                is_deleted, limit, offset)
 
-    def stream_segments(self, stream, start=None, end=None, limit=50, offset=0):
+    def stream_segments(self,
+                        stream,
+                        start=None,
+                        end=None,
+                        limit=50,
+                        offset=0):
         """Retrieve audio information about a specific stream
 
         Args:
@@ -148,43 +209,8 @@ class Client(object):
         if end is None:
             end = util.date_now()
 
-        return api_rfcx.stream_segments(self.credentials.token, stream,
-                                        start, end, limit, offset)
-
-    def streams(self,
-                organizations=None,
-                projects=None,
-                created_by=None,
-                keyword=None,
-                is_public=True,
-                is_deleted=False,
-                limit=1000,
-                offset=0):
-        """Retrieve a list of streams
-
-        Args:
-            organizations: (optional, default= None) List of organization ids
-            projects: (optional, default= None) List of project ids
-            created_by: (optional, default= None) The stream owner. Have 3 options: None, me, or collaborators
-            keyword: (optional, default= None) Match streams name with keyword
-            is_public: (optional, default=True) Match public or private streams
-            is_deleted: (optional, default=False) Match deleted streams
-            limit: (optional, default=1000) Maximum number of  results to return
-            offset: (optional, default=0) Number of results to skip
-
-        Returns:
-            List of streams
-        """
-
-        if created_by is not None and created_by not in [
-                "me", "collaborators"
-        ]:
-            print("created_by can be only None, me, or collaborators")
-            return
-
-        return api_rfcx.streams(self.credentials.token, organizations,
-                                projects, created_by, keyword, is_public,
-                                is_deleted, limit, offset)
+        return api_rfcx.stream_segments(self.credentials.token, stream, start,
+                                        end, limit, offset)
 
     def ingest_file(self, stream, filepath, timestamp):
         """ Ingest an audio to RFCx

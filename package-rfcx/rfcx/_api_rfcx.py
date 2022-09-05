@@ -11,13 +11,12 @@ host = 'https://api.rfcx.org'  # TODO move to configuration
 
 def stream_segments(token, stream_id, start, end, limit, offset):
     data = {
-        'id': stream_id,
         'start': start,
         'end': end,
         'limit': limit,
         'offset': offset
     }
-    path = f'/streams/{stream_id}/stream-segments'
+    path = f'/streams/{stream_id}/segments'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 
@@ -66,6 +65,7 @@ def streams(token,
             organizations=None,
             projects=None,
             created_by=None,
+            name=None,
             keyword=None,
             is_public=True,
             is_deleted=False,
@@ -85,10 +85,38 @@ def streams(token,
         data['created_by'] = created_by
     if keyword:
         data['keyword'] = keyword
+    if name:
+        data['name'] = name
     path = '/streams'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 
+
+def projects(token,
+        keyword=None,
+        created_by=None,
+        only_public=None,
+        only_deleted=None,
+        limit=1000,
+        offset=0
+    ):
+    data = {
+        'limit': limit,
+        'offset': offset
+    }
+    if keyword:
+        data['keyword'] = keyword
+    if created_by:
+        data['created_by'] = created_by
+    if only_public:
+        data['only_public'] = only_public
+    if only_deleted:
+        data['only_deleted'] = only_deleted
+
+
+    path = '/projects'
+    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    return _request(url, token=token)
 
 def _request(url, method='GET', token=None):
     logger.debug('get url: %s', url)

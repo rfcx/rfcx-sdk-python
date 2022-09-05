@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 REQUIRED_PACKAGES = ['httplib2', 'six']
 
 setup(name='rfcx',
-      version='0.2.0',
+      version='0.2.1',
       url='https://github.com/rfcx/rfcx-sdk-python',
       license='None',
       author='Rainforest Connection',

@@ -33,7 +33,7 @@ class Authentication(object):
         self.persisted_credentials_path = persisted_credentials_path
         self.client_id = os.getenv('AUTH0_CLIENT_ID', DEFAULT_CLIENT_ID)
 
-    def authentication(self):
+    def authenticate(self):
         """Authenticate an RFCx user to obtain a token
 
         If you want to persist/load the credentials to/from a custom path then set `persisted_credentials_path`
