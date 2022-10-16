@@ -64,8 +64,9 @@ class Client(object):
             print("end_time is not type datetime")
             return
 
-        return audio.download_audio_file(self.credentials.token, dest_path, stream,
-                                   start_time, end_time, gain, file_ext)
+        return audio.download_audio_file(self.credentials.token, dest_path,
+                                         stream, start_time, end_time, gain,
+                                         file_ext)
 
     def download_audio_files(self,
                              stream,
@@ -115,8 +116,8 @@ class Client(object):
             os.makedirs(dest_path)
 
         return audio.download_audio_files(self.credentials.token, dest_path,
-                                            stream, min_date, max_date, gain,
-                                            file_ext, parallel)
+                                          stream, min_date, max_date, gain,
+                                          file_ext, parallel)
 
     def projects(self,
                  keyword=None,
@@ -140,6 +141,26 @@ class Client(object):
         """
         return api_rfcx.projects(self.credentials.token, keyword, created_by,
                                  only_public, only_deleted, limit, offset)
+
+    def stream(self, stream_id=None, fields=[]):
+        """ Retrieve a stream information
+
+        Args:
+            stream_id: (required) Identifies a stream/site.
+            fields: (optional, default=[]) stream information custom retrive fields.
+        
+        Returns:
+            Stream information which contains id, name, description, start, end, project_id, is_public, latitude, longitude, altitude, timezone, max_sample_rate, external_id, created_by_id, created_at, updated_at, created_by, and project fields as default.
+        """
+        if self.credentials is None:
+            print('Not authenticated')
+            return
+
+        if stream_id is None:
+            print('Require stream id')
+            return
+
+        return api_rfcx.stream(self.credentials, stream_id, fields)
 
     def streams(self,
                 organizations=None,

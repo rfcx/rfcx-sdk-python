@@ -10,12 +10,7 @@ host = 'https://api.rfcx.org'  # TODO move to configuration
 
 
 def stream_segments(token, stream_id, start, end, limit, offset):
-    data = {
-        'start': start,
-        'end': end,
-        'limit': limit,
-        'offset': offset
-    }
+    data = {'start': start, 'end': end, 'limit': limit, 'offset': offset}
     path = f'/streams/{stream_id}/segments'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
@@ -61,22 +56,26 @@ def detections(token,
     return _request(url, token=token)
 
 
+def stream(token, stream_id=None, fields=[]):
+    data = {}
+    if len(fields) > 0:
+        data['fields[]'] = fields
+    path = f'/streams/{stream_id}'
+    url = f'{host}{path}?{urllib.parse.urlencode(data, True)}'
+    return _request(url, token=token)
+
+
 def streams(token,
             organizations=None,
             projects=None,
             created_by=None,
             name=None,
             keyword=None,
-            is_public=True,
-            is_deleted=False,
+            only_public=True,
+            only_deleted=False,
             limit=1000,
             offset=0):
-    data = {
-        'is_public': is_public,
-        'is_deleted': is_deleted,
-        'limit': limit,
-        'offset': offset
-    }
+    data = {'limit': limit, 'offset': offset}
     if organizations:
         data['organizations[]'] = organizations
     if projects:
@@ -87,36 +86,36 @@ def streams(token,
         data['keyword'] = keyword
     if name:
         data['name'] = name
+    if isinstance(only_public, bool):
+        data['only_public'] = 'true' if only_public else 'false'
+    if isinstance(only_deleted, bool):
+        data['only_deleted'] = 'true' if only_deleted else 'false'
     path = '/streams'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
 
 
 def projects(token,
-        keyword=None,
-        created_by=None,
-        only_public=None,
-        only_deleted=None,
-        limit=1000,
-        offset=0
-    ):
-    data = {
-        'limit': limit,
-        'offset': offset
-    }
+             keyword=None,
+             created_by=None,
+             only_public=None,
+             only_deleted=None,
+             limit=1000,
+             offset=0):
+    data = {'limit': limit, 'offset': offset}
     if keyword:
         data['keyword'] = keyword
     if created_by:
         data['created_by'] = created_by
-    if only_public:
-        data['only_public'] = only_public
-    if only_deleted:
-        data['only_deleted'] = only_deleted
-
+    if isinstance(only_public, bool):
+        data['only_public'] = 'true' if only_public else 'false'
+    if isinstance(only_deleted, bool):
+        data['only_deleted'] = 'true' if only_deleted else 'false'
 
     path = '/projects'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
+
 
 def _request(url, method='GET', token=None):
     logger.debug('get url: %s', url)

@@ -3,7 +3,7 @@ import shutil
 import os
 import concurrent.futures
 import requests
-from rfcx._api_rfcx import stream_segments
+import rfcx._api_rfcx as api_rfcx
 
 
 def __save_file(url, local_path, token):
@@ -48,7 +48,7 @@ def __get_all_segments(token, stream_id, start, end):
 
     while not empty_segment:
         # No data will return empty array from server
-        segments = stream_segments(token,
+        segments = api_rfcx.stream_segments(token,
                                    stream_id,
                                    start,
                                    end,
@@ -108,7 +108,7 @@ def download_audio_file(token,
 
 def download_audio_files(token,
                          dest_path,
-                         stream,
+                         stream_id,
                          min_date,
                          max_date,
                          gain=1,
@@ -119,7 +119,7 @@ def download_audio_files(token,
         Args:
             token: RFCx client token.
             dest_path: Audio save path.
-            stream: Identifies a stream/site
+            stream_id: Identifies a stream/site
             min_date: Minimum timestamp to get the audio.
             max_date: Maximum timestamp to get the audio.
             gain: (optional, default= 1) Input channel tone loudness.
@@ -132,31 +132,33 @@ def download_audio_files(token,
         Raises:
             TypeError: if missing required arguements.
     """
-    save_path = dest_path + '/' + stream
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    stream_name = api_rfcx.stream(token, stream_id)['name']
 
     start = __generate_date_in_isoformat(min_date)
     end = __generate_date_in_isoformat(max_date)
 
-    segments = __get_all_segments(token, stream, start, end)
+    segments = __get_all_segments(token, stream_id, start, end)
 
     if segments:
-        print(f'Downloading {len(segments)} audio from {stream}')
+        print(f'Downloading {len(segments)} audio from {stream_name}')
+        save_path = dest_path + '/' + stream_name
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+
         if parallel:
             with concurrent.futures.ThreadPoolExecutor(
                     max_workers=100) as executor:
                 futures = []
                 for segment in segments:
                     futures.append(
-                        executor.submit(__segment_download, save_path, stream,
+                        executor.submit(__segment_download, save_path, stream_id,
                                         gain, file_ext, segment, token))
 
                 futures, _ = concurrent.futures.wait(futures)
         else:
             for segment in segments:
-                __segment_download(save_path, stream, gain, file_ext, segment,
+                __segment_download(save_path, stream_id, gain, file_ext, segment,
                                    token)
-        print(f'Finish download on {stream}')
+        print(f'Finish download on {stream_name}')
     else:
-        print(f'No data found on {start[:-10]} - {end[:-10]} at {stream}')
+        print(f'No data found on {start[:-10]} - {end[:-10]} at {stream_name}')
