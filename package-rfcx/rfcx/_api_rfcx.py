@@ -56,9 +56,9 @@ def detections(token,
     return _request(url, token=token)
 
 
-def stream(token, stream_id=None, fields=[]):
+def stream(token, stream_id=None, fields=None):
     data = {}
-    if len(fields) > 0:
+    if fields is not None:
         data['fields[]'] = fields
     path = f'/streams/{stream_id}'
     url = f'{host}{path}?{urllib.parse.urlencode(data, True)}'
@@ -71,8 +71,8 @@ def streams(token,
             created_by=None,
             name=None,
             keyword=None,
-            only_public=True,
-            only_deleted=False,
+            only_public=None,
+            only_deleted=None,
             limit=1000,
             offset=0):
     data = {'limit': limit, 'offset': offset}
