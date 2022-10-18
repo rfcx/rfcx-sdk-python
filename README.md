@@ -79,7 +79,11 @@ Better test:
 
 ### Building documentation
 
-The documentation is generated from docstrings in the source code. To generate it, run:
+The documentation is generated from docstrings in the source code. To generate it, you have to build an image:
+
+`docker build -t rfcx-sdk-python .`
+
+and then run:
 
 `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python pdoc3 --html --force --template-dir docs_src/template --output-dir docs package-rfcx/rfcx package-rfcx-utils/rfcx-utils`
 
