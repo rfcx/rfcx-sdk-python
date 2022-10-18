@@ -44,12 +44,12 @@ def ingest_file(token, stream_id, filepath, timestamp):
     filename = os.path.basename(filepath)
 
     post_resp = _generate_signed_url(token, upload_endpoint, stream_id, filename, timestamp)
-    if (post_resp == None):
+    if post_resp is not None:
         print('Fail to generate url for ingest an audio')
         return
 
     put_resp = _ingest_to_rfcx(token, upload_endpoint, post_resp['url'], filepath)
-    if (put_resp == None):
+    if put_resp is not None:
         print('Fail to ingest an audio')
         return
 
