@@ -132,8 +132,11 @@ def download_audio_files(token,
         Raises:
             TypeError: if missing required arguements.
     """
-    stream_name = api_rfcx.stream(token, stream_id)['name']
+    stream_resp = api_rfcx.stream(token, stream_id)
+    if stream_resp is None:
+        return
 
+    stream_name = stream_resp['name']
     start = __generate_date_in_isoformat(min_date)
     end = __generate_date_in_isoformat(max_date)
 

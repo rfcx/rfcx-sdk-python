@@ -1,8 +1,9 @@
 import rfcx
 
 client = rfcx.Client()
-client.authentication()
+client.authenticate()
 
+# streams from Puerto Rico Island-Wide
 streams = client.streams(projects=['n9nrlg45vyf0'])
 for stream in streams[:5]:
     print(stream['id'], stream['name'], stream['project_id'], stream['updated_at'])
