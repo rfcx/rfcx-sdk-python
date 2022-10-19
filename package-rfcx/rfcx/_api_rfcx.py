@@ -20,14 +20,15 @@ def annotations(token,
                 start,
                 end,
                 classifications=None,
-                stream=None,
+                stream_id=None,
                 limit=50,
                 offset=0):
     data = {'start': start, 'end': end, 'limit': limit, 'offset': offset}
     if classifications:
         data['classifications[]'] = classifications
-    if stream:
-        data['stream_id'] = stream
+    if stream_id:
+        data['stream_id'] = stream_id
+
     path = '/annotations'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
@@ -38,7 +39,7 @@ def detections(token,
                end,
                classifications=None,
                classifiers=None,
-               streams=None,
+               stream_ids=None,
                min_confidence=None,
                limit=50,
                offset=0):
@@ -47,10 +48,11 @@ def detections(token,
         data['classifications[]'] = classifications
     if classifiers:
         data['classifiers[]'] = classifiers
-    if streams:
-        data['streams[]'] = streams
+    if stream_ids:
+        data['streams[]'] = stream_ids
     if min_confidence:
         data['min_confidence'] = min_confidence
+
     path = '/detections'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
@@ -73,6 +75,7 @@ def streams(token,
             keyword=None,
             only_public=None,
             only_deleted=None,
+            fields=None,
             limit=1000,
             offset=0):
     data = {'limit': limit, 'offset': offset}
@@ -90,6 +93,9 @@ def streams(token,
         data['only_public'] = 'true' if only_public else 'false'
     if isinstance(only_deleted, bool):
         data['only_deleted'] = 'true' if only_deleted else 'false'
+    if fields is not None:
+        data['fields[]'] = fields
+
     path = '/streams'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
     return _request(url, token=token)
@@ -100,6 +106,7 @@ def projects(token,
              created_by=None,
              only_public=None,
              only_deleted=None,
+             fields=None,
              limit=1000,
              offset=0):
     data = {'limit': limit, 'offset': offset}
@@ -111,6 +118,8 @@ def projects(token,
         data['only_public'] = 'true' if only_public else 'false'
     if isinstance(only_deleted, bool):
         data['only_deleted'] = 'true' if only_deleted else 'false'
+    if fields is not None:
+        data['fields[]'] = fields
 
     path = '/projects'
     url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))

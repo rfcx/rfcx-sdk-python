@@ -61,7 +61,7 @@
 <dd>(optional, default=0) Number of results to skip.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>List of annotations</p></div>
+<p>List of annotations contains id, stream_id, start, end, frequency_min, and frequency_max.</p></div>
 </dd>
 <dt id="rfcx.client.Client.authenticate"><code class="name flex">
 <span>def <span class="ident">authenticate</span></span>(<span>self, persist=True, persisted_credentials_path='.rfcx_credentials')</span>
@@ -104,7 +104,7 @@
 <dd>(optional, default=0) Number of results to skip.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>List of detections</p></div>
+<p>List of detections contains stream_id, start, end, confidence, and classification.</p></div>
 </dd>
 <dt id="rfcx.client.Client.download_audio_file"><code class="name flex">
 <span>def <span class="ident">download_audio_file</span></span>(<span>self, stream, dest_path, start_time, end_time, gain=1, file_ext='wav')</span>
@@ -167,17 +167,17 @@
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>stream</code></strong></dt>
-<dd>(required) Identifies a stream/site</dd>
+<dd>(required) Identifies a stream/site.</dd>
 <dt><strong><code>filepath</code></strong></dt>
-<dd>(required) Local file path to be ingest</dd>
+<dd>(required) Local file path to be ingest.</dd>
 <dt><strong><code>timestamp</code></strong></dt>
-<dd>(required) Audio timestamp in datetime type</dd>
+<dd>(required) Audio timestamp in datetime type.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
 <dt id="rfcx.client.Client.projects"><code class="name flex">
-<span>def <span class="ident">projects</span></span>(<span>self, keyword=None, created_by=None, only_public=None, only_deleted=None, limit=1000, offset=0)</span>
+<span>def <span class="ident">projects</span></span>(<span>self, keyword=None, created_by=None, only_public=None, only_deleted=None, fields=None, limit=1000, offset=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Retrieve a list of projects</p>
@@ -191,6 +191,8 @@
 <dd>(optional, default= None) Return only public projects</dd>
 <dt><strong><code>only_deleted</code></strong></dt>
 <dd>(optional, default= None) Return only deleted projects</dd>
+<dt><strong><code>fields</code></strong></dt>
+<dd>(optional, default=None) project information custom retrive fields.</dd>
 <dt><strong><code>limit</code></strong></dt>
 <dd>(optional, default= 1000) Maximum number of
 results to return</dd>
@@ -198,7 +200,7 @@ results to return</dd>
 <dd>(optional, default= 0) Number of results to skip</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>List of projects</p></div>
+<p>List of projects contains id, name, is_public, and external_id as default.</p></div>
 </dd>
 <dt id="rfcx.client.Client.stream"><code class="name flex">
 <span>def <span class="ident">stream</span></span>(<span>self, stream_id=None, fields=None)</span>
@@ -210,10 +212,12 @@ results to return</dd>
 <dt><strong><code>stream_id</code></strong></dt>
 <dd>(required) Identifies a stream/site.</dd>
 <dt><strong><code>fields</code></strong></dt>
-<dd>(optional, default=[]) stream information custom retrive fields.</dd>
+<dd>(optional, default=None) stream information custom retrive fields.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>Stream information which contains id, name, description, start, end, project_id, is_public, latitude, longitude, altitude, timezone, max_sample_rate, external_id, created_by_id, created_at, updated_at, created_by, and project fields as default.</p></div>
+<p>Stream contains id, name, description, start, end, project_id, project
+is_public, latitude, longitude, altitude, timezone, max_sample_rate, external_id,
+created_by_id, created_at, updated_at, and created_by fields as default.</p></div>
 </dd>
 <dt id="rfcx.client.Client.stream_segments"><code class="name flex">
 <span>def <span class="ident">stream_segments</span></span>(<span>self, stream, start=None, end=None, limit=50, offset=0)</span>
@@ -234,10 +238,10 @@ results to return</dd>
 <dd>(optional, default= 0) Offset of the audio group.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>List of audio files (meta data showing audio id and recorded timestamp)</p></div>
+<p>List of audio files contains id, start, end, and file extensions (meta data showing audio id and recorded timestamp).</p></div>
 </dd>
 <dt id="rfcx.client.Client.streams"><code class="name flex">
-<span>def <span class="ident">streams</span></span>(<span>self, organizations=None, projects=None, created_by=None, name=None, keyword=None, only_public=None, only_deleted=None, limit=1000, offset=0)</span>
+<span>def <span class="ident">streams</span></span>(<span>self, organizations=None, projects=None, created_by=None, name=None, keyword=None, only_public=None, only_deleted=None, fields=None, limit=1000, offset=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Retrieve a list of streams</p>
@@ -254,9 +258,11 @@ results to return</dd>
 <dt><strong><code>keyword</code></strong></dt>
 <dd>(optional, default= None) Match stream name with keyword</dd>
 <dt><strong><code>only_public</code></strong></dt>
-<dd>(optional, default=True) Match public or private streams</dd>
+<dd>(optional, default=None) Match public or private streams</dd>
 <dt><strong><code>only_deleted</code></strong></dt>
-<dd>(optional, default=False) Match deleted streams</dd>
+<dd>(optional, default=None) Match deleted streams</dd>
+<dt><strong><code>fields</code></strong></dt>
+<dd>(optional, default=None) streams information custom retrive fields.</dd>
 <dt><strong><code>limit</code></strong></dt>
 <dd>(optional, default= 1000) Maximum number of
 results to return</dd>
@@ -264,7 +270,9 @@ results to return</dd>
 <dd>(optional, default= 0) Number of results to skip</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>List of streams</p></div>
+<p>List of streams contains id, name, description, start, end, project_id, project
+is_public, latitude, longitude, altitude, timezone, max_sample_rate, external_id,
+created_by_id, created_at, updated_at, created_by, and country_name as default.</p></div>
 </dd>
 </dl>
 </dd>

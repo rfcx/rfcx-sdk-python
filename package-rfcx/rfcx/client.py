@@ -10,6 +10,7 @@ from rfcx._authentication import Authentication
 
 class Client(object):
     """Authenticate and perform requests against the RFCx platform"""
+
     def __init__(self):
         self.credentials = None
 
@@ -124,6 +125,7 @@ class Client(object):
                  created_by=None,
                  only_public=None,
                  only_deleted=None,
+                 fields=None,
                  limit=1000,
                  offset=0):
         """Retrieve a list of projects
@@ -133,24 +135,27 @@ class Client(object):
             created_by: (optional, default= None) The project owner. Have 3 options: None, me, or collaborator id
             only_public: (optional, default= None) Return only public projects
             only_deleted: (optional, default= None) Return only deleted projects
+            fields: (optional, default=None) project information custom retrive fields.
             limit: (optional, default= 1000) Maximum number of  results to return
             offset: (optional, default= 0) Number of results to skip
 
         Returns:
-            List of projects
+            List of projects contains id, name, is_public, and external_id as default.
         """
         return api_rfcx.projects(self.credentials.token, keyword, created_by,
-                                 only_public, only_deleted, limit, offset)
+                                 only_public, only_deleted, fields, limit, offset)
 
     def stream(self, stream_id=None, fields=None):
         """ Retrieve a stream information
 
         Args:
             stream_id: (required) Identifies a stream/site.
-            fields: (optional, default=[]) stream information custom retrive fields.
-        
+            fields: (optional, default=None) stream information custom retrive fields.
+
         Returns:
-            Stream information which contains id, name, description, start, end, project_id, is_public, latitude, longitude, altitude, timezone, max_sample_rate, external_id, created_by_id, created_at, updated_at, created_by, and project fields as default.
+            Stream contains id, name, description, start, end, project_id, project
+            is_public, latitude, longitude, altitude, timezone, max_sample_rate, external_id,
+            created_by_id, created_at, updated_at, and created_by fields as default.
         """
         if self.credentials is None:
             print('Not authenticated')
@@ -170,6 +175,7 @@ class Client(object):
                 keyword=None,
                 only_public=None,
                 only_deleted=None,
+                fields=None,
                 limit=1000,
                 offset=0):
         """Retrieve a list of streams
@@ -180,13 +186,16 @@ class Client(object):
             created_by: (optional, default= None) The stream owner. Have 3 options: None, me, or collaborators
             name: (optional, default= None) Match exact streams with name (support *)
             keyword: (optional, default= None) Match stream name with keyword
-            only_public: (optional, default=True) Match public or private streams
-            only_deleted: (optional, default=False) Match deleted streams
+            only_public: (optional, default=None) Match public or private streams
+            only_deleted: (optional, default=None) Match deleted streams
+            fields: (optional, default=None) streams information custom retrive fields.
             limit: (optional, default= 1000) Maximum number of  results to return
             offset: (optional, default= 0) Number of results to skip
 
         Returns:
-            List of streams
+            List of streams contains id, name, description, start, end, project_id, project
+            is_public, latitude, longitude, altitude, timezone, max_sample_rate, external_id,
+            created_by_id, created_at, updated_at, created_by, and country_name as default.
         """
 
         if created_by is not None and created_by not in [
@@ -196,8 +205,8 @@ class Client(object):
             return
 
         return api_rfcx.streams(self.credentials.token, organizations,
-                                projects, created_by, name, keyword, only_public,
-                                only_deleted, limit, offset)
+                                projects, created_by, name, keyword,
+                                only_public, only_deleted, fields, limit, offset)
 
     def stream_segments(self,
                         stream,
@@ -215,7 +224,7 @@ class Client(object):
             offset: (optional, default= 0) Offset of the audio group.
 
         Returns:
-            List of audio files (meta data showing audio id and recorded timestamp)
+            List of audio files contains id, start, end, and file extensions (meta data showing audio id and recorded timestamp).
         """
         if self.credentials is None:
             print('Not authenticated')
@@ -236,9 +245,9 @@ class Client(object):
     def ingest_file(self, stream, filepath, timestamp):
         """ Ingest an audio to RFCx
         Args:
-            stream: (required) Identifies a stream/site
-            filepath: (required) Local file path to be ingest
-            timestamp: (required) Audio timestamp in datetime type
+            stream: (required) Identifies a stream/site.
+            filepath: (required) Local file path to be ingest.
+            timestamp: (required) Audio timestamp in datetime type.
 
         Returns:
             None.
@@ -271,7 +280,8 @@ class Client(object):
             offset: (optional, default=0) Number of results to skip.
 
         Returns:
-            List of annotations"""
+            List of annotations contains id, stream_id, start, end, frequency_min, and frequency_max.
+        """
 
         if limit > 1000:
             raise Exception("Please give the value <= 1000")
@@ -306,7 +316,8 @@ class Client(object):
             offset: (optional, default=0) Number of results to skip.
 
         Returns:
-            List of detections"""
+            List of detections contains stream_id, start, end, confidence, and classification.
+        """
 
         if limit > 1000:
             raise Exception("Please give the value <= 1000")
