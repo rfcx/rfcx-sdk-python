@@ -31,22 +31,17 @@ class Client(object):
         auth.authenticate()
         self.credentials = auth.credentials
 
-    def download_audio_file(self,
+    def download_segment(self,
                             stream,
                             dest_path,
                             start_time,
-                            end_time,
-                            gain=1,
-                            file_ext='wav'):
-        """ Download single audio. Duration can not be more than 15 minutes.
+                            file_ext):
+        """ Download single audio file (stream segment).
         Args:
-            stream: (required) Identifies a stream/site.
-            dest_path: (required) Audio save path.
-            start_time: (required) Minimum timestamp to get the audio.
-            end_time: (required) Maximum timestamp to get the audio.
-            gain: (optional, default = 1) Input channel tone loudness.
-            file_ext: (optional, default = 'wav') Extension for saving audio files.
-
+            stream: (required) Identifier for stream/site
+            dest_path: (required) Directory/folder path to save the file
+            start_time: (required) Exact start timestamp (string or datetime) of the segment
+            file_ext: (optional, default='wav') Audio file extension. Default to `wav`
         Returns:
             None.
 
@@ -57,36 +52,25 @@ class Client(object):
         if not os.path.exists(dest_path):
             os.makedirs(dest_path)
 
-        if not isinstance(start_time, datetime.datetime):
-            print("start_time is not type datetime")
-            return
+        return audio.download_segment(self.credentials.token, dest_path,
+                                         stream, start_time, file_ext)
 
-        if not isinstance(end_time, datetime.datetime):
-            print("end_time is not type datetime")
-            return
-
-        return audio.download_audio_file(self.credentials.token, dest_path,
-                                         stream, start_time, end_time, gain,
-                                         file_ext)
-
-    def download_audio_files(self,
+    def download_segments(self,
                              stream,
                              dest_path='./audios',
                              min_date=None,
                              max_date=None,
-                             gain=1,
                              file_ext='wav',
                              parallel=True):
         """Download multiple audio in giving time range.
 
         Args:
             stream: (required) Identifies a stream/site
-            dest_path: (optional, default= './audios') Path to save audio.
-            min_date: (optional, default= None) Minimum timestamp to get the audio. If None then defaults to exactly 30 days ago.
-            max_date: (optional, default= None) Maximum timestamp to get the audio. If None then defaults to now.
-            gain: (optional, default= 1) Input channel tone loudness.
-            file_ext: (optional, default= 'wav') Audio file extension. Default to `wav`
-            parallel: (optional, default= True) Parallel download audio. Defaults to True.
+            dest_path: (optional, default= './audios') Directory/folder path to save the files
+            min_date: (optional, default=None) Minimum timestamp to get the audio. If None then defaults to 30 days ago.
+            max_date: (optional, default=None) Maximum timestamp to get the audio. If None then defaults to now.
+            file_ext: (optional, default='wav') Audio file extension. Default to `wav`
+            parallel: (optional, default=True) Parallel download audio. Defaults to True.
 
         Returns:
             None.
@@ -96,29 +80,20 @@ class Client(object):
             return
 
         if stream is None:
-            print("Please specific the stream id.")
+            print("stream cannot be None")
             return
 
         if min_date is None:
             min_date = datetime.datetime.utcnow() - datetime.timedelta(days=30)
 
-        if not isinstance(min_date, datetime.datetime):
-            print("min_date is not type datetime")
-            return
-
         if max_date is None:
             max_date = datetime.datetime.utcnow()
-
-        if not isinstance(max_date, datetime.datetime):
-            print("max_date is not type datetime")
-            return
 
         if not os.path.exists(dest_path):
             os.makedirs(dest_path)
 
-        return audio.download_audio_files(self.credentials.token, dest_path,
-                                          stream, min_date, max_date, gain,
-                                          file_ext, parallel)
+        return audio.download_segments(self.credentials.token, dest_path,
+                                          stream, min_date, max_date, file_ext, parallel)
 
     def projects(self,
                  keyword=None,

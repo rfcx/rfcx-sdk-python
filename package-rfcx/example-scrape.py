@@ -4,12 +4,14 @@ import os
 client = rfcx.Client()
 client.authenticate()
 
-def download(stream_id, start, end, local_path, file_ext):
-    if not os.path.isdir(local_path):
-        os.makedirs(local_path)
-    client.download_audio_files(local_path, stream_id, start, end, file_ext=file_ext)
+local_path = 'audio'
+if not os.path.isdir(local_path):
+    os.makedirs(local_path)
 
-PUERTO_RICO_RA11 = '4GhAqNg3k9D8'
+stream_id = '4GhAqNg3k9D8' # Puerto Rico - RA11
 
-print('\nAudio for Puerto Rico RA 11 at 11:00 - 13:00 on 01 Jan 2022')
-download(PUERTO_RICO_RA11, '2022-01-01T11:00:00.000Z', '2022-01-01T12:59:59.999Z', 'ra11', 'wav')
+any_segment = client.stream_segments(stream=stream_id, start='2022-01-01T11:00:00.000Z', end='2023-01-01T11:00:00.000Z')[0]
+expected_file_extension = any_segment['file_extension']
+
+client.download_segments(stream_id, local_path, '2022-04-17T11:00:00.000Z', '2022-04-18T23:59:59.999Z', expected_file_extension)
+

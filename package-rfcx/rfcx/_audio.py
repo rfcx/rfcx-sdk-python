@@ -1,4 +1,5 @@
 """RFCx audio segment information and download"""
+import datetime
 import shutil
 import os
 import concurrent.futures
@@ -20,14 +21,14 @@ def __save_file(url, local_path, token):
             shutil.copyfileobj(response.raw, out_file)
             print(f'Saved {local_path}')
     else:
-        print('Can not download', url)
+        print('Cannot download', url)
         reason = response.json()
         print('Reason:', response.status_code, reason['message'])
 
 
 def __local_audio_file_path(path, audio_name, audio_extension):
     """ Create string for the name and the path """
-    return path + '/' + audio_name + '.' + audio_extension
+    return path + '/' + audio_name + '.' + audio_extension.lstrip('.')
 
 
 def __generate_date_in_isoformat(date):
@@ -63,33 +64,24 @@ def __get_all_segments(token, stream_id, start, end):
     return all_segments
 
 
-def __segment_download(save_path, stream_id, gain, file_ext, segment, token):
-    """Download audio using the core api(v2)"""
-    start = __iso_to_rfcx_custom_format(segment['start'])
-    end = __iso_to_rfcx_custom_format(segment['end'])
-    time = start + '.' + end
-    rfcx_audio_format = f'{stream_id}_t{time}_rfull_g{gain}_f{file_ext}'
-    audio_name = f'{stream_id}_{start}_{segment["id"]}_gain{gain}'
-    url = 'https://media-api.rfcx.org/internal/assets/streams/' + rfcx_audio_format + '.' + file_ext
+def __download_segment(token, save_path, stream_id, start_str, file_ext):
+    audio_name = stream_id + '_' + start_str.replace('.000Z', '').replace('Z', '').replace(':', '-').replace('.', '-').replace('T', '_')
+    url = f'{api_rfcx.host}/streams/{stream_id}/segments/{start_str}/file'
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 
 
-def download_audio_file(token,
+def download_segment(token,
                         dest_path,
                         stream_id,
-                        start_time,
-                        end_time,
-                        gain=1,
-                        file_ext='wav'):
-    """ Prepare `url` and `local_path` and save it using function `__save_file`
+                        start,
+                        file_ext):
+    """ Download a single audio file (segment)
         Args:
             dest_path: Audio save path.
             stream_id: Stream id to get the segment.
-            start_time: Minimum timestamp to get the audio.
-            end_time: Maximum timestamp to get the audio. (Should not more than 15 min range)
-            gain: (optional, default = 1) Input channel tone loudness.
-            file_ext: (optional, default = 'wav') Extension for saving audio files.
+            start: Exact start timestamp (string or datetime).
+            file_ext: Extension for saving audio files.
 
         Returns:
             None.
@@ -97,32 +89,25 @@ def download_audio_file(token,
         Raises:
             TypeError: if missing required arguements.
     """
-    start = __iso_to_rfcx_custom_format(
-        __generate_date_in_isoformat(start_time))
-    end = __iso_to_rfcx_custom_format(__generate_date_in_isoformat(end_time))
-    audio_name = f'{stream_id}_t{start}.{end}_g{gain}_f{file_ext}'
-    url = 'https://media-api.rfcx.org/internal/assets/streams/' + audio_name + '.' + file_ext
-    local_path = __local_audio_file_path(dest_path, audio_name, file_ext)
-    __save_file(url, local_path, token)
+    if isinstance(start, datetime.datetime):
+        start = __generate_date_in_isoformat(start)
+    __download_segment(token, dest_path, stream_id, start, file_ext)
 
 
-def download_audio_files(token,
+def download_segments(token,
                          dest_path,
                          stream_id,
                          min_date,
                          max_date,
-                         gain=1,
                          file_ext='wav',
                          parallel=True):
-    """ Download RFCx audio on specific time range using `stream_segments` to get audio segments information
-        and save it using function `__save_file`
+    """ Download a set of audio files (segments) falling within a date range
         Args:
             token: RFCx client token.
             dest_path: Audio save path.
             stream_id: Identifies a stream/site
             min_date: Minimum timestamp to get the audio.
             max_date: Maximum timestamp to get the audio.
-            gain: (optional, default= 1) Input channel tone loudness.
             file_ext: (optional, default= 'wav') Extension for saving audio file.
             parallel: (optional, default= True) Enable to parallel download audio from RFCx.
 
@@ -137,10 +122,12 @@ def download_audio_files(token,
         return
 
     stream_name = stream_resp['name']
-    start = __generate_date_in_isoformat(min_date)
-    end = __generate_date_in_isoformat(max_date)
+    if isinstance(min_date, datetime.datetime):
+        min_date = __generate_date_in_isoformat(min_date)
+    if isinstance(max_date, datetime.datetime):
+        max_date = __generate_date_in_isoformat(max_date)
 
-    segments = __get_all_segments(token, stream_id, start, end)
+    segments = __get_all_segments(token, stream_id, min_date, max_date)
 
     if segments:
         print(f'Downloading {len(segments)} audio from {stream_name}')
@@ -154,14 +141,13 @@ def download_audio_files(token,
                 futures = []
                 for segment in segments:
                     futures.append(
-                        executor.submit(__segment_download, save_path, stream_id,
-                                        gain, file_ext, segment, token))
+                        executor.submit(__download_segment, token, save_path, stream_id,
+                                        segment['start'], file_ext))
 
                 futures, _ = concurrent.futures.wait(futures)
         else:
             for segment in segments:
-                __segment_download(save_path, stream_id, gain, file_ext, segment,
-                                   token)
+                __download_segment(token, save_path, stream_id, segment['start'], file_ext)
         print(f'Finish download on {stream_name}')
     else:
-        print(f'No data found on {start[:-10]} - {end[:-10]} at {stream_name}')
+        print(f'No data found on {min_date[:10]} - {max_date[:10]} at {stream_name}')
