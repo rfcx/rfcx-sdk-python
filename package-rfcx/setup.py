@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-REQUIRED_PACKAGES = ['httplib2', 'six']
+REQUIRED_PACKAGES = ['httplib2', 'six', 'requests']
 
 setup(name='rfcx',
       version='0.2.3',
