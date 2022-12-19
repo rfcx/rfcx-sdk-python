@@ -148,8 +148,8 @@ class Client(object):
                 created_by=None,
                 name=None,
                 keyword=None,
-                only_public=None,
-                only_deleted=None,
+                include_public=False,
+                include_deleted=False,
                 fields=None,
                 limit=1000,
                 offset=0):
@@ -161,9 +161,9 @@ class Client(object):
             created_by: (optional, default= None) The stream owner. Have 3 options: None, me, or collaborators
             name: (optional, default= None) Match exact streams with name (support *)
             keyword: (optional, default= None) Match stream name with keyword
-            only_public: (optional, default=None) Match public or private streams
-            only_deleted: (optional, default=None) Match deleted streams
-            fields: (optional, default=None) streams information custom retrive fields.
+            include_public: (optional, default=None) Include streams from public projects (that you aren't a member of)
+            include_deleted: (optional, default=None) Include deleted streams
+            fields: (optional, default=None) Specify fields to return (None will choose API default fields)
             limit: (optional, default= 1000) Maximum number of  results to return
             offset: (optional, default= 0) Number of results to skip
 
@@ -181,7 +181,7 @@ class Client(object):
 
         return api_rfcx.streams(self.credentials.token, organizations,
                                 projects, created_by, name, keyword,
-                                only_public, only_deleted, fields, limit, offset)
+                                include_public, include_deleted, fields, limit, offset)
 
     def stream_segments(self,
                         stream,
