@@ -66,7 +66,7 @@ def __get_all_segments(token, stream_id, start, end):
 
 def __download_segment(token, save_path, stream_id, start_str, file_ext):
     audio_name = stream_id + '_' + start_str.replace('.000Z', '').replace('Z', '').replace(':', '-').replace('.', '-').replace('T', '_')
-    url = f'{api_rfcx.host}/streams/{stream_id}/segments/{start_str}/file'
+    url = f'{api_rfcx.base_url}/streams/{stream_id}/segments/{start_str}/file'
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
 

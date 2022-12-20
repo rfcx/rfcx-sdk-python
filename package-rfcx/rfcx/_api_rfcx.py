@@ -1,18 +1,18 @@
 import httplib2
 import json
 import logging
+import os
 from six.moves import http_client
 from six.moves import urllib
 
 logger = logging.getLogger(__name__)
 
-host = 'https://api.rfcx.org'  # TODO move to configuration
-
+base_url = os.getenv('RFCX_API_URL', 'https://api.rfcx.org')
 
 def stream_segments(token, stream_id, start, end, limit, offset):
     data = {'start': start, 'end': end, 'limit': limit, 'offset': offset}
     path = f'/streams/{stream_id}/segments'
-    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    url = f'{base_url}{path}?{urllib.parse.urlencode(data, True)}'
     return _request(url, token=token)
 
 
@@ -30,7 +30,7 @@ def annotations(token,
         data['stream_id'] = stream_id
 
     path = '/annotations'
-    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    url = f'{base_url}{path}?{urllib.parse.urlencode(data, True)}'
     return _request(url, token=token)
 
 
@@ -54,7 +54,7 @@ def detections(token,
         data['min_confidence'] = min_confidence
 
     path = '/detections'
-    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    url = f'{base_url}{path}?{urllib.parse.urlencode(data, True)}'
     return _request(url, token=token)
 
 
@@ -63,7 +63,7 @@ def stream(token, stream_id=None, fields=None):
     if fields is not None:
         data['fields[]'] = fields
     path = f'/streams/{stream_id}'
-    url = f'{host}{path}?{urllib.parse.urlencode(data, True)}'
+    url = f'{base_url}{path}?{urllib.parse.urlencode(data, True)}'
     return _request(url, token=token)
 
 
@@ -97,7 +97,7 @@ def streams(token,
         data['fields[]'] = fields
 
     path = '/streams'
-    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    url = f'{base_url}{path}?{urllib.parse.urlencode(data, True)}'
     return _request(url, token=token)
 
 
@@ -122,7 +122,7 @@ def projects(token,
         data['fields[]'] = fields
 
     path = '/projects'
-    url = '{}{}?{}'.format(host, path, urllib.parse.urlencode(data, True))
+    url = f'{base_url}{path}?{urllib.parse.urlencode(data, True)}'
     return _request(url, token=token)
 
 
