@@ -20,7 +20,7 @@ def csv_download(destination_path, csv_file_name, audio_extension='opus'):
             None.
 
         Raises:
-            TypeError: if missing required arguements.
+            TypeError: if missing required arguments.
     """
 
     if not os.path.exists(destination_path):  
@@ -45,7 +45,7 @@ def csv_slice_audio(csv_file_name, output_path, input_path_prefix=None, slice_se
             None.
 
         Raises:
-            TypeError: if missing required arguements.
+            TypeError: if missing required arguments.
             FileNotFoundError: if missing required audio file.
     """
     audio_info_list = list()
@@ -67,7 +67,7 @@ def praat_slice_audio(praat_file_name, output_path, input_path_prefix=None, slic
             None.
 
         Raises:
-            TypeError: if missing required arguements.
+            TypeError: if missing required arguments.
             FileNotFoundError: if missing required audio file.
     """
     audio_info_list = list()
@@ -134,7 +134,7 @@ def save_audio_file(destination_path, audio_id, source_audio_extension='opus'):
             None.
 
         Raises:
-            TypeError: if missing required arguements.
+            TypeError: if missing required arguments.
     
     """
     url = "https://assets.rfcx.org/audio/" + audio_id + "." + source_audio_extension

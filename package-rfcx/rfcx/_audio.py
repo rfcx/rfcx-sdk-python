@@ -87,7 +87,7 @@ def download_segment(token,
             None.
 
         Raises:
-            TypeError: if missing required arguements.
+            TypeError: if missing required arguments.
     """
     if isinstance(start, datetime.datetime):
         start = __generate_date_in_isoformat(start)
@@ -115,7 +115,7 @@ def download_segments(token,
             None.
 
         Raises:
-            TypeError: if missing required arguements.
+            TypeError: if missing required arguments
     """
     stream_resp = api_rfcx.stream(token, stream_id)
     if stream_resp is None:

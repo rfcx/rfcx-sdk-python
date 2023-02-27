@@ -46,8 +46,7 @@ class Client(object):
             None.
 
         Raises:
-            TypeError: if missing required arguements.
-
+            TypeError: if missing required arguments.
         """
         if not os.path.exists(dest_path):
             os.makedirs(dest_path)
