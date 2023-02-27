@@ -43,7 +43,7 @@ class Client(object):
             start_time: (required) Exact start timestamp (string or datetime) of the segment
             file_ext: (optional, default='wav') Audio file extension. Default to `wav`
         Returns:
-            None.
+            Path to downloaded file.
 
         Raises:
             TypeError: if missing required arguments.

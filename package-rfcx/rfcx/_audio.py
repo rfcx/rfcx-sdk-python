@@ -69,6 +69,7 @@ def __download_segment(token, save_path, stream_id, start_str, file_ext):
     url = f'{api_rfcx.base_url}/streams/{stream_id}/segments/{start_str}/file'
     local_path = __local_audio_file_path(save_path, audio_name, file_ext)
     __save_file(url, local_path, token)
+    return local_path
 
 
 def download_segment(token,
@@ -84,14 +85,14 @@ def download_segment(token,
             file_ext: Extension for saving audio files.
 
         Returns:
-            None.
+            Path to downloaded file.
 
         Raises:
             TypeError: if missing required arguments.
     """
     if isinstance(start, datetime.datetime):
         start = __generate_date_in_isoformat(start)
-    __download_segment(token, dest_path, stream_id, start, file_ext)
+    return __download_segment(token, dest_path, stream_id, start, file_ext)
 
 
 def download_segments(token,
