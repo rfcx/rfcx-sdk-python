@@ -217,24 +217,40 @@ class Client(object):
                                         end, limit, offset)
 
     def ingest_file(self, stream, filepath, timestamp):
-        """ Ingest an audio to RFCx
+        """ Ingest a single audio file
+
         Args:
             stream: (required) Identifies a stream/site.
             filepath: (required) Local file path to be ingest.
             timestamp: (required) Audio timestamp in datetime type.
 
         Returns:
-            None.
+            Ingest identifier
         """
 
         if not isinstance(timestamp, datetime.datetime):
-            print("timestamp is not type datetime")
-            return
+            raise Exception("timestamp is not type datetime")
 
         iso_timestamp = timestamp.replace(microsecond=0).isoformat() + 'Z'
 
         return ingest.ingest_file(self.credentials.token, stream, filepath,
                                   iso_timestamp)
+
+    def check_ingest(self, ingest_id, wait_for_completion = False):
+        """ Check the status of an ingest
+            Args:
+                ingest_id: (required) Ingest identifier (returned from `ingest_file`)
+                wait_for_completion: (optional, default=False) Keep waiting and checking until file is processed
+
+            Returns:
+                status: 10 is waiting (not yet processed), 20 is success, 3x is failure
+                status_name
+                failure_message
+
+            Raises:
+                Exception: on failed upload or ingest
+        """
+        return ingest.check_ingest(self.credentials.token, ingest_id, wait_for_completion)
 
     def annotations(self,
                     start=None,
