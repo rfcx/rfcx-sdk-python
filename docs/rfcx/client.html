@@ -79,6 +79,31 @@
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
+<dt id="rfcx.client.Client.check_ingest"><code class="name flex">
+<span>def <span class="ident">check_ingest</span></span>(<span>self, ingest_id, wait_for_completion=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check the status of an ingest</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>ingest_id</code></strong></dt>
+<dd>(required) Ingest identifier (returned from <code>ingest_file</code>)</dd>
+<dt><strong><code>wait_for_completion</code></strong></dt>
+<dd>(optional, default=False) Keep waiting and checking until file is processed</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>status</code></dt>
+<dd>10 is waiting (not yet processed), 20 is success, 3x is failure</dd>
+</dl>
+<p>status_name
+failure_message</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>on failed upload or ingest</dd>
+</dl></div>
+</dd>
 <dt id="rfcx.client.Client.detections"><code class="name flex">
 <span>def <span class="ident">detections</span></span>(<span>self, min_date=None, max_date=None, classifications=None, classifiers=None, streams=None, min_confidence=None, limit=50, offset=0)</span>
 </code></dt>
@@ -123,7 +148,7 @@
 <dd>(optional, default='wav') Audio file extension. Default to <code>wav</code></dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>None.</p>
+<p>Path to downloaded file.</p>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>TypeError</code></dt>
@@ -157,7 +182,7 @@
 <span>def <span class="ident">ingest_file</span></span>(<span>self, stream, filepath, timestamp)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Ingest an audio to RFCx</p>
+<div class="desc"><p>Ingest a single audio file</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>stream</code></strong></dt>
@@ -168,7 +193,7 @@
 <dd>(required) Audio timestamp in datetime type.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>None.</p></div>
+<p>Ingest identifier</p></div>
 </dd>
 <dt id="rfcx.client.Client.projects"><code class="name flex">
 <span>def <span class="ident">projects</span></span>(<span>self, keyword=None, created_by=None, only_public=None, only_deleted=None, fields=None, limit=1000, offset=0)</span>
@@ -294,6 +319,7 @@ created_by_id, created_at, updated_at, created_by, and country_name as default.<
 <ul class="two-column">
 <li><code><a title="rfcx.client.Client.annotations" href="#rfcx.client.Client.annotations">annotations</a></code></li>
 <li><code><a title="rfcx.client.Client.authenticate" href="#rfcx.client.Client.authenticate">authenticate</a></code></li>
+<li><code><a title="rfcx.client.Client.check_ingest" href="#rfcx.client.Client.check_ingest">check_ingest</a></code></li>
 <li><code><a title="rfcx.client.Client.detections" href="#rfcx.client.Client.detections">detections</a></code></li>
 <li><code><a title="rfcx.client.Client.download_segment" href="#rfcx.client.Client.download_segment">download_segment</a></code></li>
 <li><code><a title="rfcx.client.Client.download_segments" href="#rfcx.client.Client.download_segments">download_segments</a></code></li>
