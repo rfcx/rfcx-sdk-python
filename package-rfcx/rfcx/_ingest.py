@@ -79,4 +79,6 @@ def check_ingest(token, ingest_id, wait_for_completion = False):
             break
         time.sleep(5)
 
-    return status, statuses[status], resp['failureMessage']
+    status_name = statuses[status] if status in statuses else 'UNKNOWN'
+    failure_message = resp['failureMessage'] if 'failureMessage' in resp else None
+    return status, status_name, failure_message

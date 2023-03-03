@@ -49,5 +49,8 @@ print('Upload starting')
 ingest_id = client.ingest_file(stream['id'], filepath, timestamp)
 print('Uploaded')
 
-status, status_name, failure_message = client.check_ingest(ingest_id, wait_for_completion=True)
+status, status_name, failure_message = client.check_ingest(ingest_id)
 print(f'Ingest status: {status_name} {failure_message if status >= 30 else ""}')
+
+status, status_name, failure_message = client.check_ingest(ingest_id, wait_for_completion=True)
+print(f'Ingest status after wait: {status_name} {failure_message if status >= 30 else ""}')
