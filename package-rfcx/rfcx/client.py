@@ -9,7 +9,7 @@ from rfcx._authentication import Authentication
 
 
 class Client(object):
-    """Authenticate and perform requests against the RFCx platform"""
+    """Authenticate and perform requests against the RFCx/Arbimon platform"""
 
     def __init__(self):
         self.credentials = None
@@ -17,7 +17,7 @@ class Client(object):
     def authenticate(self,
                      persist=True,
                      persisted_credentials_path='.rfcx_credentials'):
-        """Authenticate an RFCx user to obtain a token
+        """Authenticate an RFCx/Arbimon user to obtain a token
 
         If you want to persist/load the credentials to/from a custom path then set `persisted_credentials_path`
         Args:
