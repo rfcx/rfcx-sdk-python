@@ -58,6 +58,14 @@ def detections(token,
     return _request(url, token=token)
 
 
+def classifications(token, keyword, levels, limit=1000, offset=0):
+    data = {'keyword': keyword, 'limit': limit, 'offset': offset}
+    if levels:
+        data['levels[]'] = levels
+    url = f'{base_url}/classifications?{urllib.parse.urlencode(data, True)}'
+    return _request(url, token=token)
+
+
 def stream(token, stream_id=None, fields=None):
     data = {}
     if fields is not None:

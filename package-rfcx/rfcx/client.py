@@ -2,6 +2,7 @@
 import datetime
 import os
 import rfcx._audio as audio
+import rfcx._classifiers as classifiers
 import rfcx._ingest as ingest
 import rfcx._util as util
 import rfcx._api_rfcx as api_rfcx
@@ -105,13 +106,13 @@ class Client(object):
         """Retrieve a list of projects
 
         Args:
-            keyword: (optional, default= None) Match project name with keyword
-            created_by: (optional, default= None) The project owner. Have 3 options: None, me, or collaborator id
-            only_public: (optional, default= None) Return only public projects
-            only_deleted: (optional, default= None) Return only deleted projects
-            fields: (optional, default=None) project information custom retrive fields.
-            limit: (optional, default= 1000) Maximum number of  results to return
-            offset: (optional, default= 0) Number of results to skip
+            keyword: (optional, default=None) Match project name with keyword
+            created_by: (optional, default=None) The project owner. Have 3 options: None, me, or collaborator id
+            only_public: (optional, default=None) Return only public projects
+            only_deleted: (optional, default=None) Return only deleted projects
+            fields: (optional, default=None) Return only specific fields
+            limit: (optional, default=1000) Maximum number of  results to return
+            offset: (optional, default=0) Number of results to skip
 
         Returns:
             List of projects contains id, name, is_public, and external_id as default.
@@ -155,16 +156,16 @@ class Client(object):
         """Retrieve a list of streams
 
         Args:
-            organizations: (optional, default= None) List of organization ids
-            projects: (optional, default= None) List of project ids
-            created_by: (optional, default= None) The stream owner. Have 3 options: None, me, or collaborators
-            name: (optional, default= None) Match exact streams with name (support *)
-            keyword: (optional, default= None) Match stream name with keyword
+            organizations: (optional, default=None) List of organization ids
+            projects: (optional, default=None) List of project ids
+            created_by: (optional, default=None) The stream owner. Have 3 options: None, me, or collaborators
+            name: (optional, default=None) Match exact streams with name (support *)
+            keyword: (optional, default=None) Match stream name with keyword
             include_public: (optional, default=None) Include streams from public projects (that you aren't a member of)
             include_deleted: (optional, default=None) Include deleted streams
             fields: (optional, default=None) Specify fields to return (None will choose API default fields)
-            limit: (optional, default= 1000) Maximum number of  results to return
-            offset: (optional, default= 0) Number of results to skip
+            limit: (optional, default=1000) Maximum number of  results to return
+            offset: (optional, default=0) Number of results to skip
 
         Returns:
             List of streams contains id, name, description, start, end, project_id, project
@@ -192,10 +193,10 @@ class Client(object):
 
         Args:
             stream: (required) Identifies a stream/site.
-            start: (optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            end: (optional, default= None) Maximum timestamp of the audio. If None then defaults to now.
-            limit: (optional, default= 50) Maximum results to return. Defaults to 50.
-            offset: (optional, default= 0) Offset of the audio group.
+            start: (optional, default=None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: (optional, default=None) Maximum timestamp of the audio. If None then defaults to now.
+            limit: (optional, default=50) Maximum results to return. Defaults to 50.
+            offset: (optional, default=0) Offset of the audio group.
 
         Returns:
             List of audio files contains id, start, end, and file extensions (meta data showing audio id and recorded timestamp).
@@ -262,8 +263,8 @@ class Client(object):
         """Retrieve a list of annotations
 
         Args:
-            start: (optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            end: (optional, default= None) Maximum timestamp of the audio. If None then defaults to now.
+            start: (optional, default=None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            end: (optional, default=None) Maximum timestamp of the audio. If None then defaults to now.
             classifications: (optional, default=None) List of classification names e.g. orca, chainsaw.
             stream: (optional, default=None) Limit results to a given stream id.
             limit: (optional, default=50) Maximum number of results to be return.
@@ -296,8 +297,8 @@ class Client(object):
         """Retrieve a list of detections
 
         Args:
-            min_date: (optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
-            max_date: (optional, default= None) Maximum timestamp of the audio. If None then defaults to now.
+            min_date: (optional, default=None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.
+            max_date: (optional, default=None) Maximum timestamp of the audio. If None then defaults to now.
             classifications: (optional, default=None) List of classification names e.g. orca, chainsaw.
             classifiers: (optional, default=None) List of classifier ids (integer) e.g. 93, 94.
             streams: (optional, default=None) List of stream ids.
@@ -320,3 +321,31 @@ class Client(object):
         return api_rfcx.detections(self.credentials.token, min_date, max_date,
                                    classifications, classifiers, streams,
                                    min_confidence, limit, offset)
+
+    def classifications(self, keyword, levels=None, limit=1000, offset=0):
+        """Get a list of classifications
+
+        Args:
+            keyword: (required) Match classification title or alternative names with keyword
+            levels: (option, default=None) List of classification types e.g. 'species' (None -> all types)
+            limit: (optional, default=1000) Maximum number of results to return
+            offset: (optional, default=0) Number of results to skip
+
+        Returns:
+            List of classifications containing value, title, image
+        """
+        return api_rfcx.classifications(self.credentials.token, keyword, levels, limit, offset)
+
+    def upload_classifier(self, filepath, name, version, classification_values) -> int:
+        """Upload a classifier (e.g. CNN)
+        
+        Args:
+            filepath: (required) Path of the local file (tar.gz) containing the model (currently only supports RFCx's tf2 format)
+            name: (required) Classifier name
+            version: (required) Classifier version
+            classification_values: (required) List of mappings from model class name to classification values
+
+        Returns:
+            Identifier for created classifier (int)
+        """
+        return classifiers.upload(self.credentials.token, filepath, name, version, classification_values)
