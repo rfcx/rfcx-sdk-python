@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 REQUIRED_PACKAGES = ['httplib2', 'six', 'requests', 'requests-toolbelt']
 
 setup(name='rfcx',
-      version='0.2.8',
+      version='0.3.0',
       url='https://github.com/rfcx/rfcx-sdk-python',
       license='None',
       author='Rainforest Connection',
       author_email='antony@rfcx.org',
       install_requires=REQUIRED_PACKAGES,
-      description='Python client SDK for connecting to the Rainforest Connection platform',
-      long_description="[See the documentation](https://rfcx.github.io/rfcx-sdk-python/) or [try an example](https://gist.github.com/antonyharfield/93231b3df86cd58fecee4f4d1ec9cc5b)",
+      description='Client SDK for the Rainforest Connection and Arbimon platforms',
+      long_description="[See the documentation](https://rfcx.github.io/rfcx-sdk-python/) and [try the examples](https://github.com/rfcx/rfcx-sdk-python/tree/master/package-rfcx)",
       long_description_content_type="text/markdown",
       packages=find_packages(exclude=['tests']),
       classifiers=[

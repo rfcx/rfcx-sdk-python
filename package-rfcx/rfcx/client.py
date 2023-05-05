@@ -337,7 +337,7 @@ class Client(object):
         return api_rfcx.classifications(self.credentials.token, keyword, levels, limit, offset)
 
     def upload_classifier(self, filepath, name, version, classification_values) -> int:
-        """Upload a classifier (e.g. CNN)
+        """Upload a classifier (a.k.a. model, CNN)
         
         Args:
             filepath: (required) Path of the local file (tar.gz) containing the model (currently only supports RFCx's tf2 format)

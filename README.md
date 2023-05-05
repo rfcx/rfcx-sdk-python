@@ -28,13 +28,13 @@ Or run a terminal and execute scripts inside the container:
 
 *To build a new version:*
 
-Increment the version in `package-rfcx/setup.py` and `package-rfcx-utils/setup.py`.
+Increment the version in `package-rfcx/setup.py` and `package-rfcxtf/setup.py`.
 
 Create a distribution (source and wheel):
 
 - `cd package-rfcx` and `python setup.py sdist bdist_wheel`
 
-- `cd package-rfcx-utils` and `python setup.py sdist bdist_wheel`
+- `cd package-rfcxtf` and `python setup.py sdist bdist_wheel`
 
 The generated files will be in your `dist` of each directory
 
@@ -42,7 +42,7 @@ Alternatively through docker:
 
 `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx/setup.py sdist bdist_wheel`
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx-utils/setup.py sdist bdist_wheel`
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcxtf/setup.py sdist bdist_wheel`
 
 ### Uploading to Python Package Index (PyPI)
 
@@ -50,7 +50,7 @@ First time only:
 
 `pip install --user --upgrade twine`
 
-Upload:
+Upload (from `package-rfcx` or `package-rfcxtf` folders):
 
 `twine upload dist/*` (or if it fails to find twine then `python -m twine upload dist/*`)
 

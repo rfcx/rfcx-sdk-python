@@ -48,9 +48,9 @@
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>start</code></strong></dt>
-<dd>(optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dd>(optional, default=None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
 <dt><strong><code>end</code></strong></dt>
-<dd>(optional, default= None) Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dd>(optional, default=None) Maximum timestamp of the audio. If None then defaults to now.</dd>
 <dt><strong><code>classifications</code></strong></dt>
 <dd>(optional, default=None) List of classification names e.g. orca, chainsaw.</dd>
 <dt><strong><code>stream</code></strong></dt>
@@ -104,6 +104,25 @@ failure_message</p>
 <dd>on failed upload or ingest</dd>
 </dl></div>
 </dd>
+<dt id="rfcx.client.Client.classifications"><code class="name flex">
+<span>def <span class="ident">classifications</span></span>(<span>self, keyword, levels=None, limit=1000, offset=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get a list of classifications</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>keyword</code></strong></dt>
+<dd>(required) Match classification title or alternative names with keyword</dd>
+<dt><strong><code>levels</code></strong></dt>
+<dd>(option, default=None) List of classification types e.g. 'species' (None -&gt; all types)</dd>
+<dt><strong><code>limit</code></strong></dt>
+<dd>(optional, default=1000) Maximum number of results to return</dd>
+<dt><strong><code>offset</code></strong></dt>
+<dd>(optional, default=0) Number of results to skip</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of classifications containing value, title, image</p></div>
+</dd>
 <dt id="rfcx.client.Client.detections"><code class="name flex">
 <span>def <span class="ident">detections</span></span>(<span>self, min_date=None, max_date=None, classifications=None, classifiers=None, streams=None, min_confidence=None, limit=50, offset=0)</span>
 </code></dt>
@@ -112,9 +131,9 @@ failure_message</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>min_date</code></strong></dt>
-<dd>(optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dd>(optional, default=None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
 <dt><strong><code>max_date</code></strong></dt>
-<dd>(optional, default= None) Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dd>(optional, default=None) Maximum timestamp of the audio. If None then defaults to now.</dd>
 <dt><strong><code>classifications</code></strong></dt>
 <dd>(optional, default=None) List of classification names e.g. orca, chainsaw.</dd>
 <dt><strong><code>classifiers</code></strong></dt>
@@ -203,20 +222,20 @@ failure_message</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>keyword</code></strong></dt>
-<dd>(optional, default= None) Match project name with keyword</dd>
+<dd>(optional, default=None) Match project name with keyword</dd>
 <dt><strong><code>created_by</code></strong></dt>
-<dd>(optional, default= None) The project owner. Have 3 options: None, me, or collaborator id</dd>
+<dd>(optional, default=None) The project owner. Have 3 options: None, me, or collaborator id</dd>
 <dt><strong><code>only_public</code></strong></dt>
-<dd>(optional, default= None) Return only public projects</dd>
+<dd>(optional, default=None) Return only public projects</dd>
 <dt><strong><code>only_deleted</code></strong></dt>
-<dd>(optional, default= None) Return only deleted projects</dd>
+<dd>(optional, default=None) Return only deleted projects</dd>
 <dt><strong><code>fields</code></strong></dt>
-<dd>(optional, default=None) project information custom retrive fields.</dd>
+<dd>(optional, default=None) Return only specific fields</dd>
 <dt><strong><code>limit</code></strong></dt>
-<dd>(optional, default= 1000) Maximum number of
+<dd>(optional, default=1000) Maximum number of
 results to return</dd>
 <dt><strong><code>offset</code></strong></dt>
-<dd>(optional, default= 0) Number of results to skip</dd>
+<dd>(optional, default=0) Number of results to skip</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>List of projects contains id, name, is_public, and external_id as default.</p></div>
@@ -248,13 +267,13 @@ created_by_id, created_at, updated_at, and created_by fields as default.</p></di
 <dt><strong><code>stream</code></strong></dt>
 <dd>(required) Identifies a stream/site.</dd>
 <dt><strong><code>start</code></strong></dt>
-<dd>(optional, default= None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
+<dd>(optional, default=None) Minimum timestamp of the audio. If None then defaults to exactly 30 days ago.</dd>
 <dt><strong><code>end</code></strong></dt>
-<dd>(optional, default= None) Maximum timestamp of the audio. If None then defaults to now.</dd>
+<dd>(optional, default=None) Maximum timestamp of the audio. If None then defaults to now.</dd>
 <dt><strong><code>limit</code></strong></dt>
-<dd>(optional, default= 50) Maximum results to return. Defaults to 50.</dd>
+<dd>(optional, default=50) Maximum results to return. Defaults to 50.</dd>
 <dt><strong><code>offset</code></strong></dt>
-<dd>(optional, default= 0) Offset of the audio group.</dd>
+<dd>(optional, default=0) Offset of the audio group.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>List of audio files contains id, start, end, and file extensions (meta data showing audio id and recorded timestamp).</p></div>
@@ -267,15 +286,15 @@ created_by_id, created_at, updated_at, and created_by fields as default.</p></di
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>organizations</code></strong></dt>
-<dd>(optional, default= None) List of organization ids</dd>
+<dd>(optional, default=None) List of organization ids</dd>
 <dt><strong><code>projects</code></strong></dt>
-<dd>(optional, default= None) List of project ids</dd>
+<dd>(optional, default=None) List of project ids</dd>
 <dt><strong><code>created_by</code></strong></dt>
-<dd>(optional, default= None) The stream owner. Have 3 options: None, me, or collaborators</dd>
+<dd>(optional, default=None) The stream owner. Have 3 options: None, me, or collaborators</dd>
 <dt><strong><code>name</code></strong></dt>
-<dd>(optional, default= None) Match exact streams with name (support *)</dd>
+<dd>(optional, default=None) Match exact streams with name (support *)</dd>
 <dt><strong><code>keyword</code></strong></dt>
-<dd>(optional, default= None) Match stream name with keyword</dd>
+<dd>(optional, default=None) Match stream name with keyword</dd>
 <dt><strong><code>include_public</code></strong></dt>
 <dd>(optional, default=None) Include streams from public projects (that you aren't a member of)</dd>
 <dt><strong><code>include_deleted</code></strong></dt>
@@ -283,15 +302,34 @@ created_by_id, created_at, updated_at, and created_by fields as default.</p></di
 <dt><strong><code>fields</code></strong></dt>
 <dd>(optional, default=None) Specify fields to return (None will choose API default fields)</dd>
 <dt><strong><code>limit</code></strong></dt>
-<dd>(optional, default= 1000) Maximum number of
+<dd>(optional, default=1000) Maximum number of
 results to return</dd>
 <dt><strong><code>offset</code></strong></dt>
-<dd>(optional, default= 0) Number of results to skip</dd>
+<dd>(optional, default=0) Number of results to skip</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>List of streams contains id, name, description, start, end, project_id, project
 is_public, latitude, longitude, altitude, timezone, max_sample_rate, external_id,
 created_by_id, created_at, updated_at, created_by, and country_name as default.</p></div>
+</dd>
+<dt id="rfcx.client.Client.upload_classifier"><code class="name flex">
+<span>def <span class="ident">upload_classifier</span></span>(<span>self, filepath, name, version, classification_values) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Upload a classifier (a.k.a. model, CNN)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filepath</code></strong></dt>
+<dd>(required) Path of the local file (tar.gz) containing the model (currently only supports RFCx's tf2 format)</dd>
+<dt><strong><code>name</code></strong></dt>
+<dd>(required) Classifier name</dd>
+<dt><strong><code>version</code></strong></dt>
+<dd>(required) Classifier version</dd>
+<dt><strong><code>classification_values</code></strong></dt>
+<dd>(required) List of mappings from model class name to classification values</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Identifier for created classifier (int)</p></div>
 </dd>
 </dl>
 </dd>
@@ -320,6 +358,7 @@ created_by_id, created_at, updated_at, created_by, and country_name as default.<
 <li><code><a title="rfcx.client.Client.annotations" href="#rfcx.client.Client.annotations">annotations</a></code></li>
 <li><code><a title="rfcx.client.Client.authenticate" href="#rfcx.client.Client.authenticate">authenticate</a></code></li>
 <li><code><a title="rfcx.client.Client.check_ingest" href="#rfcx.client.Client.check_ingest">check_ingest</a></code></li>
+<li><code><a title="rfcx.client.Client.classifications" href="#rfcx.client.Client.classifications">classifications</a></code></li>
 <li><code><a title="rfcx.client.Client.detections" href="#rfcx.client.Client.detections">detections</a></code></li>
 <li><code><a title="rfcx.client.Client.download_segment" href="#rfcx.client.Client.download_segment">download_segment</a></code></li>
 <li><code><a title="rfcx.client.Client.download_segments" href="#rfcx.client.Client.download_segments">download_segments</a></code></li>
@@ -328,6 +367,7 @@ created_by_id, created_at, updated_at, created_by, and country_name as default.<
 <li><code><a title="rfcx.client.Client.stream" href="#rfcx.client.Client.stream">stream</a></code></li>
 <li><code><a title="rfcx.client.Client.stream_segments" href="#rfcx.client.Client.stream_segments">stream_segments</a></code></li>
 <li><code><a title="rfcx.client.Client.streams" href="#rfcx.client.Client.streams">streams</a></code></li>
+<li><code><a title="rfcx.client.Client.upload_classifier" href="#rfcx.client.Client.upload_classifier">upload_classifier</a></code></li>
 </ul>
 </li>
 </ul>
