@@ -4,3 +4,6 @@ pandas
 httplib2
 pydub
 pdoc3
+tensorflow
+pysndfile
+numpy

@@ -28,39 +28,33 @@ Or run a terminal and execute scripts inside the container:
 
 *To build a new version:*
 
-Increment the version in `package-rfcx/setup.py` and `package-rfcxtf/setup.py`.
+1. Increment the version in the package setup.py files (for whichever package you want to distribute, e.g. `package-rfcx/setup.py` or `package-rfcxtf/setup.py`).
 
-Create a distribution (source and wheel):
+2. Remove existing files `rm -r dist`
 
-- `cd package-rfcx` and `python setup.py sdist bdist_wheel`
+3. Create a distribution (source and wheel) through docker for each package you want to distribute:
 
-- `cd package-rfcxtf` and `python setup.py sdist bdist_wheel`
+   `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx/setup.py sdist bdist_wheel`
 
-The generated files will be in your `dist` of each directory
+   `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcxtf/setup.py sdist bdist_wheel`
 
-Alternatively through docker:
+   `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcxutils/setup.py sdist bdist_wheel`
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx/setup.py sdist bdist_wheel`
+4. Upload to PyPI:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcxtf/setup.py sdist bdist_wheel`
+   First time only, install twine `pip install --user --upgrade twine`
 
-### Uploading to Python Package Index (PyPI)
+   Then
 
-First time only:
+   `twine upload dist/*` (or if it fails to find twine then `python -m twine upload dist/*`)
 
-`pip install --user --upgrade twine`
-
-Upload (from `package-rfcx` or `package-rfcxtf` folders):
-
-`twine upload dist/*` (or if it fails to find twine then `python -m twine upload dist/*`)
-
-Enter your username and password.
+   Enter your username and password.
 
 ### Testing
 
 #### Unit tests
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx-utils/setup.py test`
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcxutils/setup.py test`
 
 #### Package tests
 
@@ -85,13 +79,13 @@ The documentation is generated from docstrings in the source code. To generate i
 
 and then run:
 
-`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python pdoc3 --html --force --template-dir docs_src/template --output-dir docs package-rfcx/rfcx package-rfcx-utils/rfcx-utils`
+`docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python pdoc3 --html --force --template-dir docs_src/template --output-dir docs package-rfcx/rfcx package-rfcxtf/rfcxtf package-rfcxutils/rfcxutils`
 
 *Note: For windows, please switch to linux base terminal or Powershell before running the command*
 
 To generate a PDF:
 
 ```
-docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python pdoc3 --pdf --force --template-dir docs_src/template package-rfcx/rfcx package-rfcx-utils/rfcx-utils > docs.md
+docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python pdoc3 --pdf --force --template-dir docs_src/template package-rfcx/rfcx package-rfcxtf/rfcxtf package-rfcxutils/rfcxutils > docs.md
 docker run --rm -v ${PWD}:/data pandoc/latex docs.md -o docs.pdf
 ```
