@@ -1,0 +1,2 @@
+class UnexpectedAudioFormat(Exception):
+    pass
