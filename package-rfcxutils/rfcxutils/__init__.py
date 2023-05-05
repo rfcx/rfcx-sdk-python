@@ -12,4 +12,4 @@ from .audio import save_audio_file
 from .audio import praat_slice_audio
 from .audio import csv_slice_audio
 from .audio import csv_download
-name = "rfcx-utils"
+name = "rfcxutils"
