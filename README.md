@@ -30,15 +30,15 @@ Or run a terminal and execute scripts inside the container:
 
 1. Increment the version in the package setup.py files (for whichever package you want to distribute, e.g. `package-rfcx/setup.py` or `package-rfcxtf/setup.py`).
 
-2. Remove existing files `rm -r dist`
+2. Remove existing files `rm -r package-rfcx*/dist`
 
 3. Create a distribution (source and wheel) through docker for each package you want to distribute:
 
-   `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcx/setup.py sdist bdist_wheel`
+   `docker run -it --rm -v ${PWD}/package-rfcx:/usr/src/app rfcx-sdk-python python setup.py sdist bdist_wheel`
 
-   `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcxtf/setup.py sdist bdist_wheel`
+   `docker run -it --rm -v ${PWD}/package-rfcxtf:/usr/src/app rfcx-sdk-python python setup.py sdist bdist_wheel`
 
-   `docker run -it --rm -v ${PWD}:/usr/src/app rfcx-sdk-python python package-rfcxutils/setup.py sdist bdist_wheel`
+   `docker run -it --rm -v ${PWD}/package-rfcxutils:/usr/src/app rfcx-sdk-python python setup.py sdist bdist_wheel`
 
 4. Upload to PyPI:
 
@@ -46,7 +46,7 @@ Or run a terminal and execute scripts inside the container:
 
    Then
 
-   `twine upload dist/*` (or if it fails to find twine then `python -m twine upload dist/*`)
+   `twine upload package-rfcx/dist/*` (or if it fails to find twine then `python -m twine upload package-rfcx*/dist/*`)
 
    Enter your username and password.
 
