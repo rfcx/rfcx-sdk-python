@@ -1,10 +1,10 @@
 """## Getting started
 
-1. Get the latest version from [Rainforest Connection's Github releases page](https://github.com/rfcx/rfcx-sdk-python/releases)
+1. Install the package `pip install rfcx`
 
-2. Install with pip: `pip install rfcx-x.x.x-py3-none-any.whl`
+2. Use `import rfcx`
 
-3. Use `import rfcx`
+3. Create a client `client = rfcx.Client()` and authenticate `client.authenticate()` using your RFCx or Arbimon account
 """
 
 from .client import Client
