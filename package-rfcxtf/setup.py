@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 REQUIRED_PACKAGES = ['tensorflow', 'pysndfile', 'numpy']
 
 setup(name='rfcxtf',
-      version='0.0.2',
+      version='0.0.3',
       url='https://github.com/rfcx/rfcx-sdk-python',
       license='None',
       author='Rainforest Connection',

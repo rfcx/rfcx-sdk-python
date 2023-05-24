@@ -1,9 +1,9 @@
-import rfcxtf
+from rfcxtf import ClassifierTF2
 
 model_path = './example/model'
 audio_path = './example/guardian_audio.wav'
 
-model = rfcxtf.ClassifierTF2(model_path)
+model = ClassifierTF2(model_path)
 print('Model loaded')
 print(' - class names =', model.class_names)
 print(' - sample rate =', model.sample_rate)

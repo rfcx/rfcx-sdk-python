@@ -46,7 +46,7 @@ Or run a terminal and execute scripts inside the container:
 
    Then
 
-   `twine upload package-rfcx/dist/*` (or if it fails to find twine then `python -m twine upload package-rfcx*/dist/*`)
+   `twine upload package-rfcx*/dist/*` (or if it fails to find twine then `python -m twine upload package-rfcx*/dist/*`)
 
    Enter your username and password.
 
