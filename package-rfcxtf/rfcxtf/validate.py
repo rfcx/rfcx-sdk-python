@@ -6,8 +6,6 @@ import tensorflow as tf
 from typing import Optional
 from .utils.io import read_wav
 
-# TODO Work in progress!
-
 def validate(saved_model_package_path: str) -> Optional[str]:
     # Must have tar.gz extension
     if not saved_model_package_path.endswith('.tar.gz'):
@@ -80,6 +78,3 @@ def validate(saved_model_package_path: str) -> Optional[str]:
 
     # Looks good
     return None
-
-
-    
