@@ -8,7 +8,7 @@ if len(sys.argv) != 2:
 
 model_path = sys.argv[1]
 timing_start = time.time()
-result = validate(model_path)
+result = validate(model_path, 'example/guardian_audio.wav')
 if result is None:
     print(f'Passed validation: {time.time() - timing_start:.3f}s')
 else:

@@ -6,7 +6,7 @@ import tensorflow as tf
 from typing import Optional
 from .utils.io import read_wav
 
-def validate(saved_model_package_path: str) -> Optional[str]:
+def validate(saved_model_package_path: str, audio_file_path: str) -> Optional[str]:
     # Must have tar.gz extension
     if not saved_model_package_path.endswith('.tar.gz'):
         return 'Package must be a .tar.gz file'
@@ -66,7 +66,7 @@ def validate(saved_model_package_path: str) -> Optional[str]:
         return 'Length of `class_names` in `metadata` must match size of `score` output'
 
     # Can score an input
-    data, _ = read_wav('example/guardian_audio.wav')
+    data, _ = read_wav(audio_file_path)
     waveform_values = np.array(data, dtype=np.float32).reshape((1, len(data), 1)) 
     try:
         _ = next(iter(score_fn(
