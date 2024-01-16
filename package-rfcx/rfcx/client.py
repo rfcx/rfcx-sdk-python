@@ -343,7 +343,7 @@ class Client(object):
             filepath: (required) Path of the local file (tar.gz) containing the model (currently only supports RFCx's tf2 format)
             name: (required) Classifier name
             version: (required) Classifier version
-            classification_values: (required) List of mappings from model class name to classification values
+            classification_values: (required) List of mappings from model class name to classification values to ignore threshold (from_model_class_name[:to_classification_value][:ignore_threshold])
 
         Returns:
             Identifier for created classifier (int)
